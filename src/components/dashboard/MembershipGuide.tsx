@@ -1,7 +1,17 @@
+import { useState } from 'react';
 import styles from './MembershipGuide.module.css';
 import LocationSection from '../common/LocationSection';
 
 export default function MembershipGuide() {
+  const [showToast, setShowToast] = useState(false);
+
+  const handleCopy = () => {
+    const accountNumber = "3333143159646";
+    navigator.clipboard.writeText(accountNumber).then(() => {
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2000);
+    });
+  };
   return (
     <div className={styles.container}>
       {/* Hero Section */}
@@ -77,19 +87,19 @@ export default function MembershipGuide() {
         <LocationSection />
       </section>
 
-      {/* Contact & Info */}
-      <section className={`${styles.card} ${styles.contactCard}`}>
-        <h2 className={`${styles.cardTitle} ${styles.contactTitle}`}>📞 연락처 및 정보</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '0.5rem' }}>
-          <div className={styles.contactItem}>
-            <span className={styles.contactLabel}>문의</span>
-            <span className={styles.contactValue}>스톤 010.7209.2468</span>
-          </div>
-          <div className={styles.contactItem}>
-            <span className={styles.contactLabel}>계좌안내</span>
-            <span className={`${styles.contactValue} ${styles.bankValue}`}>카카오뱅크 3333-14-3159646 홍병석</span>
-          </div>
+      {/* Bank Account Section */}
+      <section className={styles.bankCard}>
+        <h2 className={styles.accountTitle}>💰 계좌 안내</h2>
+        <div className={styles.bankAccountBox}>
+          <span className={styles.bankName}>카카오뱅크 (홍병석)</span>
+          <span className={styles.accountNumber}>3333-14-3159646</span>
+          <button className={styles.copyBtn} onClick={handleCopy}>
+            복사하기
+          </button>
         </div>
+        <p style={{ fontSize: '0.85rem', color: '#8b95a1', textAlign: 'center', margin: 0 }}>
+          복사 후 은행 앱에서 붙여넣어 주세요.
+        </p>
       </section>
 
       {/* Host / Contact Section like TangoStay */}
@@ -100,7 +110,7 @@ export default function MembershipGuide() {
           </div>
           <div>
             <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#191f28' }}>Stone | 홍병석</h3>
-            <p style={{ margin: '0.2rem 0 0', fontSize: '0.9rem', color: '#4e5968' }}>Tango Instructor</p>
+            <p style={{ margin: '0.2rem 0 0', fontSize: '0.9rem', color: '#4e5968' }}>Tango Instructor (010.7209.2468)</p>
           </div>
         </div>
 
@@ -126,6 +136,12 @@ export default function MembershipGuide() {
           <p style={{ fontSize: '0.75rem', color: '#adb5bd' }}>© {new Date().getFullYear()} FreestyleTango. All rights reserved.</p>
         </div>
       </section>
+
+      {showToast && (
+        <div className={styles.copyToast}>
+          계좌번호가 복사되었습니다
+        </div>
+      )}
     </div>
   );
 }
