@@ -15,6 +15,7 @@ interface ClassDetailProps {
   curriculum: string;
   imageUrl?: string;
   teacherProfile?: string;
+  videoUrl?: string;
   onRegister: (id: string) => void;
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
@@ -33,6 +34,7 @@ export default function ClassDetail({
   price, 
   imageUrl,
   teacherProfile,
+  videoUrl,
   onRegister,
   onEdit,
   onDelete
@@ -63,6 +65,20 @@ export default function ClassDetail({
             강사: {teacher1} {teacher2 && `& ${teacher2}`}
           </div>
         </header>
+        
+        {videoUrl && (
+          <section>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#191f28', marginBottom: '1rem' }}>미리보기 영상</h3>
+            <div style={{ width: '100%', borderRadius: '14px', overflow: 'hidden', background: '#000', lineHeight: 0 }}>
+              <video 
+                src={videoUrl} 
+                controls 
+                style={{ width: '100%', maxHeight: '400px' }} 
+                playsInline
+              />
+            </div>
+          </section>
+        )}
 
         <section>
           <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#191f28', marginBottom: '1rem' }}>수업 소개</h3>

@@ -271,6 +271,7 @@ export default function Home() {
               price={selectedClass.price}
               imageUrl={selectedClass.imageUrl}
               teacherProfile={selectedClass.teacherProfile}
+              videoUrl={selectedClass.videoUrl}
               onRegister={handleRegisterClick}
               onEdit={isAdminLogged ? handleEdit : undefined}
               onDelete={isAdminLogged ? handleDelete : undefined}

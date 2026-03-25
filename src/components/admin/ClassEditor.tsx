@@ -2,6 +2,8 @@
 
 import React, { useState, useRef } from 'react';
 import styles from './ClassEditor.module.css';
+import { storage } from '@/lib/firebase';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 interface ClassEditorProps {
   initialData?: any;
@@ -21,6 +23,7 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
     time: initialData?.time || '',
     maxCount: initialData?.maxCount || 10,
     teacherProfile: initialData?.teacherProfile || '',
+    videoUrl: initialData?.videoUrl || '',
   });
 
   const [dates, setDates] = useState<string[]>(
@@ -51,7 +54,9 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
   );
   
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -108,6 +113,41 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
       setIsUploading(false);
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check size (rough limit 50MB for 30s)
+    if (file.size > 50 * 1024 * 1024) {
+      alert("동영상 파일이 너무 큽니다. (최대 50MB)");
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    const storageRef = ref(storage, `videos/${Date.now()}_${file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on('state_changed', 
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setUploadProgress(Math.round(progress));
+      }, 
+      (error) => {
+        console.error("Upload failed", error);
+        alert("동영상 업로드 중 오류가 발생했습니다.");
+        setIsUploading(false);
+      }, 
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          setFormData(prev => ({ ...prev, videoUrl: downloadURL }));
+          setIsUploading(false);
+        });
+      }
+    );
   };
 
   const handleDateChange = (index: number, value: string) => {
@@ -192,6 +232,42 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
           ref={fileInputRef} 
           style={{ display: 'none' }} 
           onChange={handleImageUpload} 
+        />
+      </div>
+
+      {/* 1.1 Video Upload */}
+      <div className={styles.inputGroup}>
+        <label>수업 동영상 업로드 (30초 내외 추천)</label>
+        <div 
+          className={styles.imageUploadBox}
+          style={{ height: '120px', borderStyle: 'dashed' }}
+          onClick={() => videoInputRef.current?.click()}
+        >
+          {isUploading && uploadProgress < 100 ? (
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '0.9rem', marginBottom: '0.5rem' }}>동영상 업로드 중... ({uploadProgress}%)</div>
+              <div style={{ width: '200px', height: '6px', background: '#f2f4f6', borderRadius: '3px', overflow: 'hidden' }}>
+                <div style={{ width: `${uploadProgress}%`, height: '100%', background: '#3182f6' }}></div>
+              </div>
+            </div>
+          ) : formData.videoUrl ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ fontSize: '1.5rem' }}>✅</span>
+              <div>
+                <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>동영상 업로드 완료</div>
+                <div style={{ fontSize: '0.8rem', color: '#8b95a1' }}>클릭하여 변경</div>
+              </div>
+            </div>
+          ) : (
+            <span style={{ fontSize: '0.9rem', color: '#8b95a1' }}>여기를 클릭하여 동영상 파일 선택</span>
+          )}
+        </div>
+        <input 
+          type="file" 
+          accept="video/*" 
+          ref={videoInputRef} 
+          style={{ display: 'none' }} 
+          onChange={handleVideoUpload} 
         />
       </div>
 
