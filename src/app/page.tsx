@@ -266,9 +266,13 @@ export default function Home() {
         {selectedClass && (
           modalView === 'detail' ? (
             <ClassDetail 
-              {...selectedClass} 
-              onRegister={handleRegisterClick} 
-              onEdit={handleEdit}
+              {...selectedClass}
+              curriculum={selectedClass.curriculum}
+              price={selectedClass.price}
+              imageUrl={selectedClass.imageUrl}
+              teacherProfile={selectedClass.teacherProfile}
+              onRegister={handleRegisterClick}
+              onEdit={isAdminLogged ? handleEdit : undefined}
               onDelete={isAdminLogged ? handleDelete : undefined}
             />
           ) : (

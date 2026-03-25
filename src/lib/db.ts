@@ -25,6 +25,7 @@ export interface TangoClass {
   femaleCount: number;
   maxCount: number;
   imageUrl?: string;
+  teacherProfile?: string;
 }
 
 const COLLECTION_NAME = 'tango_classes';

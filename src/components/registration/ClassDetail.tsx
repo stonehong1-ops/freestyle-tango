@@ -13,8 +13,8 @@ interface ClassDetailProps {
   teacher2: string;
   description: string;
   curriculum: string;
-  price: string;
   imageUrl?: string;
+  teacherProfile?: string;
   onRegister: (id: string) => void;
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
@@ -32,6 +32,7 @@ export default function ClassDetail({
   curriculum,
   price, 
   imageUrl,
+  teacherProfile,
   onRegister,
   onEdit,
   onDelete
@@ -52,7 +53,14 @@ export default function ClassDetail({
           <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#3182f6', marginBottom: '0.5rem' }}>{level} · {type}</div>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#191f28', marginBottom: '0.5rem' }}>{title}</h2>
           <div style={{ color: '#4e5968', fontSize: '0.95rem' }}>{time}</div>
-          <div style={{ color: '#8b95a1', fontSize: '0.9rem', marginTop: '0.5rem' }}>강사: {teacher1} {teacher2 && `& ${teacher2}`}</div>
+          <div style={{ color: '#8b95a1', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+            강사: {teacher1} {teacher2 && `& ${teacher2}`}
+          </div>
+          {teacherProfile && (
+            <div style={{ color: '#3182f6', fontSize: '0.85rem', marginTop: '0.25rem', fontWeight: 500 }}>
+              "{teacherProfile}"
+            </div>
+          )}
         </header>
 
         <section>

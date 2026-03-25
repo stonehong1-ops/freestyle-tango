@@ -20,6 +20,7 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
     price: initialData?.price || '',
     time: initialData?.time || '',
     maxCount: initialData?.maxCount || 10,
+    teacherProfile: initialData?.teacherProfile || '',
   });
 
   const [dates, setDates] = useState<string[]>(
@@ -214,6 +215,18 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
           <label>강사 2</label>
           <input className={styles.input} name="teacher2" value={formData.teacher2} onChange={handleChange} placeholder="이름 (없으면 비움)" />
         </div>
+      </div>
+
+      <div className={styles.inputGroup}>
+        <label>강사 프로필 (약 30자 이내)</label>
+        <input 
+          className={styles.input} 
+          name="teacherProfile" 
+          value={formData.teacherProfile} 
+          onChange={handleChange} 
+          placeholder="예: 10년 경력의 베테랑 강사, 밀롱가 전문"
+          maxLength={50}
+        />
       </div>
 
       {/* 2. Automated Dates (Fixed 4 Weeks) */}
