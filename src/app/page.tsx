@@ -57,16 +57,6 @@ export default function Home() {
       
       const savedClasses = localStorage.getItem('my_tango_classes');
       if (savedClasses) setAppliedClassIds(new Set(JSON.parse(savedClasses)));
-
-      // One-time fix for existing genderless registrations
-      (async () => {
-        try {
-          const { fixExistingGenders } = await import('@/lib/db');
-          await fixExistingGenders();
-        } catch (e) {
-          console.error("Gender Fix Error:", e);
-        }
-      })();
     };
     loadUser();
     
@@ -163,16 +153,32 @@ export default function Home() {
       {activeTab === 'home' && (
         <>
           <header className={styles.header}>
-            {currentUser && (
-              <div className={styles.userBadge}>
-                {currentUser.nickname}님 환영합니다✨
-              </div>
-            )}
             <div className={styles.titleCard}>
               <div className={styles.titleLine1}>프리스타일탱고</div>
               <div className={styles.titleLine2}>
                 <span className={styles.highlight}>4월</span> 수업신청
               </div>
+            </div>
+
+            <div 
+              className={styles.profileArea}
+              onClick={() => requireIdentity(() => {})}
+            >
+              {currentUser ? (
+                <>
+                  <div className={styles.profileText}>
+                    <span className={styles.nickname}>{currentUser.nickname}</span>
+                  </div>
+                  <div className={`${styles.profilePhoto} ${currentUser.gender === 'male' ? styles.male : styles.female}`} />
+                </>
+              ) : (
+                <>
+                  <div className={styles.profileText}>
+                    <span className={styles.loginRequired}>로그인필요</span>
+                  </div>
+                  <div className={styles.profilePhotoPlaceholder} />
+                </>
+              )}
             </div>
           </header>
 
@@ -334,7 +340,8 @@ export default function Home() {
       <FullscreenModal
         isOpen={showIdentityForm}
         onClose={() => setShowIdentityForm(false)}
-        title="수업 신청하기"
+        title="정보 입력"
+        isBottomSheet={true}
       >
         <IdentityForm 
           onClose={() => setShowIdentityForm(false)} 

@@ -92,44 +92,46 @@ export default function RegistrationAdmin() {
         </button>
       </div>
       <div style={{ overflowX: 'auto' }}>
-        <thead>
-          <tr style={{ background: '#f9fafb', borderBottom: '2px solid #eee' }}>
-            <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>날짜</th>
-            <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>닉네임</th>
-            <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>신청수업</th>
-            <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>구분</th>
-            <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>연락처</th>
-          </tr>
-        </thead>
-        <tbody>
-          {registrations.length === 0 ? (
-            <tr>
-              <td colSpan={5} style={{ padding: '3rem', textAlign: 'center', color: '#adb5bd' }}>신청 내역이 없습니다.</td>
+        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
+          <thead>
+            <tr style={{ background: '#f9fafb', borderBottom: '2px solid #eee' }}>
+              <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>날짜</th>
+              <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>닉네임</th>
+              <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>신청수업</th>
+              <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>구분</th>
+              <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>연락처</th>
             </tr>
-          ) : (
-            registrations.map(reg => (
-              <tr key={reg.id} style={{ borderBottom: '1px solid #f2f4f6' }}>
-                <td style={{ padding: '1rem', color: '#4e5968' }}>{formatDate(reg.date)}</td>
-                <td style={{ padding: '1rem', fontWeight: 700, color: '#191f28' }}>{reg.nickname}</td>
-                <td style={{ padding: '1rem', color: '#4e5968', maxWidth: '300px' }}>{getClassTitles(reg.classIds)}</td>
-                <td style={{ padding: '1rem' }}>
-                  <span style={{ 
-                    padding: '0.3rem 0.6rem', 
-                    borderRadius: '8px', 
-                    fontSize: '0.8rem',
-                    background: reg.type === '6개월 멤버쉽' ? '#fff0f2' : reg.type === '1개월 신청' ? '#eef3ff' : '#f2f4f6',
-                    color: reg.type === '6개월 멤버쉽' ? '#f04452' : reg.type === '1개월 신청' ? '#3182f6' : '#4e5968',
-                    fontWeight: 600
-                  }}>
-                    {reg.type}
-                  </span>
-                </td>
-                <td style={{ padding: '1rem', color: '#8b95a1', fontSize: '0.8rem' }}>{reg.phone}</td>
+          </thead>
+          <tbody>
+            {registrations.length === 0 ? (
+              <tr>
+                <td colSpan={5} style={{ padding: '3rem', textAlign: 'center', color: '#adb5bd' }}>신청 내역이 없습니다.</td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              registrations.map(reg => (
+                <tr key={reg.id} style={{ borderBottom: '1px solid #f2f4f6' }}>
+                  <td style={{ padding: '1rem', color: '#4e5968' }}>{formatDate(reg.date)}</td>
+                  <td style={{ padding: '1rem', fontWeight: 700, color: '#191f28' }}>{reg.nickname}</td>
+                  <td style={{ padding: '1rem', color: '#4e5968', maxWidth: '300px' }}>{getClassTitles(reg.classIds)}</td>
+                  <td style={{ padding: '1rem' }}>
+                    <span style={{ 
+                      padding: '0.3rem 0.6rem', 
+                      borderRadius: '8px', 
+                      fontSize: '0.8rem',
+                      background: reg.type === '6개월 멤버쉽' ? '#fff0f2' : reg.type === '1개월 신청' ? '#eef3ff' : '#f2f4f6',
+                      color: reg.type === '6개월 멤버쉽' ? '#f04452' : reg.type === '1개월 신청' ? '#3182f6' : '#4e5968',
+                      fontWeight: 600
+                    }}>
+                      {reg.type}
+                    </span>
+                  </td>
+                  <td style={{ padding: '1rem', color: '#8b95a1', fontSize: '0.8rem' }}>{reg.phone}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
