@@ -21,9 +21,9 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
     imageUrl: initialData?.imageUrl || '',
     price: initialData?.price || '',
     time: initialData?.time || '',
-    maxCount: initialData?.maxCount || 10,
-    teacherProfile: initialData?.teacherProfile || '',
     videoUrl: initialData?.videoUrl || '',
+    maleCount: initialData?.maleCount || 0,
+    femaleCount: initialData?.femaleCount || 0,
   });
 
   const [dates, setDates] = useState<string[]>(
@@ -396,6 +396,39 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
               {t}
             </button>
           ))}
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+        <div className={styles.inputGroup} style={{ flex: 1 }}>
+          <label>리더 인원 (남성)</label>
+          <input 
+            type="number" 
+            className={styles.input} 
+            name="maleCount" 
+            value={formData.maleCount} 
+            onChange={handleChange} 
+          />
+        </div>
+        <div className={styles.inputGroup} style={{ flex: 1 }}>
+          <label>팔로워 인원 (여성)</label>
+          <input 
+            type="number" 
+            className={styles.input} 
+            name="femaleCount" 
+            value={formData.femaleCount} 
+            onChange={handleChange} 
+          />
+        </div>
+        <div className={styles.inputGroup} style={{ flex: 1 }}>
+          <label>최대 정원</label>
+          <input 
+            type="number" 
+            className={styles.input} 
+            name="maxCount" 
+            value={formData.maxCount} 
+            onChange={handleChange} 
+          />
         </div>
       </div>
 
