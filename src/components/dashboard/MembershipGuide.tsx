@@ -115,8 +115,8 @@ export default function MembershipGuide() {
           <a href="https://open.kakao.com/o/glYslQvc" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
             <div style={{ padding: '1.25rem', background: '#FEE500', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
               <img src="/images/kakaotalk_openchat.png" alt="KakaoTalk" style={{ width: '48px', height: '48px', borderRadius: '12px' }} />
-              <span style={{ color: '#3c1e1e', fontWeight: 800, fontSize: '0.9rem', lineHeight: 1.5, textAlign: 'left' }}>
-                신청하신 분은 &apos;오픈톡방&apos;에 반드시 들어오셔야<br/>수업 안내를 받으실 수 있어요! (클릭)
+              <span style={{ color: '#3c1e1e', fontWeight: 800, fontSize: '0.82rem', lineHeight: 1.4, textAlign: 'left' }}>
+                신청하신 분은 &apos;오픈톡방&apos;에 반드시 들어오셔야 수업 안내를 받으실 수 있어요! (클릭)
               </span>
             </div>
           </a>
