@@ -158,14 +158,6 @@
   padding: 1rem 1rem 0;
 }
 
-.titleCard {
-  background: #ffffff;
-  border-radius: 0 0 32px 32px;
-  padding: 3.5rem 2rem 2.5rem;
-  width: 100%;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  display: flex;
 .pageHeader {
   display: flex;
   justify-content: space-between;
