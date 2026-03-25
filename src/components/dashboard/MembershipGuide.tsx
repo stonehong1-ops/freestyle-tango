@@ -1,5 +1,5 @@
-import React from 'react';
 import styles from './MembershipGuide.module.css';
+import LocationSection from '../common/LocationSection';
 
 export default function MembershipGuide() {
   return (
@@ -72,14 +72,15 @@ export default function MembershipGuide() {
         </ul>
       </section>
 
+      {/* Location Map Section */}
+      <section className={styles.card}>
+        <LocationSection />
+      </section>
+
       {/* Contact & Info */}
       <section className={`${styles.card} ${styles.contactCard}`}>
-        <h2 className={`${styles.cardTitle} ${styles.contactTitle}`}>📍 프리스타일 탱고</h2>
+        <h2 className={`${styles.cardTitle} ${styles.contactTitle}`}>📞 연락처 및 정보</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '0.5rem' }}>
-          <div className={styles.contactItem}>
-            <span className={styles.contactLabel}>오시는 길</span>
-            <span className={styles.contactValue} style={{ textAlign: 'right' }}>마포구 합정동 386-37<br/>어반오아시스빌딩 B2</span>
-          </div>
           <div className={styles.contactItem}>
             <span className={styles.contactLabel}>문의</span>
             <span className={styles.contactValue}>스톤 010.7209.2468</span>

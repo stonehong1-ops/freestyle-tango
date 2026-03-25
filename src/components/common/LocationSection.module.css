@@ -1,0 +1,63 @@
+.container {
+  margin: 1.5rem 0;
+  padding: 0;
+}
+
+.title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #191f28;
+  margin-bottom: 1rem;
+  padding-left: 0.5rem;
+  border-left: 4px solid #3182f6;
+}
+
+.addressBox {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  color: #4e5968;
+  background: #f2f4f6;
+  padding: 1.25rem;
+  border-radius: 16px;
+}
+
+.mapWrapper {
+  width: 100%;
+  margin-bottom: 1rem;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  background-color: #eaeaea;
+  height: 250px;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.mapBtn {
+  flex: 1;
+  padding: 0.8rem;
+  text-align: center;
+  border-radius: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.mapBtn:active {
+  transform: scale(0.96);
+}
+
+.naver {
+  background-color: #03C75A;
+  color: #fff;
+}
+
+.kakao {
+  background-color: #FEE500;
+  color: #3c1e1e;
+}

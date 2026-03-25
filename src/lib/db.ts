@@ -31,6 +31,7 @@ export interface TangoClass {
   videoUrl?: string;
   dates?: string[];
   timeStr?: string;
+  targetMonth?: string; // YYYY-MM
 }
 
 export interface Registration {
@@ -41,6 +42,10 @@ export interface Registration {
   role: 'leader' | 'follower';
   classIds: string[];
   type: '개별신청' | '1개월 신청' | '6개월 멤버쉽';
+  month?: string; // YYYY-MM
+  status?: 'waiting' | 'paid';
+  paidAt?: string;
+  amount?: number;
 }
 
 const COLLECTION_NAME = 'tango_classes';
@@ -70,21 +75,23 @@ export const deleteClass = async (id: string) => {
 const REG_COLLECTION = 'registrations';
 
 export const addRegistration = async (regData: Omit<Registration, 'id'>) => {
-  // Check if a registration with this phone number already exists
-  const q = query(collection(db, REG_COLLECTION), where('phone', '==', regData.phone), limit(1));
-  const querySnapshot = await getDocs(q);
-  
-  if (!querySnapshot.empty) {
-    // Update existing record
-    const existingDoc = querySnapshot.docs[0];
-    const docRef = doc(db, REG_COLLECTION, existingDoc.id);
-    // Cast to any because the exact type mapping for Omit can sometimes be tricky with updateDoc
-    // but here regData is exactly the fields we want to update.
-    return await updateDoc(docRef, regData as object);
-  } else {
-    // Add new record
-    return await addDoc(collection(db, REG_COLLECTION), regData);
-  }
+  // We ALWAYS add a new record now to maintain history
+  // Fallback month if not provided (should be provided by the UI)
+  const dataToSave = {
+    ...regData,
+    month: regData.month || new Date().toISOString().substring(0, 7),
+    status: regData.status || 'waiting'
+  };
+  return await addDoc(collection(db, REG_COLLECTION), dataToSave);
+};
+
+export const updatePaymentStatus = async (id: string, amount: number) => {
+  const docRef = doc(db, REG_COLLECTION, id);
+  return await updateDoc(docRef, {
+    status: 'paid',
+    paidAt: new Date().toISOString(),
+    amount: amount
+  });
 };
 
 export const getRegistrations = async (): Promise<Registration[]> => {
@@ -99,9 +106,40 @@ export const getRegistrations = async (): Promise<Registration[]> => {
 // Counts are now calculated on the fly from registrations in the UI components
 
 export const getRegistrationByPhone = async (phone: string): Promise<Registration | null> => {
-  const q = query(collection(db, REG_COLLECTION), where('phone', '==', phone), limit(1));
+  const q = query(
+    collection(db, REG_COLLECTION), 
+    where('phone', '==', phone), 
+    orderBy('date', 'desc'),
+    limit(1)
+  );
   const querySnapshot = await getDocs(q);
   if (querySnapshot.empty) return null;
   const docSnap = querySnapshot.docs[0];
   return { id: docSnap.id, ...docSnap.data() } as Registration;
+};
+
+export const getAllRegistrationsByPhone = async (phone: string): Promise<Registration[]> => {
+  const q = query(
+    collection(db, REG_COLLECTION), 
+    where('phone', '==', phone), 
+    orderBy('date', 'desc')
+  );
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(docSnap => ({
+    id: docSnap.id,
+    ...docSnap.data()
+  } as Registration));
+};
+
+export const getClassesByMonth = async (month: string): Promise<TangoClass[]> => {
+  const q = query(
+    collection(db, COLLECTION_NAME), 
+    where('targetMonth', '==', month),
+    orderBy('time', 'asc')
+  );
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(docSnap => ({
+    id: docSnap.id,
+    ...docSnap.data()
+  } as TangoClass));
 };

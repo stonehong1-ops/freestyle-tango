@@ -1,46 +1,40 @@
-import React, { useState, useEffect } from 'react';
-import { TangoClass } from '@/lib/db';
-import styles from './RegistrationStatus.module.css';
-
 interface Props {
   classes: TangoClass[];
+  selectedMonth: string; // From Home page
   onClose: () => void;
   requireIdentity?: (action: () => void) => void;
 }
 
-export default function RegistrationStatus({ classes, onClose, requireIdentity }: Props) {
+export default function RegistrationStatus({ classes, selectedMonth, onClose, requireIdentity }: Props) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isSuccess, setIsSuccess] = useState(false);
+  const [dbRegs, setDbRegs] = useState<Registration[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   // Remove manual name/phone state as it's handled by IdentityForm
 
 
   useEffect(() => {
     const loadData = async () => {
-      // 1. Load from local first
+      setIsLoading(true);
+      // 1. Load from local first (Drafts)
       const localSaved = localStorage.getItem('my_tango_classes');
-      const combinedIds = new Set<string>();
       if (localSaved) {
-        JSON.parse(localSaved).forEach((id: string) => combinedIds.add(id));
+        setSelectedIds(new Set(JSON.parse(localSaved)));
       }
 
-      // 2. Try fetching from DB if user is identified
+      // 2. Fetch history from DB 
       const savedUser = localStorage.getItem('ft_user');
       if (savedUser) {
         try {
           const { phone } = JSON.parse(savedUser);
-          const { getRegistrationByPhone } = await import('@/lib/db');
-          const dbReg = await getRegistrationByPhone(phone);
-          if (dbReg) {
-            dbReg.classIds.forEach(id => combinedIds.add(id));
-            // Sync combined back to local storage
-            localStorage.setItem('my_tango_classes', JSON.stringify(Array.from(combinedIds)));
-            window.dispatchEvent(new Event('ft_user_updated'));
-          }
+          const { getAllRegistrationsByPhone } = await import('@/lib/db');
+          const regs = await getAllRegistrationsByPhone(phone);
+          setDbRegs(regs);
         } catch (error) {
           console.error("DB Fetch Error:", error);
         }
       }
-      setSelectedIds(combinedIds);
+      setIsLoading(false);
     };
     
     loadData();
@@ -66,54 +60,97 @@ export default function RegistrationStatus({ classes, onClose, requireIdentity }
 
   const handleRegister = async (regType: string) => {
     const action = async () => {
-      // 1. Get user info from ft_user
       const savedUser = localStorage.getItem('ft_user');
-      if (!savedUser) {
-        alert("사용자 정보를 찾을 수 없습니다. 다시 시도해주세요.");
-        return;
-      }
+      if (!savedUser) return;
+      
       const { nickname, phone, role: rawRole } = JSON.parse(savedUser);
       const role = (rawRole || '').replace(/"/g, '');
 
-      // 2. Prepare registration data
       const typeDisplay = 
         regType === 'month6' ? '6개월 멤버쉽' :
         regType === 'month1' ? '1개월 신청' : '개별신청';
 
       try {
         const { addRegistration } = await import('@/lib/db');
-        
-        // A. 신청 내역 저장
         await addRegistration({
           date: new Date().toISOString(),
           nickname,
           phone,
           role,
           classIds: Array.from(selectedIds),
-          type: typeDisplay as '개별신청' | '1개월 신청' | '6개월 멤버쉽'
+          type: typeDisplay as '개별신청' | '1개월 신청' | '6개월 멤버쉽',
+          month: selectedMonth, // Tie to the current selected month from Home
+          status: 'waiting'
         });
 
-        // B. (No longer needed: counts are calculated on the fly from registrations)
-
-        // 3. Success handling
         localStorage.removeItem('my_tango_classes');
         setSelectedIds(new Set());
         window.dispatchEvent(new Event('ft_user_updated'));
-        window.dispatchEvent(new Event('ft_classes_updated'));
-        window.dispatchEvent(new Event('ft_registrations_updated'));
         setIsSuccess(true);
       } catch (error) {
         console.error("Registration Error:", error);
-        alert("신청 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+        alert("신청 중 오류가 발생했습니다.");
       }
     };
 
-    if (requireIdentity) {
-      requireIdentity(action);
-    } else {
-      action();
+    if (requireIdentity) requireIdentity(action);
+    else action();
+  };
+
+  const handlePaymentConfirm = async (id: string, type: string, classCount: number) => {
+    if (!window.confirm('입금을 완료하셨습니까?')) return;
+    
+    // Logic for amount:
+    // 개별신청: 120,000
+    // 1개월/6개월: 180,000
+    const amount = type === '개별신청' ? 120000 : 180000;
+    
+    try {
+      const { updatePaymentStatus } = await import('@/lib/db');
+      await updatePaymentStatus(id, amount);
+      alert('입금 확인 요청이 완료되었습니다.');
+      // Refresh
+      const savedUser = localStorage.getItem('ft_user');
+      if (savedUser) {
+        const { phone } = JSON.parse(savedUser);
+        const { getAllRegistrationsByPhone } = await import('@/lib/db');
+        const regs = await getAllRegistrationsByPhone(phone);
+        setDbRegs(regs);
+      }
+    } catch (e) {
+      console.error(e);
+      alert('오류가 발생했습니다.');
     }
   };
+
+  const calculateMembershipMonth = (currentReg: Registration) => {
+    if (currentReg.type !== '6개월 멤버쉽') return null;
+    const pastMemberRegs = dbRegs
+      .filter(r => r.type === '6개월 멤버쉽')
+      .sort((a, b) => a.date.localeCompare(b.date));
+    
+    const index = pastMemberRegs.findIndex(r => r.id === currentReg.id);
+    return index !== -1 ? index + 1 : 1;
+  };
+
+  const toggleSelection = (id: string) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) newSelected.delete(id);
+    else newSelected.add(id);
+    setSelectedIds(newSelected);
+    localStorage.setItem('my_tango_classes', JSON.stringify(Array.from(newSelected)));
+    window.dispatchEvent(new Event('ft_user_updated'));
+  };
+
+  // Filter classes for the current selection month
+  const activeMonthClasses = classes.filter(c => (c.targetMonth || '2026-04') === selectedMonth);
+
+  const grouped = activeMonthClasses.reduce((acc, cls) => {
+    const dayName = cls.time.match(/([월화수목금토일]요일)/)?.[1] || '기타';
+    if (!acc[dayName]) acc[dayName] = [];
+    acc[dayName].push(cls);
+    return acc;
+  }, {} as Record<string, TangoClass[]>);
 
   if (isSuccess) {
     return (
@@ -142,33 +179,100 @@ export default function RegistrationStatus({ classes, onClose, requireIdentity }
 
   return (
     <div className={styles.container}>
-      <p className={styles.headerDesc}>기존에 신청한 수업은 체크되어 있습니다. 원하는 수업을 체크하여 한 번에 신청해 보세요.</p>
-      
-      <div className={styles.listContainer}>
-        {daysOrdered.map(day => {
-          if (!grouped[day] || grouped[day].length === 0) return null;
-          return (
-            <div key={day} className={styles.dayGroup}>
-              <h3 className={styles.dayTitle}>{day}</h3>
-              <div className={styles.classList}>
-                {grouped[day].map(cls => (
-                  <label key={cls.id} className={styles.classItem}>
-                    <input 
-                      type="checkbox" 
-                      className={styles.checkbox}
-                      checked={selectedIds.has(cls.id)}
-                      onChange={() => toggleSelection(cls.id)}
-                    />
-                    <div className={styles.classInfo}>
-                      <div className={styles.classTitle}>{cls.title}</div>
-                      <div className={styles.classMeta}>{cls.time} | 강사: {cls.teacher1}</div>
+      {/* 1. History Section */}
+      <div className={styles.historySection}>
+        <h3 className={styles.sectionTitle}>📅 나의 신청 내역</h3>
+        {isLoading ? (
+          <div className={styles.loadingSmall}>데이터를 불러오는 중...</div>
+        ) : dbRegs.length === 0 ? (
+          <div className={styles.emptyHistory}>아직 신청 내역이 없습니다.</div>
+        ) : (
+          <div className={styles.historyList}>
+            {dbRegs.map(reg => {
+              const monthName = reg.month ? reg.month.split('-')[1] : '4';
+              const memberMonth = calculateMembershipMonth(reg);
+              const regClasses = classes.filter(c => reg.classIds.includes(c.id));
+
+              return (
+                <div key={reg.id} className={styles.historyCard}>
+                  <div className={styles.cardHeader}>
+                    <div className={styles.cardTitle}>
+                      <span className={styles.monthTag}>{monthName}월</span>
+                      수업 신청 완료
                     </div>
-                  </label>
-                ))}
+                    <div className={`${styles.statusBadge} ${reg.status === 'paid' ? styles.statusPaid : styles.statusWaiting}`}>
+                      {reg.status === 'paid' ? '입금 확인됨' : '입금 대기중'}
+                    </div>
+                  </div>
+                  
+                  <div className={styles.regInfo}>
+                    신청일: {new Date(reg.date).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  </div>
+
+                  <div className={styles.regClasses}>
+                    {regClasses.map(c => (
+                      <div key={c.id} className={styles.regClassInner}>
+                        • {c.title} ({c.time.split(' ')[0]})
+                      </div>
+                    ))}
+                  </div>
+
+                  {reg.status === 'paid' ? (
+                    <div className={styles.paidArea}>
+                      <div className={styles.paidMessage}>
+                        {reg.type} {reg.amount?.toLocaleString()}원을 입금함
+                        {memberMonth && <span className={styles.memberTag}> ({memberMonth}개월차)</span>}
+                      </div>
+                      <div className={styles.paidDate}>확인일: {new Date(reg.paidAt!).toLocaleString()}</div>
+                    </div>
+                  ) : (
+                    <button 
+                      className={styles.confirmPayBtn}
+                      onClick={() => handlePaymentConfirm(reg.id, reg.type, reg.classIds.length)}
+                    >
+                      입금완료 버튼 클릭
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      <div className={styles.divider} />
+
+      {/* 2. Current Selection Section */}
+      <div className={styles.selectionSection}>
+        <h3 className={styles.sectionTitle}>✍️ {selectedMonth.split('-')[1]}월 신규 신청하기</h3>
+        <p className={styles.sectionDesc}>원하는 수업을 체크하고 하단 버튼을 눌러주세요.</p>
+        
+        <div className={styles.listContainer}>
+          {daysOrdered.map(day => {
+            if (!grouped[day] || grouped[day].length === 0) return null;
+            return (
+              <div key={day} className={styles.dayGroup}>
+                <h4 className={styles.dayTitle}>{day}</h4>
+                <div className={styles.classList}>
+                  {grouped[day].map(cls => (
+                    <label key={cls.id} className={styles.classItem}>
+                      <input 
+                        type="checkbox" 
+                        className={styles.checkbox}
+                        checked={selectedIds.has(cls.id)}
+                        onChange={() => toggleSelection(cls.id)}
+                      />
+                      <div className={styles.classInfo}>
+                        <div className={styles.classTitle}>{cls.title}</div>
+                        <div className={styles.classMeta}>{cls.time} | 강사: {cls.teacher1}</div>
+                      </div>
+                    </label>
+                  ))}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
       <div className={styles.footer}>

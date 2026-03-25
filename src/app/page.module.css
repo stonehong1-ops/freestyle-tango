@@ -95,7 +95,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 0 0 2.5rem 0;
+  margin: 0 0 1.5rem 0;
   z-index: 10;
 }
 
@@ -159,4 +159,36 @@
   .titleCard { padding: 4rem 1rem 3rem; border-radius: 0 0 32px 32px; }
   .titleLine1 { font-size: 1.4rem; }
   .titleLine2 { font-size: 1.4rem; }
+}
+
+.monthTabs {
+  display: flex;
+  gap: 0.6rem;
+  padding: 0 1.5rem 1.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.monthTabs::-webkit-scrollbar {
+  display: none;
+}
+
+.monthTab {
+  padding: 0.6rem 1.2rem;
+  border-radius: 100px;
+  border: none;
+  background: #f2f4f6;
+  color: #8b95a1;
+  font-weight: 700;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.monthTab.activeMonth {
+  background: #3182f6;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(49, 130, 246, 0.2);
 }

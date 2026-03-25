@@ -3,6 +3,8 @@
   flex-direction: column;
   height: 100%;
   background: #f9fafb;
+  overflow-y: auto;
+  padding-bottom: 180px; /* Space for fixed footer */
 }
 .headerDesc {
   padding: 1.5rem;
@@ -13,10 +15,9 @@
   margin: 0;
 }
 .listContainer {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1.5rem;
-  padding-bottom: 12rem; /* space for footer buttons */
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 .dayGroup {
   margin-bottom: 2rem;
@@ -108,8 +109,158 @@
   color: #fff;
 }
 
-/* Success UI */
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #191f28;
+  margin-bottom: 1rem;
+}
+
+.sectionDesc {
+  font-size: 0.9rem;
+  color: #8b95a1;
+  margin-bottom: 1.5rem;
+}
+
+.historySection, .selectionSection {
+  padding: 2rem 1.5rem;
+}
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.historyCard {
+  background: #fff;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+  border: 1px solid #f2f4f6;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 800;
+  color: #191f28;
+  font-size: 1.1rem;
+}
+
+.monthTag {
+  background: #e8f3fc;
+  color: #3182f6;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.statusBadge {
+  padding: 6px 12px;
+  border-radius: 100px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.statusPaid {
+  background: #e6fcf5;
+  color: #0ca678;
+}
+
+.statusWaiting {
+  background: #fff0f6;
+  color: #d6336c;
+}
+
+.regInfo {
+  font-size: 0.85rem;
+  color: #adb5bd;
+  margin-bottom: 1rem;
+}
+
+.regClasses {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.regClassInner {
+  font-size: 0.95rem;
+  color: #4e5968;
+  font-weight: 500;
+}
+
+.paidArea {
+  border-top: 1px dashed #eef3f6;
+  padding-top: 1rem;
+}
+
+.paidMessage {
+  font-weight: 700;
+  color: #191f28;
+  font-size: 0.95rem;
+  margin-bottom: 0.4rem;
+}
+
+.memberTag {
+  color: #3182f6;
+}
+
+.paidDate {
+  font-size: 0.8rem;
+  color: #adb5bd;
+}
+
+.confirmPayBtn {
+  width: 100%;
+  padding: 1rem;
+  background: #fff0f6;
+  color: #d6336c;
+  border: 1px solid #ffd1e1;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.confirmPayBtn:active {
+  background: #ffdeeb;
+  transform: scale(0.98);
+}
+
+.divider {
+  height: 8px;
+  background: #f2f4f6;
+}
+
+.loadingSmall, .emptyHistory {
+  padding: 2rem;
+  text-align: center;
+  color: #adb5bd;
+  font-size: 0.9rem;
+}
+
+/* Success UI remains largely same but ensure it's atop */
 .successContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 200;
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -21,6 +21,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<{ nickname: string, phone: string, role?: 'leader' | 'follower' } | null>(null);
   const [appliedClassIds, setAppliedClassIds] = useState<Set<string>>(new Set());
+  const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().substring(0, 7)); // e.g. "2026-04" 
 
   // Navigation state
   const [activeTab, setActiveTab] = useState<string>('home');
@@ -144,7 +145,18 @@ export default function Home() {
     setModalView('detail');
   };
 
-  const groupedClasses = classes.reduce((acc, cls) => {
+  // Calculate available months from classes
+  const availableMonths = Array.from(new Set([
+    '2026-04', // Default minimum for transition
+    ...classes.map(c => c.targetMonth).filter(Boolean) as string[]
+  ])).sort();
+
+  const filteredClasses = classes.filter(cls => {
+    const month = cls.targetMonth || '2026-04';
+    return month === selectedMonth;
+  });
+
+  const groupedClasses = filteredClasses.reduce((acc, cls) => {
     const dayName = cls.time.match(/([월화수목금토일]요일)/)?.[1] || '기타';
     if (!acc[dayName]) acc[dayName] = [];
     acc[dayName].push(cls);
@@ -152,6 +164,8 @@ export default function Home() {
   }, {} as Record<string, TangoClass[]>);
 
   const selectedClass = classes.find(c => c.id === selectedClassId);
+  const currentMonthStr = new Date().toISOString().substring(0, 7);
+  const isPastMonth = selectedMonth < currentMonthStr;
 
   return (
     <div className={styles.container}>
@@ -162,8 +176,21 @@ export default function Home() {
             <div className={styles.titleCard}>
               <div className={styles.titleLine1}>프리스타일탱고</div>
               <div className={styles.titleLine2}>
-                <span className={styles.highlight}>4월</span> 수업신청
+                <span className={styles.highlight}>{selectedMonth.split('-')[1]}월</span> 수업신청
               </div>
+            </div>
+
+            {/* Month Selector Tabs */}
+            <div className={styles.monthTabs}>
+              {availableMonths.map(m => (
+                <button 
+                  key={m} 
+                  className={`${styles.monthTab} ${selectedMonth === m ? styles.activeMonth : ''}`}
+                  onClick={() => setSelectedMonth(m)}
+                >
+                  {m.split('-')[1]}월
+                </button>
+              ))}
             </div>
 
             <div 
@@ -204,8 +231,8 @@ export default function Home() {
           <main className={styles.mainContent}>
             {isLoading ? (
               <div style={{ textAlign: 'center', padding: '3rem', color: '#8b95a1' }}>로딩 중...</div>
-            ) : classes.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '3rem', color: '#8b95a1' }}>등록된 수업이 없습니다.</div>
+            ) : filteredClasses.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '3rem', color: '#8b95a1' }}>{selectedMonth.split('-')[1]}월에 등록된 수업이 없습니다.</div>
             ) : (
               ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일', '기타']
                 .filter(day => groupedClasses[day] && groupedClasses[day].length > 0)
@@ -258,6 +285,7 @@ export default function Home() {
         <main className={styles.mainContent} style={{ paddingTop: '0', paddingLeft: 0, paddingRight: 0 }}>
           <RegistrationStatus 
             classes={classes} 
+            selectedMonth={selectedMonth}
             onClose={() => setActiveTab('home')} 
             requireIdentity={requireIdentity}
           />
@@ -361,7 +389,7 @@ export default function Home() {
               teacherProfile={selectedClass.teacherProfile}
               videoUrl={selectedClass.videoUrl}
               registrations={registrations.filter(r => r.classIds.includes(selectedClass.id))}
-              onRegister={handleRegisterClick}
+              onRegister={isPastMonth ? () => alert('지나간 달의 수업은 신청할 수 없습니다.') : handleRegisterClick}
               onEdit={isAdminLogged ? handleEdit : undefined}
               onDelete={isAdminLogged ? handleDelete : undefined}
             />

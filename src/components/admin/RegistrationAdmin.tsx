@@ -7,6 +7,17 @@ export default function RegistrationAdmin() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [classes, setClasses] = useState<TangoClass[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [adminMonth, setAdminMonth] = useState(new Date().toISOString().substring(0, 7)); // e.g. "2026-04"
+
+  const availableMonths = Array.from(new Set([
+    '2026-04',
+    ...registrations.map(r => r.month).filter(Boolean) as string[]
+  ])).sort();
+
+  const filteredRegs = registrations.filter(reg => {
+    const m = reg.month || '2026-04';
+    return m === adminMonth;
+  });
 
   useEffect(() => {
     fetchData();
@@ -46,9 +57,27 @@ export default function RegistrationAdmin() {
 
   return (
     <div style={{ background: '#fff', borderRadius: '16px', padding: '1rem', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem', gap: '0.5rem' }}>
-
-        {/* Counts are now calculated on the fly, no recalibration needed */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', gap: '1rem' }}>
+        <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#191f28' }}>
+          {adminMonth.split('-')[1]}월 신청 명단 ({filteredRegs.length}명)
+        </h3>
+        <select 
+          value={adminMonth} 
+          onChange={(e) => setAdminMonth(e.target.value)}
+          style={{ 
+            padding: '0.6rem 1rem', 
+            borderRadius: '12px', 
+            border: '2px solid #3182f6', 
+            background: '#fff',
+            color: '#3182f6',
+            fontWeight: 700,
+            cursor: 'pointer'
+          }}
+        >
+          {availableMonths.map(m => (
+            <option key={m} value={m}>{m.split('-')[0]}년 {m.split('-')[1]}월</option>
+          ))}
+        </select>
       </div>
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
@@ -59,16 +88,17 @@ export default function RegistrationAdmin() {
               <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>역할</th>
               <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>신청수업</th>
               <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>구분</th>
+              <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>입금상태</th>
               <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>연락처</th>
             </tr>
           </thead>
           <tbody>
-            {registrations.length === 0 ? (
+            {filteredRegs.length === 0 ? (
               <tr>
-                <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: '#adb5bd' }}>신청 내역이 없습니다.</td>
+                <td colSpan={7} style={{ padding: '3rem', textAlign: 'center', color: '#adb5bd' }}>{adminMonth.split('-')[1]}월 신청 내역이 없습니다.</td>
               </tr>
             ) : (
-              registrations.map(reg => (
+              filteredRegs.map(reg => (
                 <tr key={reg.id} style={{ borderBottom: '1px solid #f2f4f6' }}>
                   <td style={{ padding: '1rem', color: '#4e5968' }}>{formatDate(reg.date)}</td>
                   <td style={{ padding: '1rem', fontWeight: 700, color: '#191f28' }}>{reg.nickname}</td>
@@ -101,6 +131,18 @@ export default function RegistrationAdmin() {
                     }}>
                       {reg.type}
                     </span>
+                  </td>
+                  <td style={{ padding: '1rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                      <span style={{ 
+                        fontSize: '0.8rem',
+                        fontWeight: 700,
+                        color: reg.status === 'paid' ? '#0ca678' : '#d6336c'
+                      }}>
+                        {reg.status === 'paid' ? '완료' : '대기'}
+                      </span>
+                      {reg.amount && <span style={{ fontSize: '0.7rem', color: '#8b95a1' }}>{reg.amount.toLocaleString()}원</span>}
+                    </div>
                   </td>
                   <td style={{ padding: '1rem', color: '#8b95a1', fontSize: '0.8rem' }}>{reg.phone}</td>
                 </tr>

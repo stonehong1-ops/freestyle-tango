@@ -27,6 +27,7 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
     leaderCount: initialData?.leaderCount || 0,
     followerCount: initialData?.followerCount || 0,
     maxCount: initialData?.maxCount || 15,
+    targetMonth: initialData?.targetMonth || new Date().toISOString().substring(0, 7),
   });
 
   const [dates, setDates] = useState<string[]>(
@@ -228,6 +229,24 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
 
   return (
     <div className={styles.form}>
+      
+      {/* 0. Target Month Selection */}
+      <div className={styles.inputGroup}>
+        <label style={{ color: '#3182f6', fontWeight: 800 }}>대상 월 (해당 월의 수업 목록에 노출됩니다)</label>
+        <select 
+          className={styles.input} 
+          name="targetMonth" 
+          value={formData.targetMonth} 
+          onChange={handleChange}
+          style={{ border: '2px solid #3182f6' }}
+        >
+          {Array.from({ length: 12 }, (_, i) => {
+            const d = new Date(2026, i, 1);
+            const val = d.toISOString().substring(0, 7);
+            return <option key={val} value={val}>{d.getFullYear()}년 {i + 1}월</option>;
+          })}
+        </select>
+      </div>
       
       {/* 1. Image Upload */}
       <div className={styles.inputGroup}>
