@@ -1,4 +1,4 @@
-'use client'; // Production deployment trigger v1.0.1
+'use client'; // Production deployment trigger v1.0.2
 
 import React, { useState, useEffect } from 'react';
 import ClassCard from '@/components/registration/ClassCard';
@@ -11,6 +11,7 @@ import MembershipGuide from '@/components/dashboard/MembershipGuide';
 import RegistrationStatus from '@/components/dashboard/RegistrationStatus';
 import RegistrationAdmin from '@/components/admin/RegistrationAdmin';
 import MilongaLucy from '@/components/dashboard/MilongaLucy';
+import StatisticsView from '@/components/admin/StatisticsView';
 import { getClasses, addClass, updateClass, deleteClass, getRegistrations, TangoClass, Registration, CURRENT_REGISTRATION_MONTH } from '@/lib/db';
 import styles from './page.module.css';
 
@@ -27,6 +28,10 @@ export default function Home() {
   // Navigation state
   const [activeTab, setActiveTab] = useState<string>('home');
   const [isAdminLogged, setIsAdminLogged] = useState(false);
+  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
+  const [showAdminStatus, setShowAdminStatus] = useState(false);
+  const [showEditorModal, setShowEditorModal] = useState(false);
+  const [showStatsModal, setShowStatsModal] = useState(false);
   
   useEffect(() => {
     const savedAdmin = localStorage.getItem('ft_admin_logged');
@@ -44,11 +49,6 @@ export default function Home() {
   };
 
   const [adminInputPw, setAdminInputPw] = useState('');
-  const [adminSubTab, setAdminSubTab] = useState<'classes' | 'registrations'>('registrations');
-  const [showAdminStatus, setShowAdminStatus] = useState(false);
-  const [showEditorModal, setShowEditorModal] = useState(false);
-  const [showStatsModal, setShowStatsModal] = useState(false);
-  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
 
   // Identity Interceptor
   const [showIdentityForm, setShowIdentityForm] = useState(false);
@@ -119,7 +119,7 @@ export default function Home() {
       localStorage.setItem('my_tango_classes', JSON.stringify(Array.from(setIds)));
       setAppliedClassIds(new Set(setIds));
       window.dispatchEvent(new Event('ft_user_updated'));
-      alert('수업이 장바구니에 담겼습니다! 하단 [내신청현황] 메뉴에서 한꺼번에 최종 신청을 진행해주세요.');
+      alert('수업이 장바구니에 담겼습니다! 하단 [마이페이지] 메뉴에서 최종 신청을 진행해주세요.');
       handleCloseModal();
     });
   };
@@ -152,7 +152,7 @@ export default function Home() {
       } else {
         await addClass(data as Omit<TangoClass, 'id'>);
         alert('등록되었습니다.');
-        setActiveTab('home'); // Go back home after adding
+        setActiveTab('home'); 
       }
       fetchClasses();
     } catch (error: unknown) {
@@ -166,9 +166,8 @@ export default function Home() {
     setModalView('detail');
   };
 
-  // Calculate available months from classes
   const availableMonths = Array.from(new Set([
-    '2026-04', // Default minimum for transition
+    '2026-04', 
     ...classes.map(c => c.targetMonth).filter(Boolean) as string[]
   ])).sort();
 
@@ -289,7 +288,6 @@ export default function Home() {
                     <h3 className={styles.dayTitle}>{day}</h3>
                     <div className={styles.cardList}>
                       {groupedClasses[day].map((cls) => {
-                        // Calculate counts in real-time from registrations array
                         const leaderCount = registrations.filter(r => 
                           r.classIds.includes(cls.id) && (r.role || '').replace(/"/g, '') === 'leader'
                         ).length;
@@ -320,41 +318,38 @@ export default function Home() {
                 ))
             )}
           </main>
-        </>
-      )}
+        )}
 
-      {activeTab === 'membership' && (
-        <main className={styles.mainContent}>
-          <MembershipGuide />
-        </main>
-      )}
+        {activeTab === 'membership' && (
+          <main className={styles.mainContent}>
+            <MembershipGuide />
+          </main>
+        )}
 
-      {activeTab === 'status' && (
-        <main className={styles.mainContent}>
-          <RegistrationStatus 
-            classes={classes} 
-            selectedMonth={selectedMonth}
-            onClose={() => setActiveTab('home')} 
-            requireIdentity={requireIdentity}
-          />
-        </main>
-      )}
+        {activeTab === 'status' && (
+          <main className={styles.mainContent}>
+            <RegistrationStatus 
+              classes={classes} 
+              selectedMonth={selectedMonth}
+              onClose={() => setActiveTab('home')} 
+              requireIdentity={requireIdentity}
+            />
+          </main>
+        )}
 
-      {activeTab === 'lucy' && (
-        <main className={styles.mainContent}>
-          <MilongaLucy />
-        </main>
-      )}
+        {activeTab === 'lucy' && (
+          <main className={styles.mainContent}>
+            <MilongaLucy />
+          </main>
+        )}
 
-      {activeTab === 'admin_status' && (
-        <main className={styles.mainContent}>
-          <RegistrationAdmin />
-        </main>
-      )}
+        {activeTab === 'admin_status' && (
+          <main className={styles.mainContent}>
+            <RegistrationAdmin />
+          </main>
+        )}
       </div>
 
-
-      {/* 수업 상세 / 수정 전체 화면 팝업 (오직 홈 탭의 목록에서 클릭했을 때만) */}
       <FullscreenModal
         isOpen={!!selectedClassId}
         onClose={handleCloseModal}
@@ -383,7 +378,6 @@ export default function Home() {
         )}
       </FullscreenModal>
 
-      {/* Admin Dashboard Modal */}
       <FullscreenModal
         isOpen={showAdminStatus}
         onClose={() => setShowAdminStatus(false)}
@@ -420,7 +414,6 @@ export default function Home() {
         )}
       </FullscreenModal>
 
-      {/* Class Creator Modal */}
       <FullscreenModal
         isOpen={showEditorModal}
         onClose={() => setShowEditorModal(false)}
@@ -434,7 +427,6 @@ export default function Home() {
         />
       </FullscreenModal>
 
-      {/* Statistics Modal */}
       <FullscreenModal
         isOpen={showStatsModal}
         onClose={() => setShowStatsModal(false)}
