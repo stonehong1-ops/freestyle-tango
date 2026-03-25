@@ -22,8 +22,10 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
     price: initialData?.price || '',
     time: initialData?.time || '',
     videoUrl: initialData?.videoUrl || '',
+    teacherProfile: initialData?.teacherProfile || '',
     maleCount: initialData?.maleCount || 0,
     femaleCount: initialData?.femaleCount || 0,
+    maxCount: initialData?.maxCount || 15,
   });
 
   const [dates, setDates] = useState<string[]>(
