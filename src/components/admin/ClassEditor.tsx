@@ -387,17 +387,17 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
 
       <div className={styles.inputGroup}>
         <label>레벨</label>
-        <div className={styles.selectGroup}>
+        <select 
+          className={styles.input} 
+          name="level" 
+          value={formData.level} 
+          onChange={handleChange}
+          style={{ background: '#f2f4f6', cursor: 'pointer' }}
+        >
           {['All', 'Basic', 'Trainning', 'Intermediate', 'Advanced', 'Very-Advanced'].map(l => (
-            <button 
-              key={l}
-              className={`${styles.optionBtn} ${formData.level === l ? styles.active : ''}`}
-              onClick={() => setFormData(prev => ({ ...prev, level: l }))}
-            >
-              {l}
-            </button>
+            <option key={l} value={l}>{l}</option>
           ))}
-        </div>
+        </select>
       </div>
 
       <div className={styles.inputGroup}>
