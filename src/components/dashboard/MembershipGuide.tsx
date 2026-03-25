@@ -48,7 +48,7 @@ export default function MembershipGuide() {
              <span className={styles.bullet}>•</span>
             <div>
               <strong style={{ color: '#191f28' }}>파트너 신청 권한</strong><br/>
-              파트너수업 외 2개 클래스 파트너 신청 가능 (기존 파트너만 대상)
+              파트너수업 외 2개 클래스 파트너 신청 가능 (공연/대회 파트너 또는 6개월 이상 파트너쉽만 대상)
             </div>
           </li>
           <li className={styles.listItem}>
