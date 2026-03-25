@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@400;700&display=swap');
+
+:root {
+  --background: #f2f4f6;
+  --foreground: #191f28;
+  --primary: #3182f6;
+  --accent: #f04452;
+  --text-main: #191f28;
+  --text-muted: #4e5968;
+  --text-dim: #8b95a1;
+  --bg-card: #ffffff;
+  --border: rgba(0, 0, 0, 0.05);
+  --glass: rgba(255, 255, 255, 0.7);
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+}

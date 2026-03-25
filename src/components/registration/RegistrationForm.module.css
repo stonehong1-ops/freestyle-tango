@@ -1,0 +1,151 @@
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.stepTitle {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.stepDesc {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+/* Step 1: Gender Select */
+.genderGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.genderBtn {
+  aspect-ratio: 1 / 1;
+  background: var(--bg-main);
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.genderBtn:hover {
+  background: #eee;
+}
+
+.genderBtn.selected {
+  border-color: var(--primary);
+  background: rgba(49, 130, 246, 0.05);
+}
+
+.genderIcon {
+  font-size: 2.5rem;
+}
+
+.genderLabel {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+/* Step 2: Input */
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputLabel {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.input {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: var(--bg-main);
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Footer & Buttons */
+.footer {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.nextBtn {
+  flex: 1;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 1.25rem;
+  border-radius: var(--radius-sm);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.nextBtn:disabled {
+  background: #e5e8eb;
+  color: #adb5bd;
+  cursor: not-allowed;
+}
+
+.backBtn {
+  padding: 1.25rem;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+/* Step 3: Success */
+.successArea {
+  text-align: center;
+  padding: 3rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.successIcon {
+  width: 80px;
+  height: 80px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}

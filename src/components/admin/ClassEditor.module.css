@@ -1,0 +1,159 @@
+.form {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputGroup label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #4e5968;
+}
+
+.input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1px solid #f2f4f6;
+  background: #f9fafb;
+  font-size: 1rem;
+  color: #191f28;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  border-color: #3182f6;
+}
+
+/* Image Upload specific styles */
+.imageUploadBox {
+  width: 100%;
+  height: 160px;
+  border-radius: 12px;
+  border: 2px dashed #d1d6db;
+  background: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b95a1;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background 0.2s;
+}
+
+.imageUploadBox:hover {
+  background: #f2f4f6;
+}
+
+.imagePreview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Dates and Curriculum Grids */
+.datesGrid, .curriculumGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dateRow, .curriculumRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.weekLabel {
+  min-width: 45px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #3182f6;
+}
+
+.actionLinks {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.textBtn {
+  background: none;
+  border: none;
+  color: #3182f6;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.checkboxGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.checkboxGroup input[type="checkbox"] {
+  width: 1.2rem;
+  height: 1.2rem;
+  accent-color: #3182f6;
+}
+
+.curriculumContainer {
+  background: #f9fafb;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid #f2f4f6;
+}
+
+.selectGroup {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.optionBtn {
+  flex: 1;
+  padding: 0.8rem;
+  border-radius: 12px;
+  border: 1px solid #f2f4f6;
+  background: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4e5968;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.optionBtn.active {
+  background: #3182f6;
+  color: #fff;
+  border-color: #3182f6;
+}
+
+.submitBtn {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  border: none;
+  background: #3182f6;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.submitBtn:active {
+  transform: scale(0.98);
+}

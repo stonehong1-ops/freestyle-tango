@@ -1,0 +1,366 @@
+'use client';
+
+import React, { useState, useRef } from 'react';
+import styles from './ClassEditor.module.css';
+
+interface ClassEditorProps {
+  initialData?: any;
+  onSave: (data: any) => void;
+}
+
+export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
+  const [formData, setFormData] = useState({
+    teacher1: initialData?.teacher1 || '',
+    teacher2: initialData?.teacher2 || '',
+    title: initialData?.title || '',
+    type: initialData?.type || '체인지수업',
+    level: initialData?.level || '베이직수업',
+    description: initialData?.description || '',
+    imageUrl: initialData?.imageUrl || '',
+    price: initialData?.price || '',
+    time: initialData?.time || '',
+    maxCount: initialData?.maxCount || 10,
+  });
+
+  const [dates, setDates] = useState<string[]>(
+    initialData?.dates?.length > 0 ? initialData.dates : ['', '', '', '']
+  );
+  let extractedStart = '20:00';
+  let extractedEnd = '21:30';
+  if (initialData?.timeStr) {
+    const parts = initialData.timeStr.split('-');
+    if (parts[0]) extractedStart = parts[0].trim().padStart(5, '0');
+    if (parts[1]) extractedEnd = parts[1].trim().padStart(5, '0');
+  } else if (initialData?.time) {
+    const match = initialData.time.match(/(\d{1,2}:\d{2})\s*(?:-|~)\s*(\d{1,2}:\d{2})/);
+    if (match) {
+      extractedStart = match[1].padStart(5, '0');
+      extractedEnd = match[2].padStart(5, '0');
+    }
+  }
+
+  const [startTime, setStartTime] = useState(extractedStart);
+  const [endTime, setEndTime] = useState(extractedEnd);
+  
+  const [hasCurriculum, setHasCurriculum] = useState(!!initialData?.curriculum);
+  const [curriculumWeeks, setCurriculumWeeks] = useState<string[]>(
+    initialData?.curriculum 
+      ? initialData.curriculum.split('\n').map((s: string) => s.replace(/^\d+주차:\s*/, '')) 
+      : ['', '', '', '']
+  );
+  
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Strip everything except numbers
+    const rawValue = e.target.value.replace(/[^0-9]/g, '');
+    if (!rawValue) {
+      setFormData(prev => ({ ...prev, price: '' }));
+      return;
+    }
+    // Format with commas and append '원'
+    const formatted = parseInt(rawValue, 10).toLocaleString('ko-KR') + '원';
+    setFormData(prev => ({ ...prev, price: formatted }));
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setIsUploading(true);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        // Max width to keep base64 string well under 1MB
+        const MAX_WIDTH = 800;
+        let scale = 1;
+        if (img.width > MAX_WIDTH) {
+          scale = MAX_WIDTH / img.width;
+        }
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        // compress to 70% JPEG
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+        setFormData(prev => ({ ...prev, imageUrl: dataUrl }));
+        setIsUploading(false);
+      };
+      img.onerror = () => {
+        alert("이미지 처리에 실패했습니다.");
+        setIsUploading(false);
+      };
+      img.src = reader.result as string;
+    };
+    reader.onerror = () => {
+      alert("이미지 로드에 실패했습니다.");
+      setIsUploading(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDateChange = (index: number, value: string) => {
+    let newDates = [...dates];
+    newDates[index] = value;
+    
+    // Auto-fill subsequent weeks based on the 1st week
+    if (index === 0 && value) {
+      const d = new Date(value);
+      for (let i = 1; i < 4; i++) {
+        const nextDate = new Date(d);
+        nextDate.setDate(d.getDate() + i * 7);
+        // Format to YYYY-MM-DD for input type="date"
+        const offset = nextDate.getTimezoneOffset()
+        const kstNextDate = new Date(nextDate.getTime() - (offset*60*1000))
+        newDates[i] = kstNextDate.toISOString().split('T')[0];
+      }
+      // Implicitly set the Day of the Week string
+      const days = ['일', '월', '화', '수', '목', '금', '토'];
+      setFormData(prev => ({ ...prev, time: `매주 ${days[d.getDay()]}요일 ${startTime} - ${endTime}` }));
+    }
+    
+    setDates(newDates.slice(0, 4)); // Ensure strictly 4 dates
+  };
+
+  const addCurriculumWeek = () => setCurriculumWeeks(prev => [...prev, '']);
+  const removeCurriculumWeek = () => setCurriculumWeeks(prev => prev.length > 1 ? prev.slice(0, -1) : prev);
+
+  const handleCurriculumChange = (index: number, value: string) => {
+    const newWeeks = [...curriculumWeeks];
+    newWeeks[index] = value;
+    setCurriculumWeeks(newWeeks);
+  }
+
+  const handleSubmit = () => {
+    let finalCurriculum = '';
+    if (hasCurriculum) {
+      finalCurriculum = curriculumWeeks
+        .map((text, i) => text.trim() ? `${i+1}주차: ${text}` : '')
+        .filter(Boolean)
+        .join('\n');
+    }
+    
+    let finalTime = formData.time;
+    const timeStr = `${startTime} - ${endTime}`;
+    if (dates[0]) {
+      const d = new Date(dates[0]);
+      const days = ['일', '월', '화', '수', '목', '금', '토'];
+      finalTime = `매주 ${days[d.getDay()]}요일 ${timeStr}`;
+    }
+
+    onSave({
+      ...formData,
+      time: finalTime,
+      timeStr,
+      dates: dates.filter(Boolean),
+      curriculum: finalCurriculum,
+    });
+  };
+
+  return (
+    <div className={styles.form}>
+      
+      {/* 1. Image Upload */}
+      <div className={styles.inputGroup}>
+        <label>대표 이미지 업로드</label>
+        <div 
+          className={styles.imageUploadBox}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          {isUploading ? (
+            <span>업로드 중...</span>
+          ) : formData.imageUrl ? (
+            <img src={formData.imageUrl} alt="preview" className={styles.imagePreview} />
+          ) : (
+            <span>여기를 클릭하여 이미지 선택</span>
+          )}
+        </div>
+        <input 
+          type="file" 
+          accept="image/*" 
+          ref={fileInputRef} 
+          style={{ display: 'none' }} 
+          onChange={handleImageUpload} 
+        />
+      </div>
+
+      <div className={styles.inputGroup}>
+        <label>수업 제목</label>
+        <input 
+          className={styles.input} 
+          name="title" 
+          value={formData.title} 
+          onChange={handleChange} 
+          placeholder="예: 초급 탱고 테크닉"
+        />
+      </div>
+
+      <div style={{ display: 'flex', gap: '1rem' }}>
+        <div className={styles.inputGroup} style={{ flex: 1 }}>
+          <label>강사 1</label>
+          <input className={styles.input} name="teacher1" value={formData.teacher1} onChange={handleChange} placeholder="이름" />
+        </div>
+        <div className={styles.inputGroup} style={{ flex: 1 }}>
+          <label>강사 2</label>
+          <input className={styles.input} name="teacher2" value={formData.teacher2} onChange={handleChange} placeholder="이름 (없으면 비움)" />
+        </div>
+      </div>
+
+      {/* 2. Automated Dates (Fixed 4 Weeks) */}
+      <div className={styles.inputGroup}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <label>수업 진행 날짜 (1주차 선택 시 자동완성)</label>
+        </div>
+        
+        <div className={styles.datesGrid}>
+          {dates.slice(0, 4).map((date, index) => (
+            <div key={index} className={styles.dateRow}>
+              <span className={styles.weekLabel}>{index + 1}주차</span>
+              <input 
+                type="date"
+                className={styles.input} 
+                value={date} 
+                onChange={(e) => handleDateChange(index, e.target.value)} 
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      <div className={styles.inputGroup}>
+        <label>수업 진행 시간 (시작 - 종료)</label>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <input 
+            type="time" 
+            className={styles.input} 
+            value={startTime} 
+            onChange={(e) => {
+              setStartTime(e.target.value);
+              if (dates[0]) {
+                const d = new Date(dates[0]);
+                const days = ['일', '월', '화', '수', '목', '금', '토'];
+                setFormData(prev => ({ ...prev, time: `매주 ${days[d.getDay()]}요일 ${e.target.value} - ${endTime}` }));
+              }
+            }} 
+          />
+          <span style={{ fontWeight: 600, color: '#4e5968' }}>~</span>
+          <input 
+            type="time" 
+            className={styles.input} 
+            value={endTime} 
+            onChange={(e) => {
+              setEndTime(e.target.value);
+              if (dates[0]) {
+                const d = new Date(dates[0]);
+                const days = ['일', '월', '화', '수', '목', '금', '토'];
+                setFormData(prev => ({ ...prev, time: `매주 ${days[d.getDay()]}요일 ${startTime} - ${e.target.value}` }));
+              }
+            }} 
+          />
+        </div>
+      </div>
+
+      {/* 3. Number-only Price */}
+      <div className={styles.inputGroup}>
+        <label>수강료 (숫자만 입력)</label>
+        <input 
+          className={styles.input} 
+          value={formData.price} 
+          onChange={handlePriceChange} 
+          placeholder="0원"
+        />
+      </div>
+
+      <div className={styles.inputGroup}>
+        <label>강습 구분</label>
+        <div className={styles.selectGroup}>
+          {['체인지수업', '파트너수업'].map(t => (
+            <button 
+              key={t}
+              className={`${styles.optionBtn} ${formData.type === t ? styles.active : ''}`}
+              onClick={() => setFormData(prev => ({ ...prev, type: t }))}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className={styles.inputGroup}>
+        <label>레벨</label>
+        <div className={styles.selectGroup}>
+          {['베이직수업', '어려움', '매우 어려움'].map(l => (
+            <button 
+              key={l}
+              className={`${styles.optionBtn} ${formData.level === l ? styles.active : ''}`}
+              onClick={() => setFormData(prev => ({ ...prev, level: l }))}
+            >
+              {l}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className={styles.inputGroup}>
+        <label>수업 설명</label>
+        <textarea 
+          className={`${styles.input} ${styles.textarea}`} 
+          name="description" 
+          value={formData.description} 
+          onChange={handleChange} 
+          placeholder="간략한 설명" 
+        />
+      </div>
+
+      {/* 4. Optional Structured Curriculum */}
+      <div className={styles.inputGroup}>
+        <div className={styles.checkboxGroup}>
+          <input 
+            type="checkbox" 
+            id="hasCur" 
+            checked={hasCurriculum} 
+            onChange={(e) => setHasCurriculum(e.target.checked)} 
+          />
+          <label htmlFor="hasCur" style={{ color: '#191f28', cursor: 'pointer', margin: 0 }}>커리큘럼 설정하기</label>
+        </div>
+        
+        {hasCurriculum && (
+          <div className={styles.curriculumContainer}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.5rem', gap: '0.5rem' }}>
+              <button className={styles.textBtn} onClick={addCurriculumWeek}>+ 내용 추가</button>
+              <button className={styles.textBtn} onClick={removeCurriculumWeek} style={{ color: '#ef4444' }}>- 삭제</button>
+            </div>
+            
+            <div className={styles.curriculumGrid}>
+              {curriculumWeeks.map((text, index) => (
+                <div key={index} className={styles.curriculumRow}>
+                  <span className={styles.weekLabel}>{index + 1}주차</span>
+                  <input 
+                    className={styles.input} 
+                    value={text} 
+                    onChange={(e) => handleCurriculumChange(index, e.target.value)} 
+                    placeholder="해당 주차의 수업 내용 입력"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <button className={styles.submitBtn} onClick={handleSubmit}>
+        {initialData ? '수정 완료' : '수업 등록하기'}
+      </button>
+    </div>
+  );
+}
