@@ -10,6 +10,7 @@ import FooterMenu from '@/components/common/FooterMenu';
 import MembershipGuide from '@/components/dashboard/MembershipGuide';
 import RegistrationStatus from '@/components/dashboard/RegistrationStatus';
 import RegistrationAdmin from '@/components/admin/RegistrationAdmin';
+import MilongaLucy from '@/components/dashboard/MilongaLucy';
 import { getClasses, addClass, updateClass, deleteClass, getRegistrations, TangoClass, Registration, CURRENT_REGISTRATION_MONTH } from '@/lib/db';
 import styles from './page.module.css';
 
@@ -28,6 +29,8 @@ export default function Home() {
   const [isAdminLogged, setIsAdminLogged] = useState(false);
   const [adminInputPw, setAdminInputPw] = useState('');
   const [adminSubTab, setAdminSubTab] = useState<'classes' | 'registrations'>('registrations');
+  const [showAdminStatus, setShowAdminStatus] = useState(false);
+  const [showEditorModal, setShowEditorModal] = useState(false);
 
   // Identity Interceptor
   const [showIdentityForm, setShowIdentityForm] = useState(false);
@@ -192,6 +195,35 @@ export default function Home() {
                 </button>
               ))}
             </div>
+            
+            {isAdminLogged ? (
+              <div style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto', marginRight: '0.75rem' }}>
+                <button 
+                  className={styles.headerAdminBtn}
+                  onClick={() => setShowEditorModal(true)}
+                  title="수업 등록"
+                >
+                  ➕
+                </button>
+                <button 
+                  className={styles.headerAdminBtn}
+                  onClick={() => setShowAdminStatus(true)}
+                  title="신청 현황"
+                >
+                  ⚙️
+                </button>
+              </div>
+            ) : (
+              <div style={{ marginLeft: 'auto', marginRight: '0.75rem' }}>
+                <button 
+                  className={styles.headerAdminBtn}
+                  onClick={() => setShowAdminStatus(true)} 
+                  title="관리자 로그인"
+                >
+                  ⚙️
+                </button>
+              </div>
+            )}
 
             <div 
               className={styles.profileArea}
@@ -292,86 +324,12 @@ export default function Home() {
         </main>
       )}
 
-      {(activeTab === 'admin' || activeTab === 'add') && (
+      {activeTab === 'lucy' && (
         <main className={styles.mainContent} style={{ paddingTop: '2rem' }}>
-          {!isAdminLogged ? (
-             <div style={{ textAlign: 'center', marginTop: '4rem' }}>
-               <h2 style={{ marginBottom: '2rem', color: '#191f28' }}>관리자 전용</h2>
-               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
-                 <input 
-                   type="password" 
-                   placeholder="비밀번호 4자리 입력"
-                   value={adminInputPw}
-                   onChange={(e) => setAdminInputPw(e.target.value)}
-                   style={{ padding: '1rem', borderRadius: '12px', border: '1px solid #ddd', width: '200px', fontSize: '1rem' }}
-                 />
-                 <button 
-                   onClick={() => {
-                     if (adminInputPw === '9999') setIsAdminLogged(true);
-                     else alert('비밀번호가 일치하지 않습니다.');
-                   }}
-                   style={{ padding: '1rem 1.5rem', background: '#3182f6', color: '#fff', borderRadius: '12px', border: 'none', fontWeight: 700, fontSize: '1rem', cursor: 'pointer' }}
-                 >
-                   접속
-                 </button>
-               </div>
-             </div>
-          ) : (
-              <div>
-                <h2 style={{ marginBottom: '2rem', color: '#191f28', textAlign: 'center' }}>
-                  {activeTab === 'add' ? '새 수업 등록' : '관리자 대시보드'}
-                </h2>
-                {activeTab === 'add' ? (
-                  <ClassEditor onSave={handleSave} />
-                ) : (
-                  <div>
-                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', justifyContent: 'center' }}>
-                      <button 
-                        onClick={() => setAdminSubTab('registrations')}
-                        style={{ 
-                          padding: '0.6rem 1.2rem', 
-                          borderRadius: '100px', 
-                          border: 'none',
-                          background: adminSubTab === 'registrations' ? '#3182f6' : '#f2f4f6',
-                          color: adminSubTab === 'registrations' ? '#fff' : '#4e5968',
-                          fontWeight: 700,
-                          fontSize: '0.9rem',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        신청현황
-                      </button>
-                      <button 
-                        onClick={() => setAdminSubTab('classes')}
-                        style={{ 
-                          padding: '0.6rem 1.2rem', 
-                          borderRadius: '100px', 
-                          border: 'none',
-                          background: adminSubTab === 'classes' ? '#3182f6' : '#f2f4f6',
-                          color: adminSubTab === 'classes' ? '#fff' : '#4e5968',
-                          fontWeight: 700,
-                          fontSize: '0.9rem',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        클래스관리
-                      </button>
-                    </div>
-
-                    {adminSubTab === 'registrations' ? (
-                      <RegistrationAdmin />
-                    ) : (
-                      <div style={{ padding: '4rem 2rem', background: '#f2f4f6', borderRadius: '16px', textAlign: 'center' }}>
-                        <p style={{ color: '#8b95a1', marginBottom: '1rem' }}>클래스 관리 모드</p>
-                        <p style={{ color: '#4e5968', fontSize: '0.85rem' }}>홈 화면에서 클래스 카드를 클릭하면<br/>수정 및 삭제가 가능합니다.</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-          )}
+          <MilongaLucy />
         </main>
       )}
+
 
       {/* 수업 상세 / 수정 전체 화면 팝업 (오직 홈 탭의 목록에서 클릭했을 때만) */}
       <FullscreenModal
@@ -402,16 +360,51 @@ export default function Home() {
         )}
       </FullscreenModal>
 
-      {/* Identity Bottom Sheet Popup */}
+      {/* Admin Dashboard Modal */}
       <FullscreenModal
-        isOpen={showIdentityForm}
-        onClose={() => setShowIdentityForm(false)}
-        title="정보 입력"
-        isBottomSheet={true}
+        isOpen={showAdminStatus}
+        onClose={() => setShowAdminStatus(false)}
+        title={isAdminLogged ? "수업 신청 현황" : "관리자 로그인"}
       >
-        <IdentityForm 
-          onClose={() => setShowIdentityForm(false)} 
-          onComplete={handleIdentityComplete} 
+        {!isAdminLogged ? (
+          <div style={{ padding: '4rem 2rem', textAlign: 'center' }}>
+            <h3 style={{ marginBottom: '1.5rem', color: '#191f28' }}>비밀번호를 입력하세요</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
+              <input 
+                type="password" 
+                placeholder="비밀번호" 
+                value={adminInputPw}
+                onChange={(e) => setAdminInputPw(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && adminInputPw === 'tangolucy' && setIsAdminLogged(true)}
+                style={{ padding: '1rem', borderRadius: '14px', border: '1px solid #ddd', width: '200px', textAlign: 'center', fontSize: '1.2rem' }}
+              />
+              <button 
+                onClick={() => {
+                  if (adminInputPw === 'tangolucy') setIsAdminLogged(true);
+                  else alert('비밀번호가 틀렸습니다.');
+                }}
+                style={{ padding: '1rem 3rem', background: '#3182f6', color: '#fff', borderRadius: '14px', border: 'none', fontWeight: 800, fontSize: '1.1rem', cursor: 'pointer' }}
+              >
+                로그인
+              </button>
+            </div>
+          </div>
+        ) : (
+          <RegistrationAdmin />
+        )}
+      </FullscreenModal>
+
+      {/* Class Creator Modal */}
+      <FullscreenModal
+        isOpen={showEditorModal}
+        onClose={() => setShowEditorModal(false)}
+        title="신규 수업 등록"
+      >
+        <ClassEditor 
+          onSave={async (data) => {
+            await handleSave(data);
+            setShowEditorModal(false);
+          }} 
         />
       </FullscreenModal>
 

@@ -1,0 +1,46 @@
+.container {
+  padding: 2rem 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+}
+
+.card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 3rem 2rem;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+  width: 100%;
+  max-width: 400px;
+}
+
+.icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #191f28;
+  margin-bottom: 0.5rem;
+}
+
+.description {
+  color: #8b95a1;
+  font-size: 1.05rem;
+  margin-bottom: 2rem;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  background: #f2f4f6;
+  color: #4e5968;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}

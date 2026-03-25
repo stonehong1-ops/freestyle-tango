@@ -6,9 +6,8 @@ import styles from './FooterMenu.module.css';
 const MENU_ITEMS = [
   { id: 'home', label: '홈', icon: '🏠' },
   { id: 'membership', label: '멤버쉽안내', icon: '💎' },
-  { id: 'add', label: '수업등록', icon: '➕' },
   { id: 'status', label: '내신청현황', icon: '📋' },
-  { id: 'admin', label: '관리자', icon: '⚙️' },
+  { id: 'lucy', label: '밀롱가Lucy', icon: '💃' },
 ];
 
 interface FooterMenuProps {
