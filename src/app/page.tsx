@@ -184,7 +184,7 @@ export default function Home() {
                   activeTab === 'membership' ? '멤버쉽안내' :
                   activeTab === 'status' ? '마이페이지' :
                   activeTab === 'lucy' ? '밀롱가Lucy' :
-                  '전체 신청현황'
+                  '수업신청현황'
                 }
               </div>
             </div>
@@ -340,19 +340,7 @@ export default function Home() {
 
       {activeTab === 'admin_status' && (
         <main className={styles.mainContent} style={{ paddingTop: '1rem' }}>
-          {!isAdminLogged ? (
-            <div style={{ padding: '4rem 2rem', textAlign: 'center' }}>
-              <h3 style={{ marginBottom: '1.5rem', color: '#191f28' }}>관리자 로그인이 필요합니다</h3>
-              <button 
-                onClick={() => setShowAdminStatus(true)}
-                style={{ padding: '1rem 2rem', background: '#3182f6', color: '#fff', borderRadius: '12px', border: 'none', fontWeight: 800, cursor: 'pointer' }}
-              >
-                관리자 로그인하기
-              </button>
-            </div>
-          ) : (
-            <RegistrationAdmin />
-          )}
+          <RegistrationAdmin />
         </main>
       )}
 
