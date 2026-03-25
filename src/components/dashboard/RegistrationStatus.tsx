@@ -26,6 +26,10 @@ export default function RegistrationStatus({ classes, onClose, requireIdentity }
     if (next.has(id)) next.delete(id);
     else next.add(id);
     setSelectedIds(next);
+    
+    // 즉시 로컬 스토리지에 저장하여 홈 화면과 동기화
+    localStorage.setItem('my_tango_classes', JSON.stringify(Array.from(next)));
+    window.dispatchEvent(new Event('ft_user_updated'));
   };
 
   const grouped = classes.reduce((acc, cls) => {
@@ -43,7 +47,7 @@ export default function RegistrationStatus({ classes, onClose, requireIdentity }
         alert("사용자 정보를 찾을 수 없습니다. 다시 시도해주세요.");
         return;
       }
-      const { nickname, phone } = JSON.parse(savedUser);
+      const { nickname, phone, gender } = JSON.parse(savedUser);
 
       // 2. Prepare registration data
       const typeDisplay = 
@@ -51,7 +55,9 @@ export default function RegistrationStatus({ classes, onClose, requireIdentity }
         regType === 'month1' ? '1개월 신청' : '개별신청';
 
       try {
-        const { addRegistration } = await import('@/lib/db');
+        const { addRegistration, incrementClassCounts } = await import('@/lib/db');
+        
+        // A. 신청 내역 저장
         await addRegistration({
           date: new Date().toISOString(),
           nickname,
@@ -60,10 +66,18 @@ export default function RegistrationStatus({ classes, onClose, requireIdentity }
           type: typeDisplay as any
         });
 
+        // B. 해당 수업들의 성별 카운트 증가
+        if (gender === 'male' || gender === 'female') {
+          await Promise.all(
+            Array.from(selectedIds).map(id => incrementClassCounts(id, gender))
+          );
+        }
+
         // 3. Success handling
         localStorage.removeItem('my_tango_classes');
         setSelectedIds(new Set());
         window.dispatchEvent(new Event('ft_user_updated'));
+        window.dispatchEvent(new Event('ft_classes_updated')); // 홈 화면 새로고침용 로컬 이벤트
         setIsSuccess(true);
       } catch (error) {
         console.error("Registration Error:", error);

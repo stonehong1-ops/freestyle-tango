@@ -7,7 +7,8 @@ import {
   deleteDoc, 
   doc, 
   query, 
-  orderBy 
+  orderBy,
+  increment
 } from 'firebase/firestore';
 
 export interface TangoClass {
@@ -75,4 +76,12 @@ export const getRegistrations = async (): Promise<Registration[]> => {
     id: doc.id,
     ...doc.data()
   } as Registration));
+};
+
+export const incrementClassCounts = async (id: string, gender: 'male' | 'female') => {
+  const docRef = doc(db, COLLECTION_NAME, id);
+  const field = gender === 'male' ? 'maleCount' : 'femaleCount';
+  return await updateDoc(docRef, {
+    [field]: increment(1)
+  });
 };

@@ -61,7 +61,11 @@ export default function Home() {
     loadUser();
     
     window.addEventListener('ft_user_updated', loadUser);
-    return () => window.removeEventListener('ft_user_updated', loadUser);
+    window.addEventListener('ft_classes_updated', fetchClasses);
+    return () => {
+      window.removeEventListener('ft_user_updated', loadUser);
+      window.removeEventListener('ft_classes_updated', fetchClasses);
+    };
   }, []);
 
   const fetchClasses = async () => {
