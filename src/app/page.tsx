@@ -211,15 +211,23 @@ export default function Home() {
                   <section key={day} className={styles.daySection}>
                     <h3 className={styles.dayTitle}>{day}</h3>
                     <div className={styles.cardList}>
-                      {groupedClasses[day].map((cls) => (
-                        <ClassCard 
-                          key={cls.id}
-                          {...cls}
-                          isApplied={appliedClassIds.has(cls.id)}
-                          teacher={`${cls.teacher1}${cls.teacher2 ? ` & ${cls.teacher2}` : ''}`}
-                          onClick={handleCardClick}
-                        />
-                      ))}
+                      {groupedClasses[day].map((cls) => {
+                        const classRegs = registrations.filter(r => r.classIds && r.classIds.includes(cls.id));
+                        const mCount = classRegs.filter(r => r.gender === 'male' || !r.gender).length;
+                        const fCount = classRegs.filter(r => r.gender === 'female').length;
+                        
+                        return (
+                          <ClassCard 
+                            key={cls.id}
+                            {...cls}
+                            maleCount={mCount}
+                            femaleCount={fCount}
+                            isApplied={appliedClassIds.has(cls.id)}
+                            teacher={`${cls.teacher1}${cls.teacher2 ? ` & ${cls.teacher2}` : ''}`}
+                            onClick={handleCardClick}
+                          />
+                        );
+                      })}
                     </div>
                   </section>
                 ))

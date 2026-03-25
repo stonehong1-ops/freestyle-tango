@@ -15,17 +15,6 @@ export default function MembershipGuide() {
         </div>
       </section>
 
-      {/* Open Chat Banner */}
-      <div style={{ padding: '0 1.5rem', marginBottom: '1.5rem' }}>
-        <a href="https://open.kakao.com/o/glYslQvc" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
-          <div style={{ padding: '1rem', background: '#fff0f2', border: '1px solid #ffe4e6', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer' }}>
-            <span style={{ color: '#e11d48', fontWeight: 800, fontSize: '0.85rem', lineHeight: 1.5 }}>
-              신청하신 분은 '오픈톡방'에 반드시 들어오셔야<br/>수업 안내를 받으실 수 있어요! (클릭)
-            </span>
-          </div>
-        </a>
-      </div>
-
       {/* Benefits Card */}
       <section className={styles.card}>
         <h2 className={styles.cardTitle}>💎 멤버십 혜택</h2>
@@ -110,8 +99,19 @@ export default function MembershipGuide() {
           </div>
           <div>
             <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#191f28' }}>Stone | 홍병석</h3>
-            <p style={{ margin: '0.2rem 0 0', fontSize: '0.9rem', color: '#4e5968' }}>Tango Instructor & Developer</p>
+            <p style={{ margin: '0.2rem 0 0', fontSize: '0.9rem', color: '#4e5968' }}>Tango Instructor</p>
           </div>
+        </div>
+
+        {/* Open Chat Banner (Moved lower) */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <a href="https://open.kakao.com/o/glYslQvc" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+            <div style={{ padding: '1rem', background: '#fff0f2', border: '1px solid #ffe4e6', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer' }}>
+              <span style={{ color: '#e11d48', fontWeight: 800, fontSize: '0.85rem', lineHeight: 1.5 }}>
+                신청하신 분은 '오픈톡방'에 반드시 들어오셔야<br/>수업 안내를 받으실 수 있어요! (클릭)
+              </span>
+            </div>
+          </a>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
