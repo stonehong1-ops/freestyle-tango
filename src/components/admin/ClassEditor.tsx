@@ -131,17 +131,26 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
     const storageRef = ref(storage, `videos/${Date.now()}_${file.name}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
+    // 15초 동안 0%에서 멈춰있으면 안내 메시지 표시
+    const timeoutId = setTimeout(() => {
+      if (uploadProgress === 0 && isUploading) {
+        alert("업로드가 시작되지 않습니다 (0%).\n\n확인 필요:\n1. Firebase Storage 규칙에서 'allow read, write: if true' 설정이 되어있나요?\n2. Vercel 환경변수(Storage Bucket)가 정확한지 확인해주세요.");
+      }
+    }, 15000);
+
     uploadTask.on('state_changed', 
       (snapshot) => {
         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         setUploadProgress(Math.round(progress));
       }, 
       (error) => {
+        clearTimeout(timeoutId);
         console.error("Upload failed", error);
         alert(`동영상 업로드 중 오류가 발생했습니다: ${error.message}\n관리자에게 문의해주세요.`);
         setIsUploading(false);
       }, 
       () => {
+        clearTimeout(timeoutId);
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setFormData(prev => ({ ...prev, videoUrl: downloadURL }));
           setIsUploading(false);
