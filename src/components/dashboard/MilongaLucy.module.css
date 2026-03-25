@@ -1,46 +1,273 @@
 .container {
-  padding: 2rem 1.5rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 50vh;
+  color: #1a1a1a;
+  padding-bottom: 5rem;
 }
 
-.card {
-  background: #fff;
-  border-radius: 24px;
-  padding: 3rem 2rem;
-  text-align: center;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+.heroSection {
+  position: relative;
   width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+}
+
+.heroImageWrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.heroImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.heroOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.7));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  text-align: center;
+  padding: 2rem;
+}
+
+.heroContent {
   max-width: 400px;
 }
 
-.icon {
-  font-size: 4rem;
-  display: block;
+.heroTitle {
+  font-size: 2.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  letter-spacing: -2px;
+}
+
+.heroSubtitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #eee;
+}
+
+.heroInfo {
+  font-size: 1.2rem;
+  font-weight: 800;
   margin-bottom: 1.5rem;
 }
 
-.title {
-  font-size: 1.5rem;
+.heroLocation {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  opacity: 0.8;
+  margin-bottom: 1rem;
+}
+
+.heroContact {
+  background: rgba(49, 130, 246, 0.9);
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.eventSection {
+  padding: 2rem 1.25rem;
+}
+
+.sectionHeader {
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.3rem;
   font-weight: 800;
-  color: #191f28;
   margin-bottom: 0.5rem;
 }
 
-.description {
+.sectionSubtitle {
+  font-size: 0.9rem;
   color: #8b95a1;
-  font-size: 1.05rem;
-  margin-bottom: 2rem;
 }
 
-.statusBadge {
-  display: inline-block;
-  padding: 0.6rem 1.2rem;
+.eventGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.eventCard {
+  background: #fdfdfd;
+  padding: 1.25rem;
+  border-radius: 16px;
+  border: 1.5px solid #f2f4f6;
+  position: relative;
+}
+
+.eventBadge {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  font-size: 0.75rem;
+  font-weight: 800;
   background: #f2f4f6;
-  color: #4e5968;
-  border-radius: 30px;
-  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+
+.eventCardTitle {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.eventCardDesc {
   font-size: 0.9rem;
+  color: #4e5968;
+  line-height: 1.5;
+}
+
+.bookingBtn {
+  width: 100%;
+  padding: 1.1rem;
+  background: #3182f6;
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(49, 130, 246, 0.2);
+}
+
+.listSection {
+  padding: 2rem 1.25rem;
+  background: #f9fafb;
+}
+
+.resList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.resItem {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  border: 1px solid #f2f4f6;
+}
+
+.resIdx {
+  color: #8b95a1;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.resName {
+  font-weight: 700;
+  font-size: 1rem;
+  min-width: 60px;
+}
+
+.resOption {
+  background: #e8f3ff;
+  color: #3182f6;
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+}
+
+.resReq {
+    width: 100%;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: #4e5968;
+    background: #f9fafb;
+    padding: 0.75rem;
+    border-radius: 8px;
+}
+
+.emptyMsg {
+  text-align: center;
+  padding: 3rem;
+  color: #8b95a1;
+}
+
+.formContent {
+  padding: 1rem 1.5rem 3rem;
+}
+
+.formField {
+  margin-bottom: 1.5rem;
+}
+
+.formField label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: #4e5968;
+}
+
+.optionGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.optionBtn {
+  padding: 1rem;
+  border-radius: 12px;
+  border: 2px solid #f2f4f6;
+  background: #fff;
+  text-align: left;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.activeOption {
+  border-color: #3182f6;
+  background: #f0f7ff;
+  color: #3182f6;
+}
+
+.input, .textarea {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1.5px solid #eee;
+  outline: none;
+  font-size: 1rem;
+}
+
+.textarea {
+  height: 100px;
+  resize: none;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 1.1rem;
+  background: #3182f6;
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  cursor: pointer;
 }

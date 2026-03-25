@@ -50,6 +50,15 @@ export interface Registration {
   paymentNote?: string;
 }
 
+export interface MilongaReservation {
+  id: string;
+  milongaDate: string; // YYYY-MM-DD
+  nickname: string;
+  option: '테이블 예약' | '2+1 이벤트' | '3+1 이벤트';
+  requests?: string;
+  timestamp: string;
+}
+
 const COLLECTION_NAME = 'tango_classes';
 
 export const getClasses = async (): Promise<TangoClass[]> => {
@@ -145,4 +154,23 @@ export const getClassesByMonth = async (month: string): Promise<TangoClass[]> =>
     id: docSnap.id,
     ...docSnap.data()
   } as TangoClass));
+};
+
+const MILONGA_RES_COLLECTION = 'milonga_reservations';
+
+export const addMilongaReservation = async (data: Omit<MilongaReservation, 'id'>) => {
+  return await addDoc(collection(db, MILONGA_RES_COLLECTION), data);
+};
+
+export const getMilongaReservations = async (date: string): Promise<MilongaReservation[]> => {
+  const q = query(
+    collection(db, MILONGA_RES_COLLECTION),
+    where('milongaDate', '==', date),
+    orderBy('timestamp', 'asc')
+  );
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(docSnap => ({
+    id: docSnap.id,
+    ...docSnap.data()
+  } as MilongaReservation));
 };
