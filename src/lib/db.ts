@@ -47,6 +47,7 @@ export interface Registration {
   status?: 'waiting' | 'paid';
   paidAt?: string;
   amount?: number;
+  paymentNote?: string;
 }
 
 const COLLECTION_NAME = 'tango_classes';
@@ -86,12 +87,13 @@ export const addRegistration = async (regData: Omit<Registration, 'id'>) => {
   return await addDoc(collection(db, REG_COLLECTION), dataToSave);
 };
 
-export const updatePaymentStatus = async (id: string, amount: number) => {
+export const updatePaymentStatus = async (id: string, amount: number, paymentNote?: string) => {
   const docRef = doc(db, REG_COLLECTION, id);
   return await updateDoc(docRef, {
     status: 'paid',
     paidAt: new Date().toISOString(),
-    amount: amount
+    amount: amount,
+    paymentNote: paymentNote || ''
   });
 };
 

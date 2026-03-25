@@ -89,6 +89,7 @@ export default function RegistrationAdmin() {
               <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>신청수업</th>
               <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>구분</th>
               <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>입금상태</th>
+              <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>입금 상세</th>
               <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>연락처</th>
             </tr>
           </thead>
@@ -144,6 +145,7 @@ export default function RegistrationAdmin() {
                       {reg.amount && <span style={{ fontSize: '0.7rem', color: '#8b95a1' }}>{reg.amount.toLocaleString()}원</span>}
                     </div>
                   </td>
+                  <td style={{ padding: '1rem', color: '#4e5968', fontSize: '0.8rem' }}>{reg.paymentNote || '-'}</td>
                   <td style={{ padding: '1rem', color: '#8b95a1', fontSize: '0.8rem' }}>{reg.phone}</td>
                 </tr>
               ))

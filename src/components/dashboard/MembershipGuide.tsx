@@ -6,7 +6,7 @@ export default function MembershipGuide() {
   const [showToast, setShowToast] = useState(false);
 
   const handleCopy = () => {
-    const accountNumber = "3333143159646";
+    const accountNumber = "3333143169646";
     navigator.clipboard.writeText(accountNumber).then(() => {
       setShowToast(true);
       setTimeout(() => setShowToast(false), 2000);
@@ -92,7 +92,7 @@ export default function MembershipGuide() {
         <h2 className={styles.accountTitle}>💰 계좌 안내</h2>
         <div className={styles.bankAccountBox}>
           <span className={styles.bankName}>카카오뱅크 (홍병석)</span>
-          <span className={styles.accountNumber}>3333-14-3159646</span>
+          <span className={styles.accountNumber}>3333-14-3169646</span>
           <button className={styles.copyBtn} onClick={handleCopy}>
             복사하기
           </button>

@@ -14,6 +14,9 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
   const [isSuccess, setIsSuccess] = useState(false);
   const [dbRegs, setDbRegs] = useState<Registration[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showToast, setShowToast] = useState(false);
+  const [paymentSheet, setPaymentSheet] = useState<{ isOpen: boolean, regId: string, type: string } | null>(null);
+  const [selectedOption, setSelectedOption] = useState<string>('');
   // Remove manual name/phone state as it's handled by IdentityForm
 
 
@@ -73,6 +76,9 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
         localStorage.removeItem('my_tango_classes');
         setSelectedIds(new Set());
         window.dispatchEvent(new Event('ft_user_updated'));
+        
+        // After success, wait for user to click "Confirm" in success screen
+        // But the user wants it triggered from success screen or history
         setIsSuccess(true);
       } catch (error) {
         console.error("Registration Error:", error);
@@ -84,18 +90,29 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
     else action();
   };
 
-  const handlePaymentConfirm = async (id: string, type: string, classCount: number) => {
-    if (!window.confirm('입금을 완료하셨습니까?')) return;
-    
-    // Logic for amount:
-    // 개별신청: 120,000
-    // 1개월/6개월: 180,000
-    const amount = type === '개별신청' ? 120000 : 180000;
+  const handlePaymentConfirm = (id: string, type: string) => {
+    setPaymentSheet({ isOpen: true, regId: id, type });
+    setSelectedOption('');
+  };
+
+  const submitPayment = async () => {
+    if (!selectedOption || !paymentSheet) {
+      alert('옵션을 선택해주세요.');
+      return;
+    }
+
+    // Determine amount based on option text
+    let amount = 0;
+    if (selectedOption.includes('18만원')) amount = 180000;
+    else if (selectedOption.includes('12만원')) amount = 120000;
+    else if (selectedOption.includes('86만원')) amount = 860000;
+    else amount = 180000; // Membership sequels
     
     try {
       const { updatePaymentStatus } = await import('@/lib/db');
-      await updatePaymentStatus(id, amount);
+      await updatePaymentStatus(paymentSheet.regId, amount, selectedOption);
       alert('입금 확인 요청이 완료되었습니다.');
+      setPaymentSheet(null);
       // Refresh
       const savedUser = localStorage.getItem('ft_user');
       if (savedUser) {
@@ -139,6 +156,14 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
     return acc;
   }, {} as Record<string, TangoClass[]>);
 
+  const handleCopySuccess = () => {
+    const accountNumber = "3333143169646";
+    navigator.clipboard.writeText(accountNumber).then(() => {
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2000);
+    });
+  };
+
   if (isSuccess) {
     return (
       <div className={styles.successContainer}>
@@ -156,8 +181,22 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
         <div className={styles.bankBox}>
           <span className={styles.bankLabel}>계좌번호</span>
           <span className={styles.bankNumber}>카카오뱅크 3333-14-3169646 홍병석</span>
+          <button className={styles.copyBtnSmall} onClick={handleCopySuccess}>
+            복사하기
+          </button>
         </div>
-        <button className={styles.closeBtn} onClick={onClose}>확인</button>
+        <button className={styles.closeBtn} onClick={() => {
+          // Open payment sheet for the latest registration if possible
+          // For now, just close and let them use the history list
+          setIsSuccess(false);
+          onClose();
+        }}>완료</button>
+
+        {showToast && (
+          <div className={styles.copyToast}>
+            계좌번호가 복사되었습니다
+          </div>
+        )}
       </div>
     );
   }
@@ -215,7 +254,7 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
                   ) : (
                     <button 
                       className={styles.confirmPayBtn}
-                      onClick={() => handlePaymentConfirm(reg.id, reg.type, reg.classIds.length)}
+                      onClick={() => handlePaymentConfirm(reg.id, reg.type)}
                     >
                       입금완료 버튼 클릭
                     </button>
@@ -275,6 +314,39 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
           6개월 멤버쉽신청
         </button>
       </div>
+
+      {/* Payment Confirmation Bottom Sheet */}
+      {paymentSheet?.isOpen && (
+        <div className={styles.sheetOverlay}>
+          <div className={styles.bottomSheet}>
+            <div className={styles.sheetHeader}>
+              <h4 className={styles.sheetTitle}>입금 확인 정보 선택</h4>
+              <p className={styles.sheetDesc}>입금하신 항목을 선택해주세요.</p>
+            </div>
+            
+            <select 
+              className={styles.paymentSelect}
+              value={selectedOption}
+              onChange={(e) => setSelectedOption(e.target.value)}
+            >
+              <option value="">선택해주세요</option>
+              <option value="1개월수강 18만원 입금하였습니다.">1개월수강 18만원 입금하였습니다.</option>
+              <option value="단일수업 신청 12만원 입금하였습니다.">단일수업 신청 12만원 입금하였습니다.</option>
+              <option value="6개월 멤버쉽 86만원 입금하였고 1개월차입니다.">6개월 멤버쉽 86만원 입금하였고 1개월차입니다.</option>
+              <option value="현재 6개월 멤버쉽 2개월차입니다.">현재 6개월 멤버쉽 2개월차입니다.</option>
+              <option value="현재 6개월 멤버쉽 3개월차입니다.">현재 6개월 멤버쉽 3개월차입니다.</option>
+              <option value="현재 6개월 멤버쉽 4개월차입니다.">현재 6개월 멤버쉽 4개월차입니다.</option>
+              <option value="현재 6개월 멤버쉽 5개월차입니다.">현재 6개월 멤버쉽 5개월차입니다.</option>
+              <option value="현재 6개월 멤버쉽 6개월차입니다.">현재 6개월 멤버쉽 6개월차입니다.</option>
+            </select>
+
+            <div className={styles.sheetFooter}>
+              <button className={styles.cancelBtn} onClick={() => setPaymentSheet(null)}>취소</button>
+              <button className={styles.submitBtn} onClick={submitPayment}>입금확인</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
