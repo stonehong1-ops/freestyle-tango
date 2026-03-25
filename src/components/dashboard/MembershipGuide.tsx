@@ -106,7 +106,7 @@ export default function MembershipGuide() {
       <section className={styles.card} style={{ marginTop: '2rem', border: 'none', background: '#f8f9fa', padding: '2rem 1.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
           <div style={{ width: '60px', height: '60px', borderRadius: '50%', overflow: 'hidden', background: '#eee' }}>
-             <img src="/images/stonehong.jpg" alt="Stone" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+             <img src="/images/stone.jpg" alt="Stone" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
           <div>
             <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#191f28' }}>Stone | 홍병석</h3>
@@ -116,7 +116,7 @@ export default function MembershipGuide() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
           <a href="tel:010-7209-2468" className={styles.contactBtn}>📞 전화</a>
-          <a href="https://open.kakao.com/o/sNq0Irmi" target="_blank" rel="noopener noreferrer" className={styles.contactBtn} style={{ background: '#FEE500', color: '#000', border: 'none' }}>💬 카카오톡</a>
+          <a href="https://open.kakao.com/me/StoneHong" target="_blank" rel="noopener noreferrer" className={styles.contactBtn} style={{ background: '#FEE500', color: '#000', border: 'none' }}>💬 카카오톡</a>
           <a href="https://wa.me/821072092468" target="_blank" rel="noopener noreferrer" className={styles.contactBtn} style={{ background: '#25D366', color: '#fff', border: 'none' }}>🟩 와츠앱</a>
         </div>
         <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
