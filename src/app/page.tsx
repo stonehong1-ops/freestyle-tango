@@ -27,6 +27,22 @@ export default function Home() {
   // Navigation state
   const [activeTab, setActiveTab] = useState<string>('home');
   const [isAdminLogged, setIsAdminLogged] = useState(false);
+  
+  useEffect(() => {
+    const savedAdmin = localStorage.getItem('ft_admin_logged');
+    if (savedAdmin === 'true') setIsAdminLogged(true);
+  }, []);
+
+  const handleAdminLogin = (success: boolean) => {
+    if (success) {
+      setIsAdminLogged(true);
+      localStorage.setItem('ft_admin_logged', 'true');
+    } else {
+      setIsAdminLogged(false);
+      localStorage.removeItem('ft_admin_logged');
+    }
+  };
+
   const [adminInputPw, setAdminInputPw] = useState('');
   const [adminSubTab, setAdminSubTab] = useState<'classes' | 'registrations'>('registrations');
   const [showAdminStatus, setShowAdminStatus] = useState(false);
@@ -189,14 +205,20 @@ export default function Home() {
                   onClick={() => setShowEditorModal(true)}
                   title="수업 등록"
                 >
-                  ➕
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
                 </button>
                 <button 
                   className={styles.headerAdminBtn}
                   onClick={() => setShowAdminStatus(true)}
                   title="신청 현황"
                 >
-                  ⚙️
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                  </svg>
                 </button>
               </>
             ) : (
@@ -205,7 +227,10 @@ export default function Home() {
                 onClick={() => setShowAdminStatus(true)} 
                 title="관리자 로그인"
               >
-                ⚙️
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
               </button>
             )}
           </div>
@@ -384,8 +409,11 @@ export default function Home() {
               />
               <button 
                 onClick={() => {
-                  if (adminInputPw === 'tangolucy') setIsAdminLogged(true);
-                  else alert('비밀번호가 틀렸습니다.');
+                  if (adminInputPw === 'tangolucy') {
+                    handleAdminLogin(true);
+                  } else {
+                    alert('비밀번호가 틀렸습니다.');
+                  }
                 }}
                 style={{ padding: '1rem 3rem', background: '#3182f6', color: '#fff', borderRadius: '14px', border: 'none', fontWeight: 800, fontSize: '1.1rem', cursor: 'pointer' }}
               >
