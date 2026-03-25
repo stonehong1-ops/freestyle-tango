@@ -192,7 +192,7 @@ export default function Home() {
       {/* Global Fixed Header */}
       <header className={styles.globalHeader}>
         <div className={styles.headerLeft}>
-          <span className={styles.logoIcon}>💃</span>
+          <img src="/images/logo.png" alt="Logo" className={styles.logoImage} />
           <span className={styles.studioName}>프리스타일탱고스튜디오</span>
         </div>
         

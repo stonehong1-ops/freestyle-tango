@@ -136,6 +136,14 @@
   background: #fdfdfd;
 }
 
+.logoImage {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  object-fit: cover;
+  margin-right: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
 .pageTitle {
   font-size: 1.4rem;
   font-weight: 800;
