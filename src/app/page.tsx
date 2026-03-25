@@ -9,6 +9,7 @@ import ClassEditor from '@/components/admin/ClassEditor';
 import FooterMenu from '@/components/common/FooterMenu';
 import MembershipGuide from '@/components/dashboard/MembershipGuide';
 import RegistrationStatus from '@/components/dashboard/RegistrationStatus';
+import RegistrationAdmin from '@/components/admin/RegistrationAdmin';
 import { getClasses, addClass, updateClass, deleteClass, TangoClass } from '@/lib/db';
 import styles from './page.module.css';
 
@@ -24,6 +25,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<string>('home');
   const [isAdminLogged, setIsAdminLogged] = useState(false);
   const [adminInputPw, setAdminInputPw] = useState('');
+  const [adminSubTab, setAdminSubTab] = useState<'classes' | 'registrations'>('registrations');
 
   // Identity Interceptor
   const [showIdentityForm, setShowIdentityForm] = useState(false);
@@ -230,19 +232,58 @@ export default function Home() {
                </div>
              </div>
           ) : (
-             <div>
-               <h2 style={{ marginBottom: '2rem', color: '#191f28', textAlign: 'center' }}>
-                 {activeTab === 'add' ? '새 수업 등록' : '관리자 대시보드'}
-               </h2>
-               {activeTab === 'add' ? (
-                 <ClassEditor onSave={handleSave} />
-               ) : (
-                 <div style={{ padding: '4rem 2rem', background: '#f2f4f6', borderRadius: '16px', textAlign: 'center' }}>
-                   <p style={{ color: '#8b95a1', marginBottom: '1rem' }}>현재 빈 페이지입니다.</p>
-                   <p style={{ color: '#4e5968', fontSize: '0.9rem' }}>하단 메뉴의 [수업등록] 탭을 눌러 새 클래스를 생성하거나,<br/>홈 탭에서 클래스를 눌러 수정/삭제하세요.</p>
-                 </div>
-               )}
-             </div>
+              <div>
+                <h2 style={{ marginBottom: '2rem', color: '#191f28', textAlign: 'center' }}>
+                  {activeTab === 'add' ? '새 수업 등록' : '관리자 대시보드'}
+                </h2>
+                {activeTab === 'add' ? (
+                  <ClassEditor onSave={handleSave} />
+                ) : (
+                  <div>
+                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', justifyContent: 'center' }}>
+                      <button 
+                        onClick={() => setAdminSubTab('registrations')}
+                        style={{ 
+                          padding: '0.6rem 1.2rem', 
+                          borderRadius: '100px', 
+                          border: 'none',
+                          background: adminSubTab === 'registrations' ? '#3182f6' : '#f2f4f6',
+                          color: adminSubTab === 'registrations' ? '#fff' : '#4e5968',
+                          fontWeight: 700,
+                          fontSize: '0.9rem',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        신청현황
+                      </button>
+                      <button 
+                        onClick={() => setAdminSubTab('classes')}
+                        style={{ 
+                          padding: '0.6rem 1.2rem', 
+                          borderRadius: '100px', 
+                          border: 'none',
+                          background: adminSubTab === 'classes' ? '#3182f6' : '#f2f4f6',
+                          color: adminSubTab === 'classes' ? '#fff' : '#4e5968',
+                          fontWeight: 700,
+                          fontSize: '0.9rem',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        클래스관리
+                      </button>
+                    </div>
+
+                    {adminSubTab === 'registrations' ? (
+                      <RegistrationAdmin />
+                    ) : (
+                      <div style={{ padding: '4rem 2rem', background: '#f2f4f6', borderRadius: '16px', textAlign: 'center' }}>
+                        <p style={{ color: '#8b95a1', marginBottom: '1rem' }}>클래스 관리 모드</p>
+                        <p style={{ color: '#4e5968', fontSize: '0.85rem' }}>홈 화면에서 클래스 카드를 클릭하면<br/>수정 및 삭제가 가능합니다.</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
           )}
         </main>
       )}

@@ -35,10 +35,40 @@ export default function RegistrationStatus({ classes, onClose, requireIdentity }
     return acc;
   }, {} as Record<string, TangoClass[]>);
 
-  const handleRegister = (type: string) => {
-    const action = () => {
-      localStorage.setItem('my_tango_classes', JSON.stringify(Array.from(selectedIds)));
-      setIsSuccess(true);
+  const handleRegister = async (regType: string) => {
+    const action = async () => {
+      // 1. Get user info from ft_user
+      const savedUser = localStorage.getItem('ft_user');
+      if (!savedUser) {
+        alert("사용자 정보를 찾을 수 없습니다. 다시 시도해주세요.");
+        return;
+      }
+      const { nickname, phone } = JSON.parse(savedUser);
+
+      // 2. Prepare registration data
+      const typeDisplay = 
+        regType === 'month6' ? '6개월 멤버쉽' :
+        regType === 'month1' ? '1개월 신청' : '개별신청';
+
+      try {
+        const { addRegistration } = await import('@/lib/db');
+        await addRegistration({
+          date: new Date().toISOString(),
+          nickname,
+          phone,
+          classIds: Array.from(selectedIds),
+          type: typeDisplay as any
+        });
+
+        // 3. Success handling
+        localStorage.removeItem('my_tango_classes');
+        setSelectedIds(new Set());
+        window.dispatchEvent(new Event('ft_user_updated'));
+        setIsSuccess(true);
+      } catch (error) {
+        console.error("Registration Error:", error);
+        alert("신청 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+      }
     };
 
     if (requireIdentity) {

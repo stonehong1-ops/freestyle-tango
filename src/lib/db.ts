@@ -29,6 +29,15 @@ export interface TangoClass {
   videoUrl?: string;
 }
 
+export interface Registration {
+  id: string;
+  date: string;
+  nickname: string;
+  phone: string;
+  classIds: string[];
+  type: '개별신청' | '1개월 신청' | '6개월 멤버쉽';
+}
+
 const COLLECTION_NAME = 'tango_classes';
 
 export const getClasses = async (): Promise<TangoClass[]> => {
@@ -52,4 +61,18 @@ export const updateClass = async (id: string, classData: Partial<TangoClass>) =>
 export const deleteClass = async (id: string) => {
   const docRef = doc(db, COLLECTION_NAME, id);
   return await deleteDoc(docRef);
+};
+const REG_COLLECTION = 'registrations';
+
+export const addRegistration = async (regData: Omit<Registration, 'id'>) => {
+  return await addDoc(collection(db, REG_COLLECTION), regData);
+};
+
+export const getRegistrations = async (): Promise<Registration[]> => {
+  const q = query(collection(db, REG_COLLECTION), orderBy('date', 'desc'));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  } as Registration));
 };
