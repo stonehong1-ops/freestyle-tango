@@ -103,7 +103,8 @@ export default function RegistrationStatus({ classes, onClose, requireIdentity }
         localStorage.removeItem('my_tango_classes');
         setSelectedIds(new Set());
         window.dispatchEvent(new Event('ft_user_updated'));
-        window.dispatchEvent(new Event('ft_classes_updated')); // 홈 화면 새로고침용 로컬 이벤트
+        window.dispatchEvent(new Event('ft_classes_updated'));
+        window.dispatchEvent(new Event('ft_registrations_updated'));
         setIsSuccess(true);
       } catch (error) {
         console.error("Registration Error:", error);

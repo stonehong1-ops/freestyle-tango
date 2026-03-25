@@ -1,7 +1,4 @@
-'use client';
-
-import React from 'react';
-import styles from './ClassDetail.module.css';
+import { Registration } from '@/lib/db';
 
 interface ClassDetailProps {
   id: string;
@@ -17,10 +14,18 @@ interface ClassDetailProps {
   imageUrl?: string;
   teacherProfile?: string;
   videoUrl?: string;
+  registrations?: Registration[];
   onRegister: (id: string) => void;
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
 }
+
+const maskName = (name: string) => {
+  if (!name) return '';
+  if (name.length <= 1) return name;
+  if (name.length === 2) return name[0] + '*';
+  return name[0] + '*'.repeat(name.length - 2) + name[name.length - 1];
+};
 
 export default function ClassDetail({ 
   id, 
@@ -36,10 +41,17 @@ export default function ClassDetail({
   imageUrl,
   teacherProfile,
   videoUrl,
+  registrations = [],
   onRegister,
   onEdit,
   onDelete
 }: ClassDetailProps) {
+  // Filter registrations for THIS class ID
+  const classRegs = registrations.filter(r => r.classIds && r.classIds.includes(id));
+  
+  // Group by gender (default missing to male/leader as per request)
+  const leaders = classRegs.filter(r => r.gender === 'male' || !r.gender);
+  const followers = classRegs.filter(r => r.gender === 'female');
   return (
     <div style={{ padding: '0', display: 'flex', flexDirection: 'column', gap: '0', background: '#fff' }}>
       {/* 수업 대표 이미지 */}
@@ -62,8 +74,24 @@ export default function ClassDetail({
           <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#3182f6', marginBottom: '0.5rem' }}>{level} · {type}</div>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#191f28', marginBottom: '0.5rem' }}>{title}</h2>
           <div style={{ color: '#4e5968', fontSize: '0.95rem' }}>{time}</div>
-          <div style={{ color: '#8b95a1', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+          <div style={{ color: '#8b95a1', fontSize: '0.9rem', marginTop: '0.5rem', marginBottom: '1.5rem' }}>
             강사: {teacher1} {teacher2 && `& ${teacher2}`}
+          </div>
+
+          <div style={{ background: '#f9fafb', padding: '1.2rem', borderRadius: '14px', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.8rem', fontSize: '0.9rem' }}>
+              <span style={{ fontWeight: 700, color: '#3182f6', minWidth: '70px' }}>리더 {leaders.length}명</span>
+              <span style={{ color: '#4e5968', lineHeight: 1.4 }}>
+                {leaders.length > 0 ? leaders.map(l => maskName(l.nickname)).join(', ') : '신청 대기 중'}
+              </span>
+            </div>
+            <div style={{ width: '100%', height: '1px', background: '#eef3f6' }} />
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.8rem', fontSize: '0.9rem' }}>
+              <span style={{ fontWeight: 700, color: '#ff4b82', minWidth: '70px' }}>팔로워 {followers.length}명</span>
+              <span style={{ color: '#4e5968', lineHeight: 1.4 }}>
+                {followers.length > 0 ? followers.map(f => maskName(f.nickname)).join(', ') : '신청 대기 중'}
+              </span>
+            </div>
           </div>
         </header>
         

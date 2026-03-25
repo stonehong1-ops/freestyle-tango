@@ -47,6 +47,18 @@
   font-weight: 700;
 }
 
+.logoutBtn {
+  font-size: 0.65rem;
+  color: #8b95a1;
+  text-decoration: underline;
+  margin-top: 0.1rem;
+  cursor: pointer;
+}
+
+.logoutBtn:hover {
+  color: #4e5968;
+}
+
 .profilePhoto, .profilePhotoPlaceholder {
   width: 32px;
   height: 32px;

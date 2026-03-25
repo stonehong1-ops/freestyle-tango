@@ -10,15 +10,16 @@ import FooterMenu from '@/components/common/FooterMenu';
 import MembershipGuide from '@/components/dashboard/MembershipGuide';
 import RegistrationStatus from '@/components/dashboard/RegistrationStatus';
 import RegistrationAdmin from '@/components/admin/RegistrationAdmin';
-import { getClasses, addClass, updateClass, deleteClass, TangoClass } from '@/lib/db';
+import { getClasses, addClass, updateClass, deleteClass, getRegistrations, TangoClass, Registration } from '@/lib/db';
 import styles from './page.module.css';
 
 export default function Home() {
   const [classes, setClasses] = useState<TangoClass[]>([]);
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
   const [modalView, setModalView] = useState<'detail' | 'edit'>('detail');
   const [isLoading, setIsLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState<{ nickname: string, phone: string } | null>(null);
+  const [currentUser, setCurrentUser] = useState<{ nickname: string, phone: string, gender?: 'male' | 'female' } | null>(null);
   const [appliedClassIds, setAppliedClassIds] = useState<Set<string>>(new Set());
 
   // Navigation state
@@ -62,19 +63,22 @@ export default function Home() {
     
     window.addEventListener('ft_user_updated', loadUser);
     window.addEventListener('ft_classes_updated', fetchClasses);
+    window.addEventListener('ft_registrations_updated', fetchClasses);
     return () => {
       window.removeEventListener('ft_user_updated', loadUser);
       window.removeEventListener('ft_classes_updated', fetchClasses);
+      window.removeEventListener('ft_registrations_updated', fetchClasses);
     };
   }, []);
 
   const fetchClasses = async () => {
     setIsLoading(true);
     try {
-      const data = await getClasses();
-      setClasses(data);
+      const [classData, regData] = await Promise.all([getClasses(), getRegistrations()]);
+      setClasses(classData);
+      setRegistrations(regData);
     } catch (error) {
-      console.error('Error fetching classes:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setIsLoading(false);
     }
@@ -168,6 +172,19 @@ export default function Home() {
                 <>
                   <div className={styles.profileText}>
                     <span className={styles.nickname}>{currentUser.nickname}</span>
+                    <span 
+                      className={styles.logoutBtn}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (window.confirm('로그아웃 하시겠습니까?')) {
+                          localStorage.removeItem('ft_user');
+                          setCurrentUser(null);
+                          window.dispatchEvent(new Event('ft_user_updated'));
+                        }
+                      }}
+                    >
+                      로그아웃
+                    </span>
                   </div>
                   <div className={`${styles.profilePhoto} ${currentUser.gender === 'male' ? styles.male : styles.female}`} />
                 </>
@@ -323,6 +340,7 @@ export default function Home() {
               imageUrl={selectedClass.imageUrl}
               teacherProfile={selectedClass.teacherProfile}
               videoUrl={selectedClass.videoUrl}
+              registrations={registrations.filter(r => r.classIds.includes(selectedClass.id))}
               onRegister={handleRegisterClick}
               onEdit={isAdminLogged ? handleEdit : undefined}
               onDelete={isAdminLogged ? handleDelete : undefined}
