@@ -138,12 +138,17 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
       }, 
       (error) => {
         console.error("Upload failed", error);
-        alert("동영상 업로드 중 오류가 발생했습니다.");
+        alert(`동영상 업로드 중 오류가 발생했습니다: ${error.message}\n관리자에게 문의해주세요.`);
         setIsUploading(false);
       }, 
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setFormData(prev => ({ ...prev, videoUrl: downloadURL }));
+          setIsUploading(false);
+          alert("동영상이 성공적으로 업로드되었습니다!");
+        }).catch(err => {
+          console.error("URL retrieval failed", err);
+          alert("동영상 경로를 가져오는데 실패했습니다.");
           setIsUploading(false);
         });
       }

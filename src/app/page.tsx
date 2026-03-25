@@ -185,16 +185,6 @@ export default function Home() {
                   </section>
                 ))
             )}
-
-            <div style={{ marginTop: '3rem', marginBottom: '2rem' }}>
-              <a href="https://open.kakao.com/o/glYslQvc" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
-                <div style={{ padding: '1.25rem', background: '#fff0f2', border: '1px solid #ffe4e6', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
-                  <span style={{ color: '#e11d48', fontWeight: 800, fontSize: '0.95rem', lineHeight: 1.5 }}>
-                    신청하신 분은 '프리스타일 오픈톡방'에 반드시 들어오셔야<br/>수업 안내 등 받으실 수 있어요~! 클릭!
-                  </span>
-                </div>
-              </a>
-            </div>
           </main>
         </>
       )}
