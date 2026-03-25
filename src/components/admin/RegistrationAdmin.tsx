@@ -15,11 +15,30 @@ export default function RegistrationAdmin() {
   const fetchData = async () => {
     setIsLoading(true);
     try {
+      const { getRegistrations, getClasses } = await import('@/lib/db');
       const [regs, cls] = await Promise.all([getRegistrations(), getClasses()]);
       setRegistrations(regs);
       setClasses(cls);
     } catch (error) {
       console.error("Fetch Admin Data Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRecalculate = async () => {
+    if (!window.confirm("모든 수업의 리더/팔로워 카운트를 현재 신청 내역 기준으로 다시 계산하시겠습니까?")) return;
+    
+    setIsLoading(true);
+    try {
+      const { recalculateClassCounts } = await import('@/lib/db');
+      await recalculateClassCounts();
+      alert("카운트 재계산 및 동기화가 완료되었습니다!");
+      fetchData();
+      window.dispatchEvent(new Event('ft_classes_updated'));
+    } catch (error) {
+      console.error("Recalculate Error:", error);
+      alert("재계산 중 오류가 발생했습니다.");
     } finally {
       setIsLoading(false);
     }
@@ -40,8 +59,16 @@ export default function RegistrationAdmin() {
   if (isLoading) return <div style={{ textAlign: 'center', padding: '2rem' }}>신청 내역 불러오는 중...</div>;
 
   return (
-    <div style={{ overflowX: 'auto', background: '#fff', borderRadius: '16px', padding: '1rem', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+    <div style={{ background: '#fff', borderRadius: '16px', padding: '1rem', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+        <button 
+          onClick={handleRecalculate}
+          style={{ padding: '0.6rem 1rem', background: '#f2f4f6', color: '#4e5968', border: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
+        >
+          🔄 카운트 강제 동기화 (재계산)
+        </button>
+      </div>
+      <div style={{ overflowX: 'auto' }}>
         <thead>
           <tr style={{ background: '#f9fafb', borderBottom: '2px solid #eee' }}>
             <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>날짜</th>

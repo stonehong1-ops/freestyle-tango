@@ -62,6 +62,7 @@ export default function RegistrationStatus({ classes, onClose, requireIdentity }
           date: new Date().toISOString(),
           nickname,
           phone,
+          gender,
           classIds: Array.from(selectedIds),
           type: typeDisplay as any
         });

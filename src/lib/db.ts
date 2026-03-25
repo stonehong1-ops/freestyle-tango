@@ -35,6 +35,7 @@ export interface Registration {
   date: string;
   nickname: string;
   phone: string;
+  gender: 'male' | 'female';
   classIds: string[];
   type: '개별신청' | '1개월 신청' | '6개월 멤버쉽';
 }
@@ -84,4 +85,18 @@ export const incrementClassCounts = async (id: string, gender: 'male' | 'female'
   return await updateDoc(docRef, {
     [field]: increment(1)
   });
+};
+
+export const recalculateClassCounts = async () => {
+  const [regs, cls] = await Promise.all([getRegistrations(), getClasses()]);
+  
+  const updates = cls.map(async (c) => {
+    const maleCount = regs.filter(r => r.classIds.includes(c.id) && r.gender === 'male').length;
+    const femaleCount = regs.filter(r => r.classIds.includes(c.id) && r.gender === 'female').length;
+    
+    const docRef = doc(db, COLLECTION_NAME, c.id);
+    return await updateDoc(docRef, { maleCount, femaleCount });
+  });
+
+  return await Promise.all(updates);
 };
