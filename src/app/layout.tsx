@@ -1,3 +1,4 @@
+// v1.0.2 - Final Production Sync
 import type { Metadata } from "next";
 import "./globals.css";
 
