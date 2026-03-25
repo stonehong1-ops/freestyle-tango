@@ -103,21 +103,23 @@ export default function MembershipGuide() {
           </div>
         </div>
 
-        {/* Open Chat Banner (Moved lower) */}
-        <div style={{ marginBottom: '1.5rem' }}>
-          <a href="https://open.kakao.com/o/glYslQvc" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
-            <div style={{ padding: '1rem', background: '#fff0f2', border: '1px solid #ffe4e6', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer' }}>
-              <span style={{ color: '#e11d48', fontWeight: 800, fontSize: '0.85rem', lineHeight: 1.5 }}>
-                신청하신 분은 &apos;오픈톡방&apos;에 반드시 들어오셔야<br/>수업 안내를 받으실 수 있어요! (클릭)
-              </span>
-            </div>
-          </a>
-        </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
           <a href="tel:010-7209-2468" className={styles.contactBtn}>📞 전화</a>
           <a href="https://open.kakao.com/me/StoneHong" target="_blank" rel="noopener noreferrer" className={styles.contactBtn} style={{ background: '#FEE500', color: '#000', border: 'none' }}>💬 카카오톡</a>
           <a href="https://wa.me/821072092468" target="_blank" rel="noopener noreferrer" className={styles.contactBtn} style={{ background: '#25D366', color: '#fff', border: 'none' }}>🟩 와츠앱</a>
+        </div>
+
+        {/* Open Chat Banner (Now at the bottom) */}
+        <div style={{ marginTop: '1.5rem' }}>
+          <a href="https://open.kakao.com/o/glYslQvc" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+            <div style={{ padding: '1.25rem', background: '#FEE500', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+              <img src="/images/kakaotalk_openchat.png" alt="KakaoTalk" style={{ width: '48px', height: '48px', borderRadius: '12px' }} />
+              <span style={{ color: '#3c1e1e', fontWeight: 800, fontSize: '0.9rem', lineHeight: 1.5, textAlign: 'left' }}>
+                신청하신 분은 &apos;오픈톡방&apos;에 반드시 들어오셔야<br/>수업 안내를 받으실 수 있어요! (클릭)
+              </span>
+            </div>
+          </a>
         </div>
         <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
           <p style={{ fontSize: '0.75rem', color: '#adb5bd' }}>© {new Date().getFullYear()} FreestyleTango. All rights reserved.</p>

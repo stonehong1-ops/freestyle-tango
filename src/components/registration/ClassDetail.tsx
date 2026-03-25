@@ -145,7 +145,7 @@ export default function ClassDetail({
               onClick={() => onRegister(id)}
               style={{ flex: 1.5, padding: '1rem', borderRadius: '14px', border: 'none', background: '#3182f6', color: '#fff', fontSize: '1rem', fontWeight: 700, cursor: 'pointer' }}
             >
-              수업신청 선택하기
+              신청수업 목록에 담기
             </button>
           </div>
           <div style={{ textAlign: 'center', color: '#8b95a1', fontSize: '0.8rem', letterSpacing: '-0.3px' }}>
