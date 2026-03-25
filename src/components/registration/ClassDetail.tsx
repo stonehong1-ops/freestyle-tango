@@ -48,6 +48,12 @@ export default function ClassDetail({
         )}
       </div>
 
+      {teacherProfile && (
+        <div style={{ padding: '0.75rem 2rem', background: '#f8f9fa', color: '#3182f6', fontSize: '0.9rem', fontWeight: 600, borderBottom: '1px solid #f2f4f6' }}>
+          "{teacherProfile}"
+        </div>
+      )}
+
       <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
         <header>
           <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#3182f6', marginBottom: '0.5rem' }}>{level} · {type}</div>
@@ -56,11 +62,6 @@ export default function ClassDetail({
           <div style={{ color: '#8b95a1', fontSize: '0.9rem', marginTop: '0.5rem' }}>
             강사: {teacher1} {teacher2 && `& ${teacher2}`}
           </div>
-          {teacherProfile && (
-            <div style={{ color: '#3182f6', fontSize: '0.85rem', marginTop: '0.25rem', fontWeight: 500 }}>
-              "{teacherProfile}"
-            </div>
-          )}
         </header>
 
         <section>
