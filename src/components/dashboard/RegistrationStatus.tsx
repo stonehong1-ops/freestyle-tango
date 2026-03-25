@@ -1,3 +1,7 @@
+import React, { useState, useEffect } from 'react';
+import { TangoClass, Registration } from '@/lib/db';
+import styles from './RegistrationStatus.module.css';
+
 interface Props {
   classes: TangoClass[];
   selectedMonth: string; // From Home page
@@ -40,23 +44,6 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
     loadData();
   }, []);
 
-  const toggleSelection = (id: string) => {
-    const next = new Set(selectedIds);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    setSelectedIds(next);
-    
-    // 즉시 로컬 스토리지에 저장하여 홈 화면과 동기화
-    localStorage.setItem('my_tango_classes', JSON.stringify(Array.from(next)));
-    window.dispatchEvent(new Event('ft_user_updated'));
-  };
-
-  const grouped = classes.reduce((acc, cls) => {
-    const day = cls.time.match(/([월화수목금토일]요일)/)?.[1] || '기타';
-    if (!acc[day]) acc[day] = [];
-    acc[day].push(cls);
-    return acc;
-  }, {} as Record<string, TangoClass[]>);
 
   const handleRegister = async (regType: string) => {
     const action = async () => {
