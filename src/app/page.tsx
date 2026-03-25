@@ -392,12 +392,12 @@ export default function Home() {
                 placeholder="비밀번호" 
                 value={adminInputPw}
                 onChange={(e) => setAdminInputPw(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && adminInputPw === 'tangolucy' && setIsAdminLogged(true)}
+                onKeyDown={(e) => e.key === 'Enter' && adminInputPw === '9999' && setIsAdminLogged(true)}
                 style={{ padding: '1rem', borderRadius: '14px', border: '1px solid #ddd', width: '200px', textAlign: 'center', fontSize: '1.2rem' }}
               />
               <button 
                 onClick={() => {
-                  if (adminInputPw === 'tangolucy') {
+                  if (adminInputPw === '9999') {
                     handleAdminLogin(true);
                   } else {
                     alert('비밀번호가 틀렸습니다.');
