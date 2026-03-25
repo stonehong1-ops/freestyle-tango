@@ -47,6 +47,8 @@ export default function Home() {
   const [adminSubTab, setAdminSubTab] = useState<'classes' | 'registrations'>('registrations');
   const [showAdminStatus, setShowAdminStatus] = useState(false);
   const [showEditorModal, setShowEditorModal] = useState(false);
+  const [showStatsModal, setShowStatsModal] = useState(false);
+  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
 
   // Identity Interceptor
   const [showIdentityForm, setShowIdentityForm] = useState(false);
@@ -199,35 +201,31 @@ export default function Home() {
         <div className={styles.headerRight}>
           <div className={styles.adminGroup}>
             {isAdminLogged ? (
-              <>
+              <div style={{ position: 'relative' }}>
                 <button 
                   className={styles.headerAdminBtn}
-                  onClick={() => setShowEditorModal(true)}
-                  title="수업 등록"
+                  onClick={() => setIsAdminMenuOpen(!isAdminMenuOpen)}
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                  </svg>
-                </button>
-                <button 
-                  className={styles.headerAdminBtn}
-                  onClick={() => setShowAdminStatus(true)}
-                  title="신청 현황"
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="12" r="3"></circle>
                     <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                   </svg>
                 </button>
-              </>
+                {isAdminMenuOpen && (
+                  <div className={styles.adminDropdown}>
+                    <button onClick={() => { setShowEditorModal(true); setIsAdminMenuOpen(false); }}>수업 등록</button>
+                    <button onClick={() => { alert('밀롱가 편집 기능 준비 중'); setIsAdminMenuOpen(false); }}>밀롱가 등록</button>
+                    <button onClick={() => { setShowStatsModal(true); setIsAdminMenuOpen(false); }}>통계 보기</button>
+                    <button onClick={() => { setShowAdminStatus(true); setIsAdminMenuOpen(false); }}>신청 현황</button>
+                  </div>
+                )}
+              </div>
             ) : (
               <button 
                 className={styles.headerAdminBtn}
                 onClick={() => setShowAdminStatus(true)} 
-                title="관리자 로그인"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="3"></circle>
                   <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                 </svg>
@@ -434,6 +432,15 @@ export default function Home() {
             setShowEditorModal(false);
           }} 
         />
+      </FullscreenModal>
+
+      {/* Statistics Modal */}
+      <FullscreenModal
+        isOpen={showStatsModal}
+        onClose={() => setShowStatsModal(false)}
+        title="전체 통계 대시보드"
+      >
+        <StatisticsView classes={classes} registrations={registrations} />
       </FullscreenModal>
 
       <FooterMenu onAction={(id) => setActiveTab(id)} />
