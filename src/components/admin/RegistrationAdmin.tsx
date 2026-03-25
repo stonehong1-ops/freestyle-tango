@@ -26,6 +26,23 @@ export default function RegistrationAdmin() {
     }
   };
 
+  const handleFixGenders = async () => {
+    if (!window.confirm("현재 성별 정보가 없는 모든 신청자를 '리더(남성)'로 일괄 설정하시겠습니까?")) return;
+    
+    setIsLoading(true);
+    try {
+      const { fixExistingGenders } = await import('@/lib/db');
+      await fixExistingGenders();
+      alert("성별 데이터 보정이 완료되었습니다!");
+      fetchData();
+    } catch (error) {
+      console.error("Fix Gender Error:", error);
+      alert("데이터 보정 중 오류가 발생했습니다.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleRecalculate = async () => {
     if (!window.confirm("모든 수업의 리더/팔로워 카운트를 현재 신청 내역 기준으로 다시 계산하시겠습니까?")) return;
     
@@ -60,7 +77,13 @@ export default function RegistrationAdmin() {
 
   return (
     <div style={{ background: '#fff', borderRadius: '16px', padding: '1rem', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem', gap: '0.5rem' }}>
+        <button 
+          onClick={handleFixGenders}
+          style={{ padding: '0.6rem 1rem', background: '#eef3f6', color: '#3182f6', border: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
+        >
+          👔 기존 데이터 성별 보정
+        </button>
         <button 
           onClick={handleRecalculate}
           style={{ padding: '0.6rem 1rem', background: '#f2f4f6', color: '#4e5968', border: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
