@@ -57,6 +57,16 @@ export default function Home() {
       
       const savedClasses = localStorage.getItem('my_tango_classes');
       if (savedClasses) setAppliedClassIds(new Set(JSON.parse(savedClasses)));
+
+      // One-time fix for existing genderless registrations
+      (async () => {
+        try {
+          const { fixExistingGenders } = await import('@/lib/db');
+          await fixExistingGenders();
+        } catch (e) {
+          console.error("Gender Fix Error:", e);
+        }
+      })();
     };
     loadUser();
     

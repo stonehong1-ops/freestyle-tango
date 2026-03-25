@@ -15,10 +15,35 @@ export default function RegistrationStatus({ classes, onClose, requireIdentity }
 
 
   useEffect(() => {
-    const saved = localStorage.getItem('my_tango_classes');
-    if (saved) {
-      setSelectedIds(new Set(JSON.parse(saved)));
-    }
+    const loadData = async () => {
+      // 1. Load from local first
+      const localSaved = localStorage.getItem('my_tango_classes');
+      let combinedIds = new Set<string>();
+      if (localSaved) {
+        JSON.parse(localSaved).forEach((id: string) => combinedIds.add(id));
+      }
+
+      // 2. Try fetching from DB if user is identified
+      const savedUser = localStorage.getItem('ft_user');
+      if (savedUser) {
+        try {
+          const { phone } = JSON.parse(savedUser);
+          const { getRegistrationByPhone } = await import('@/lib/db');
+          const dbReg = await getRegistrationByPhone(phone);
+          if (dbReg) {
+            dbReg.classIds.forEach(id => combinedIds.add(id));
+            // Sync combined back to local storage
+            localStorage.setItem('my_tango_classes', JSON.stringify(Array.from(combinedIds)));
+            window.dispatchEvent(new Event('ft_user_updated'));
+          }
+        } catch (error) {
+          console.error("DB Fetch Error:", error);
+        }
+      }
+      setSelectedIds(combinedIds);
+    };
+    
+    loadData();
   }, []);
 
   const toggleSelection = (id: string) => {

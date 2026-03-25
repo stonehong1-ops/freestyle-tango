@@ -7,8 +7,10 @@ import {
   deleteDoc, 
   doc, 
   query, 
+  where,
   orderBy,
-  increment
+  increment,
+  limit
 } from 'firebase/firestore';
 
 export interface TangoClass {
@@ -67,7 +69,19 @@ export const deleteClass = async (id: string) => {
 const REG_COLLECTION = 'registrations';
 
 export const addRegistration = async (regData: Omit<Registration, 'id'>) => {
-  return await addDoc(collection(db, REG_COLLECTION), regData);
+  // Check if a registration with this phone number already exists
+  const q = query(collection(db, REG_COLLECTION), where('phone', '==', regData.phone), limit(1));
+  const querySnapshot = await getDocs(q);
+  
+  if (!querySnapshot.empty) {
+    // Update existing record
+    const existingDoc = querySnapshot.docs[0];
+    const docRef = doc(db, REG_COLLECTION, existingDoc.id);
+    return await updateDoc(docRef, regData as any);
+  } else {
+    // Add new record
+    return await addDoc(collection(db, REG_COLLECTION), regData);
+  }
 };
 
 export const getRegistrations = async (): Promise<Registration[]> => {
@@ -98,5 +112,24 @@ export const recalculateClassCounts = async () => {
     return await updateDoc(docRef, { maleCount, femaleCount });
   });
 
+  return await Promise.all(updates);
+};
+
+export const getRegistrationByPhone = async (phone: string): Promise<Registration | null> => {
+  const q = query(collection(db, REG_COLLECTION), where('phone', '==', phone), limit(1));
+  const querySnapshot = await getDocs(q);
+  if (querySnapshot.empty) return null;
+  const doc = querySnapshot.docs[0];
+  return { id: doc.id, ...doc.data() } as Registration;
+};
+
+export const fixExistingGenders = async () => {
+  const q = query(collection(db, REG_COLLECTION));
+  const querySnapshot = await getDocs(q);
+  const updates = querySnapshot.docs.map(async (d) => {
+    if (!d.data().gender) {
+      return await updateDoc(doc(db, REG_COLLECTION, d.id), { gender: 'male' });
+    }
+  });
   return await Promise.all(updates);
 };
