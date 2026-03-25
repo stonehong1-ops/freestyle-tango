@@ -229,15 +229,21 @@ export default function Home() {
       </header>
 
       <div className={styles.scrollContent}>
+        <div className={styles.titleCard}>
+          <div className={styles.titleLine1}>프리스타일탱고</div>
+          <div className={styles.titleLine2}>
+            <span className={styles.highlight}>{selectedMonth.split('-')[1]}월</span> {
+              activeTab === 'home' ? '수업정보' : 
+              activeTab === 'membership' ? '클럽안내' :
+              activeTab === 'status' ? '마이페이지' :
+              activeTab === 'lucy' ? '밀롱가Lucy' :
+              '신청현황'
+            }
+          </div>
+        </div>
+
         {activeTab === 'home' && (
           <>
-            <div className={styles.titleCard}>
-              <div className={styles.titleLine1}>프리스타일탱고</div>
-              <div className={styles.titleLine2}>
-                <span className={styles.highlight}>{selectedMonth.split('-')[1]}월</span> 수업정보
-              </div>
-            </div>
-
             {/* Month Selector Tabs */}
             <div className={styles.monthTabs}>
               {availableMonths.map(m => (
@@ -295,41 +301,37 @@ export default function Home() {
                 ))
             )}
           </main>
-        </>
-      )}
+        )}
 
-      {activeTab === 'membership' && (
-        <main className={styles.mainContent}>
-          <div className={styles.pageTitle}>클럽안내</div>
-          <MembershipGuide />
-        </main>
-      )}
+        {activeTab === 'membership' && (
+          <main className={styles.mainContent}>
+            <MembershipGuide />
+          </main>
+        )}
 
-      {activeTab === 'status' && (
-        <main className={styles.mainContent}>
-          <div className={styles.pageTitle}>마이페이지</div>
-          <RegistrationStatus 
-            classes={classes} 
-            selectedMonth={selectedMonth}
-            onClose={() => setActiveTab('home')} 
-            requireIdentity={requireIdentity}
-          />
-        </main>
-      )}
+        {activeTab === 'status' && (
+          <main className={styles.mainContent}>
+            <RegistrationStatus 
+              classes={classes} 
+              selectedMonth={selectedMonth}
+              onClose={() => setActiveTab('home')} 
+              requireIdentity={requireIdentity}
+            />
+          </main>
+        )}
 
-      {activeTab === 'lucy' && (
-        <main className={styles.mainContent}>
-          <div className={styles.pageTitle}>밀롱가Lucy</div>
-          <MilongaLucy />
-        </main>
-      )}
+        {activeTab === 'lucy' && (
+          <main className={styles.mainContent}>
+            <MilongaLucy />
+          </main>
+        )}
 
-      {activeTab === 'admin_status' && (
-        <main className={styles.mainContent}>
-          <div className={styles.pageTitle}>{selectedMonth.split('-')[1]}월 신청현황</div>
-          <RegistrationAdmin />
-        </main>
-      )}
+        {activeTab === 'admin_status' && (
+          <main className={styles.mainContent}>
+            <RegistrationAdmin />
+          </main>
+        )}
+      </div>
       </div>
 
 
