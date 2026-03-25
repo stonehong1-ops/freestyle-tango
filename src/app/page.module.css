@@ -14,11 +14,17 @@
   position: relative;
 }
 
-.profileArea {
+.headerActions {
   position: absolute;
   top: 1.5rem;
   right: 1.5rem;
   z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.profileArea {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -29,6 +35,11 @@
   cursor: pointer;
   transition: all 0.2s;
   border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.adminGroup {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .profileArea:active {

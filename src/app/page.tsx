@@ -196,67 +196,69 @@ export default function Home() {
               ))}
             </div>
             
-            {isAdminLogged ? (
-              <div style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto', marginRight: '0.75rem' }}>
-                <button 
-                  className={styles.headerAdminBtn}
-                  onClick={() => setShowEditorModal(true)}
-                  title="수업 등록"
-                >
-                  ➕
-                </button>
-                <button 
-                  className={styles.headerAdminBtn}
-                  onClick={() => setShowAdminStatus(true)}
-                  title="신청 현황"
-                >
-                  ⚙️
-                </button>
+            <div className={styles.headerActions}>
+              <div 
+                className={styles.profileArea}
+                onClick={() => requireIdentity(() => {})}
+              >
+                {currentUser ? (
+                  <>
+                    <div className={styles.profileText}>
+                      <span className={styles.nickname}>{currentUser.nickname}</span>
+                      <span 
+                        className={styles.logoutBtn}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (window.confirm('로그아웃 하시겠습니까?')) {
+                            localStorage.removeItem('ft_user');
+                            setCurrentUser(null);
+                            window.dispatchEvent(new Event('ft_user_updated'));
+                          }
+                        }}
+                      >
+                        로그아웃
+                      </span>
+                    </div>
+                    <div className={`${styles.profilePhoto} ${currentUser.role === 'leader' ? styles.male : styles.female}`} />
+                  </>
+                ) : (
+                  <>
+                    <div className={styles.profileText}>
+                      <span className={styles.loginRequired}>로그인필요</span>
+                    </div>
+                    <div className={styles.profilePhotoPlaceholder} />
+                  </>
+                )}
               </div>
-            ) : (
-              <div style={{ marginLeft: 'auto', marginRight: '0.75rem' }}>
-                <button 
-                  className={styles.headerAdminBtn}
-                  onClick={() => setShowAdminStatus(true)} 
-                  title="관리자 로그인"
-                >
-                  ⚙️
-                </button>
-              </div>
-            )}
 
-            <div 
-              className={styles.profileArea}
-              onClick={() => requireIdentity(() => {})}
-            >
-              {currentUser ? (
-                <>
-                  <div className={styles.profileText}>
-                    <span className={styles.nickname}>{currentUser.nickname}</span>
-                    <span 
-                      className={styles.logoutBtn}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (window.confirm('로그아웃 하시겠습니까?')) {
-                          localStorage.removeItem('ft_user');
-                          setCurrentUser(null);
-                          window.dispatchEvent(new Event('ft_user_updated'));
-                        }
-                      }}
+              <div className={styles.adminGroup}>
+                {isAdminLogged ? (
+                  <>
+                    <button 
+                      className={styles.headerAdminBtn}
+                      onClick={() => setShowEditorModal(true)}
+                      title="수업 등록"
                     >
-                      로그아웃
-                    </span>
-                  </div>
-                  <div className={`${styles.profilePhoto} ${currentUser.role === 'leader' ? styles.male : styles.female}`} />
-                </>
-              ) : (
-                <>
-                  <div className={styles.profileText}>
-                    <span className={styles.loginRequired}>로그인필요</span>
-                  </div>
-                  <div className={styles.profilePhotoPlaceholder} />
-                </>
-              )}
+                      ➕
+                    </button>
+                    <button 
+                      className={styles.headerAdminBtn}
+                      onClick={() => setShowAdminStatus(true)}
+                      title="신청 현황"
+                    >
+                      ⚙️
+                    </button>
+                  </>
+                ) : (
+                  <button 
+                    className={styles.headerAdminBtn}
+                    onClick={() => setShowAdminStatus(true)} 
+                    title="관리자 로그인"
+                  >
+                    ⚙️
+                  </button>
+                )}
+              </div>
             </div>
           </header>
 
