@@ -1,4 +1,4 @@
-'use client';
+'use client'; // Production deployment trigger v1.0.1
 
 import React, { useState, useEffect } from 'react';
 import ClassCard from '@/components/registration/ClassCard';
