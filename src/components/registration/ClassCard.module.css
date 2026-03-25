@@ -94,7 +94,7 @@
   color: var(--text-main);
 }
 
-.genderBalance {
+.roleBalance {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
@@ -123,13 +123,13 @@
   overflow: hidden;
 }
 
-.malePart {
+.leaderPart {
   height: 100%;
   background: linear-gradient(90deg, #3182f6, #60a5fa);
   border-radius: 3px;
 }
 
-.femalePart {
+.followerPart {
   height: 100%;
   background: linear-gradient(90deg, #f04452, #ff7e85);
   border-radius: 3px;

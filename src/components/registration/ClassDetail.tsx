@@ -37,7 +37,6 @@ export default function ClassDetail({
   teacher2,
   description,
   curriculum,
-  price, 
   imageUrl,
   teacherProfile,
   videoUrl,
@@ -49,9 +48,9 @@ export default function ClassDetail({
   // Filter registrations for THIS class ID
   const classRegs = registrations.filter(r => r.classIds && r.classIds.includes(id));
   
-  // Group by gender (default missing to male/leader as per request)
-  const leaders = classRegs.filter(r => r.gender === 'male' || !r.gender);
-  const followers = classRegs.filter(r => r.gender === 'female');
+  // Group by role (normalize to handle potential literal quotes)
+  const leaders = classRegs.filter(r => (r.role || '').replace(/"/g, '') === 'leader');
+  const followers = classRegs.filter(r => (r.role || '').replace(/"/g, '') === 'follower');
   return (
     <div style={{ padding: '0', display: 'flex', flexDirection: 'column', gap: '0', background: '#fff' }}>
       {/* 수업 대표 이미지 */}
@@ -65,7 +64,7 @@ export default function ClassDetail({
 
       {teacherProfile && (
         <div style={{ padding: '0.75rem 2rem', background: '#f8f9fa', color: '#3182f6', fontSize: '0.9rem', fontWeight: 600, borderBottom: '1px solid #f2f4f6' }}>
-          "{teacherProfile}"
+          &quot;{teacherProfile}&quot;
         </div>
       )}
 

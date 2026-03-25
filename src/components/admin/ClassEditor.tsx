@@ -4,10 +4,11 @@ import React, { useState, useRef } from 'react';
 import styles from './ClassEditor.module.css';
 import { storage } from '@/lib/firebase';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { TangoClass } from '@/lib/db';
 
 interface ClassEditorProps {
-  initialData?: any;
-  onSave: (data: any) => void;
+  initialData?: Partial<TangoClass>;
+  onSave: (data: Omit<TangoClass, 'id'> | Partial<TangoClass>) => void;
 }
 
 export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
@@ -23,13 +24,13 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
     time: initialData?.time || '',
     videoUrl: initialData?.videoUrl || '',
     teacherProfile: initialData?.teacherProfile || '',
-    maleCount: initialData?.maleCount || 0,
-    femaleCount: initialData?.femaleCount || 0,
+    leaderCount: initialData?.leaderCount || 0,
+    followerCount: initialData?.followerCount || 0,
     maxCount: initialData?.maxCount || 15,
   });
 
   const [dates, setDates] = useState<string[]>(
-    initialData?.dates?.length > 0 ? initialData.dates : ['', '', '', '']
+    (initialData?.dates && initialData.dates.length > 0) ? initialData.dates : ['', '', '', '']
   );
   let extractedStart = '20:00';
   let extractedEnd = '21:30';
@@ -55,7 +56,8 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
       : ['', '', '', '']
   );
   
-  const [isUploading, setIsUploading] = useState(false);
+  const [isImageUploading, setIsImageUploading] = useState(false);
+  const [isVideoUploading, setIsVideoUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -81,13 +83,12 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
     const file = e.target.files?.[0];
     if (!file) return;
     
-    setIsUploading(true);
+    setIsImageUploading(true);
     const reader = new FileReader();
     reader.onloadend = () => {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        // Max width to keep base64 string well under 1MB
         const MAX_WIDTH = 800;
         let scale = 1;
         if (img.width > MAX_WIDTH) {
@@ -97,22 +98,25 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
         canvas.height = img.height * scale;
         
         const ctx = canvas.getContext('2d');
-        ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
-        
-        // compress to 70% JPEG
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-        setFormData(prev => ({ ...prev, imageUrl: dataUrl }));
-        setIsUploading(false);
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          setFormData(prev => ({ ...prev, imageUrl: dataUrl }));
+          setIsImageUploading(false);
+        } else {
+          alert("이미지 컨텍스트를 생성하지 못했습니다.");
+          setIsImageUploading(false);
+        }
       };
       img.onerror = () => {
         alert("이미지 처리에 실패했습니다.");
-        setIsUploading(false);
+        setIsImageUploading(false);
       };
       img.src = reader.result as string;
     };
     reader.onerror = () => {
       alert("이미지 로드에 실패했습니다.");
-      setIsUploading(false);
+      setIsImageUploading(false);
     };
     reader.readAsDataURL(file);
   };
@@ -121,21 +125,19 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Check size (rough limit 50MB for 30s)
     if (file.size > 50 * 1024 * 1024) {
       alert("동영상 파일이 너무 큽니다. (최대 50MB)");
       return;
     }
 
-    setIsUploading(true);
+    setIsVideoUploading(true);
     setUploadProgress(0);
 
     const storageRef = ref(storage, `videos/${Date.now()}_${file.name}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
-    // 15초 동안 0%에서 멈춰있으면 안내 메시지 표시
     const timeoutId = setTimeout(() => {
-      if (uploadProgress === 0 && isUploading) {
+      if (uploadProgress === 0 && isVideoUploading) {
         alert("업로드가 시작되지 않습니다 (0%).\n\n확인 필요:\n1. Firebase Storage 규칙에서 'allow read, write: if true' 설정이 되어있나요?\n2. Vercel 환경변수(Storage Bucket)가 정확한지 확인해주세요.");
       }
     }, 15000);
@@ -148,26 +150,26 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
       (error) => {
         clearTimeout(timeoutId);
         console.error("Upload failed", error);
-        alert(`동영상 업로드 중 오류가 발생했습니다: ${error.message}\n관리자에게 문의해주세요.`);
-        setIsUploading(false);
+        alert(`동영상 업로드 중 오류가 발생했습니다: ${error.message}`);
+        setIsVideoUploading(false);
       }, 
       () => {
         clearTimeout(timeoutId);
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setFormData(prev => ({ ...prev, videoUrl: downloadURL }));
-          setIsUploading(false);
+          setIsVideoUploading(false);
           alert("동영상이 성공적으로 업로드되었습니다!");
-        }).catch(err => {
+        }).catch((err: unknown) => {
           console.error("URL retrieval failed", err);
           alert("동영상 경로를 가져오는데 실패했습니다.");
-          setIsUploading(false);
+          setIsVideoUploading(false);
         });
       }
     );
   };
 
   const handleDateChange = (index: number, value: string) => {
-    let newDates = [...dates];
+    const newDates = [...dates];
     newDates[index] = value;
     
     // Auto-fill subsequent weeks based on the 1st week
@@ -234,10 +236,10 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
           className={styles.imageUploadBox}
           onClick={() => fileInputRef.current?.click()}
         >
-          {isUploading ? (
+          {isImageUploading ? (
             <span>업로드 중...</span>
           ) : formData.imageUrl ? (
-            <img src={formData.imageUrl} alt="preview" className={styles.imagePreview} />
+            <img src={formData.imageUrl} alt="수업 대표 이미지 미리보기" className={styles.imagePreview} />
           ) : (
             <span>여기를 클릭하여 이미지 선택</span>
           )}
@@ -249,6 +251,14 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
           style={{ display: 'none' }} 
           onChange={handleImageUpload} 
         />
+        <input 
+          className={styles.input} 
+          style={{ marginTop: '0.5rem', fontSize: '0.8rem' }}
+          name="imageUrl" 
+          value={formData.imageUrl} 
+          onChange={handleChange} 
+          placeholder="또는 이미지 주소(URL) 직접 입력"
+        />
       </div>
 
       {/* 1.1 Video Upload */}
@@ -259,7 +269,7 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
           style={{ height: '120px', borderStyle: 'dashed' }}
           onClick={() => videoInputRef.current?.click()}
         >
-          {isUploading && uploadProgress < 100 ? (
+          {isVideoUploading && uploadProgress < 100 ? (
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '0.9rem', marginBottom: '0.5rem' }}>동영상 업로드 중... ({uploadProgress}%)</div>
               <div style={{ width: '200px', height: '6px', background: '#f2f4f6', borderRadius: '3px', overflow: 'hidden' }}>
@@ -284,6 +294,14 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
           ref={videoInputRef} 
           style={{ display: 'none' }} 
           onChange={handleVideoUpload} 
+        />
+        <input 
+          className={styles.input} 
+          style={{ marginTop: '0.5rem', fontSize: '0.8rem' }}
+          name="videoUrl" 
+          value={formData.videoUrl} 
+          onChange={handleChange} 
+          placeholder="또는 동영상 주소(URL) 직접 입력"
         />
       </div>
 
@@ -403,22 +421,22 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
 
       <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
         <div className={styles.inputGroup} style={{ flex: 1 }}>
-          <label>리더 인원 (남성)</label>
+          <label>리더 인원</label>
           <input 
             type="number" 
             className={styles.input} 
-            name="maleCount" 
-            value={formData.maleCount} 
+            name="leaderCount" 
+            value={formData.leaderCount} 
             onChange={handleChange} 
           />
         </div>
         <div className={styles.inputGroup} style={{ flex: 1 }}>
-          <label>팔로워 인원 (여성)</label>
+          <label>팔로워 인원</label>
           <input 
             type="number" 
             className={styles.input} 
-            name="femaleCount" 
-            value={formData.femaleCount} 
+            name="followerCount" 
+            value={formData.followerCount} 
             onChange={handleChange} 
           />
         </div>

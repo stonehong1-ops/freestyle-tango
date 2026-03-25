@@ -11,8 +11,8 @@ interface ClassCardProps {
   teacher: string;
   imageUrl?: string;
   price: string;
-  maleCount: number;
-  femaleCount: number;
+  leaderCount: number;
+  followerCount: number;
   maxCount: number;
   isApplied?: boolean;
   onClick: (id: string) => void;
@@ -26,14 +26,14 @@ export default function ClassCard({
   teacher,
   imageUrl,
   price,
-  maleCount,
-  femaleCount,
+  leaderCount,
+  followerCount,
   maxCount,
   isApplied,
   onClick
 }: ClassCardProps) {
-  const malePercent = (maleCount / maxCount) * 100;
-  const femalePercent = (femaleCount / maxCount) * 100;
+  const leadPercent = (leaderCount / maxCount) * 100;
+  const followPercent = (followerCount / maxCount) * 100;
 
   return (
     <div className={styles.card} onClick={() => onClick(id)}>
@@ -64,20 +64,20 @@ export default function ClassCard({
         
         <div className={styles.footerArea}>
           <div className={styles.price}>{price}</div>
-          <div className={styles.genderBalance}>
+          <div className={styles.roleBalance}>
             <div className={styles.balanceStatus}>
               <span className={styles.roleLabel}>리더</span>
               <div className={styles.balanceBar}>
-                <div className={styles.malePart} style={{ width: `${malePercent}%` }} />
+                <div className={styles.leaderPart} style={{ width: `${leadPercent}%` }} />
               </div>
-              <span className={styles.countLabel}>{maleCount}</span>
+              <span className={styles.countLabel}>{leaderCount}</span>
             </div>
             <div className={styles.balanceStatus}>
               <span className={styles.roleLabel}>팔로워</span>
               <div className={styles.balanceBar}>
-                <div className={styles.femalePart} style={{ width: `${femalePercent}%` }} />
+                <div className={styles.followerPart} style={{ width: `${followPercent}%` }} />
               </div>
-              <span className={styles.countLabel}>{femaleCount}</span>
+              <span className={styles.countLabel}>{followerCount}</span>
             </div>
           </div>
         </div>

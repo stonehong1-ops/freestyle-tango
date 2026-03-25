@@ -108,7 +108,7 @@ export default function MembershipGuide() {
           <a href="https://open.kakao.com/o/glYslQvc" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
             <div style={{ padding: '1rem', background: '#fff0f2', border: '1px solid #ffe4e6', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer' }}>
               <span style={{ color: '#e11d48', fontWeight: 800, fontSize: '0.85rem', lineHeight: 1.5 }}>
-                신청하신 분은 '오픈톡방'에 반드시 들어오셔야<br/>수업 안내를 받으실 수 있어요! (클릭)
+                신청하신 분은 &apos;오픈톡방&apos;에 반드시 들어오셔야<br/>수업 안내를 받으실 수 있어요! (클릭)
               </span>
             </div>
           </a>

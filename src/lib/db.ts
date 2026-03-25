@@ -9,7 +9,6 @@ import {
   query, 
   where,
   orderBy,
-  increment,
   limit
 } from 'firebase/firestore';
 
@@ -24,12 +23,14 @@ export interface TangoClass {
   curriculum: string;
   time: string;
   price: string;
-  maleCount: number;
-  femaleCount: number;
+  leaderCount: number;
+  followerCount: number;
   maxCount: number;
   imageUrl?: string;
   teacherProfile?: string;
   videoUrl?: string;
+  dates?: string[];
+  timeStr?: string;
 }
 
 export interface Registration {
@@ -37,7 +38,7 @@ export interface Registration {
   date: string;
   nickname: string;
   phone: string;
-  gender: 'male' | 'female';
+  role: 'leader' | 'follower';
   classIds: string[];
   type: '개별신청' | '1개월 신청' | '6개월 멤버쉽';
 }
@@ -47,9 +48,9 @@ const COLLECTION_NAME = 'tango_classes';
 export const getClasses = async (): Promise<TangoClass[]> => {
   const q = query(collection(db, COLLECTION_NAME), orderBy('time', 'asc'));
   const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
+  return querySnapshot.docs.map(docSnap => ({
+    id: docSnap.id,
+    ...docSnap.data()
   } as TangoClass));
 };
 
@@ -77,7 +78,9 @@ export const addRegistration = async (regData: Omit<Registration, 'id'>) => {
     // Update existing record
     const existingDoc = querySnapshot.docs[0];
     const docRef = doc(db, REG_COLLECTION, existingDoc.id);
-    return await updateDoc(docRef, regData as any);
+    // Cast to any because the exact type mapping for Omit can sometimes be tricky with updateDoc
+    // but here regData is exactly the fields we want to update.
+    return await updateDoc(docRef, regData as object);
   } else {
     // Add new record
     return await addDoc(collection(db, REG_COLLECTION), regData);
@@ -87,49 +90,18 @@ export const addRegistration = async (regData: Omit<Registration, 'id'>) => {
 export const getRegistrations = async (): Promise<Registration[]> => {
   const q = query(collection(db, REG_COLLECTION), orderBy('date', 'desc'));
   const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
+  return querySnapshot.docs.map(docSnap => ({
+    id: docSnap.id,
+    ...docSnap.data()
   } as Registration));
 };
 
-export const incrementClassCounts = async (id: string, gender: 'male' | 'female') => {
-  const docRef = doc(db, COLLECTION_NAME, id);
-  const field = gender === 'male' ? 'maleCount' : 'femaleCount';
-  return await updateDoc(docRef, {
-    [field]: increment(1)
-  });
-};
-
-export const recalculateClassCounts = async () => {
-  const [regs, cls] = await Promise.all([getRegistrations(), getClasses()]);
-  
-  const updates = cls.map(async (c) => {
-    const maleCount = regs.filter(r => r.classIds.includes(c.id) && r.gender === 'male').length;
-    const femaleCount = regs.filter(r => r.classIds.includes(c.id) && r.gender === 'female').length;
-    
-    const docRef = doc(db, COLLECTION_NAME, c.id);
-    return await updateDoc(docRef, { maleCount, femaleCount });
-  });
-
-  return await Promise.all(updates);
-};
+// Counts are now calculated on the fly from registrations in the UI components
 
 export const getRegistrationByPhone = async (phone: string): Promise<Registration | null> => {
   const q = query(collection(db, REG_COLLECTION), where('phone', '==', phone), limit(1));
   const querySnapshot = await getDocs(q);
   if (querySnapshot.empty) return null;
-  const doc = querySnapshot.docs[0];
-  return { id: doc.id, ...doc.data() } as Registration;
-};
-
-export const fixExistingGenders = async () => {
-  const q = query(collection(db, REG_COLLECTION));
-  const querySnapshot = await getDocs(q);
-  const updates = querySnapshot.docs.map(async (d) => {
-    if (!d.data().gender) {
-      return await updateDoc(doc(db, REG_COLLECTION, d.id), { gender: 'male' });
-    }
-  });
-  return await Promise.all(updates);
+  const docSnap = querySnapshot.docs[0];
+  return { id: docSnap.id, ...docSnap.data() } as Registration;
 };

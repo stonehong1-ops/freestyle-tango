@@ -18,14 +18,14 @@
   margin-bottom: 1.5rem;
 }
 
-/* Step 1: Gender Select */
-.genderGrid {
+/* Step 1: Role Select */
+.roleGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
 
-.genderBtn {
+.roleBtn {
   aspect-ratio: 1 / 1;
   background: var(--bg-main);
   border: 2px solid transparent;
@@ -39,20 +39,20 @@
   transition: all 0.2s;
 }
 
-.genderBtn:hover {
+.roleBtn:hover {
   background: #eee;
 }
 
-.genderBtn.selected {
+.roleBtn.selected {
   border-color: var(--primary);
   background: rgba(49, 130, 246, 0.05);
 }
 
-.genderIcon {
+.roleIcon {
   font-size: 2.5rem;
 }
 
-.genderLabel {
+.roleLabel {
   font-weight: 700;
   font-size: 1.1rem;
 }

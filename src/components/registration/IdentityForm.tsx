@@ -9,7 +9,7 @@ interface IdentityFormProps {
 }
 
 export default function IdentityForm({ onClose, onComplete }: IdentityFormProps) {
-  const [gender, setGender] = useState<'male' | 'female' | null>(null);
+  const [role, setRole] = useState<'leader' | 'follower' | null>(null);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
 
@@ -19,8 +19,8 @@ export default function IdentityForm({ onClose, onComplete }: IdentityFormProps)
   };
 
   const handleComplete = () => {
-    if (gender && name && phone.length >= 10) {
-      localStorage.setItem('ft_user', JSON.stringify({ nickname: name, phone, gender }));
+    if (role && name && phone.length >= 10) {
+      localStorage.setItem('ft_user', JSON.stringify({ nickname: name, phone, role }));
       window.dispatchEvent(new Event('ft_user_updated'));
       onComplete();
     }
@@ -32,29 +32,29 @@ export default function IdentityForm({ onClose, onComplete }: IdentityFormProps)
       <p style={{ fontSize: '0.9rem', color: '#8b95a1', marginBottom: '1.5rem' }}>회원님의 정보를 입력해 주세요.</p>
 
       <div style={{ marginBottom: '1.5rem' }}>
-        <label style={{ display: 'block', fontSize: '0.85rem', color: '#4e5968', marginBottom: '0.5rem', fontWeight: 600 }}>성별</label>
+        <label style={{ display: 'block', fontSize: '0.85rem', color: '#4e5968', marginBottom: '0.5rem', fontWeight: 600 }}>역할</label>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           <button 
-            onClick={() => setGender('male')}
+            onClick={() => setRole('leader')}
             style={{
               flex: 1, padding: '0.8rem', borderRadius: '12px', border: 'none',
-              background: gender === 'male' ? '#3182f6' : '#f2f4f6',
-              color: gender === 'male' ? '#fff' : '#4e5968',
+              background: role === 'leader' ? '#3182f6' : '#f2f4f6',
+              color: role === 'leader' ? '#fff' : '#4e5968',
               fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s'
             }}
           >
-            리더 (남)
+            리더
           </button>
           <button 
-            onClick={() => setGender('female')}
+            onClick={() => setRole('follower')}
             style={{
               flex: 1, padding: '0.8rem', borderRadius: '12px', border: 'none',
-              background: gender === 'female' ? '#3182f6' : '#f2f4f6',
-              color: gender === 'female' ? '#fff' : '#4e5968',
+              background: role === 'follower' ? '#3182f6' : '#f2f4f6',
+              color: role === 'follower' ? '#fff' : '#4e5968',
               fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s'
             }}
           >
-            팔로워 (여)
+            팔로워
           </button>
         </div>
       </div>
@@ -84,10 +84,10 @@ export default function IdentityForm({ onClose, onComplete }: IdentityFormProps)
         </button>
         <button 
           onClick={handleComplete}
-          disabled={!gender || !name || phone.length < 10}
+          disabled={!role || !name || phone.length < 10}
           style={{
             flex: 2, padding: '1rem', borderRadius: '12px', border: 'none',
-            background: (!gender || !name || phone.length < 10) ? '#e5e8eb' : '#3182f6',
+            background: (!role || !name || phone.length < 10) ? '#e5e8eb' : '#3182f6',
             color: '#fff', fontWeight: 600, cursor: 'pointer'
           }}
         >

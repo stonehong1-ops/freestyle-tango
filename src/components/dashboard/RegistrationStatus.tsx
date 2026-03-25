@@ -18,7 +18,7 @@ export default function RegistrationStatus({ classes, onClose, requireIdentity }
     const loadData = async () => {
       // 1. Load from local first
       const localSaved = localStorage.getItem('my_tango_classes');
-      let combinedIds = new Set<string>();
+      const combinedIds = new Set<string>();
       if (localSaved) {
         JSON.parse(localSaved).forEach((id: string) => combinedIds.add(id));
       }
@@ -72,7 +72,8 @@ export default function RegistrationStatus({ classes, onClose, requireIdentity }
         alert("사용자 정보를 찾을 수 없습니다. 다시 시도해주세요.");
         return;
       }
-      const { nickname, phone, gender } = JSON.parse(savedUser);
+      const { nickname, phone, role: rawRole } = JSON.parse(savedUser);
+      const role = (rawRole || '').replace(/"/g, '');
 
       // 2. Prepare registration data
       const typeDisplay = 
@@ -80,24 +81,19 @@ export default function RegistrationStatus({ classes, onClose, requireIdentity }
         regType === 'month1' ? '1개월 신청' : '개별신청';
 
       try {
-        const { addRegistration, incrementClassCounts } = await import('@/lib/db');
+        const { addRegistration } = await import('@/lib/db');
         
         // A. 신청 내역 저장
         await addRegistration({
           date: new Date().toISOString(),
           nickname,
           phone,
-          gender,
+          role,
           classIds: Array.from(selectedIds),
-          type: typeDisplay as any
+          type: typeDisplay as '개별신청' | '1개월 신청' | '6개월 멤버쉽'
         });
 
-        // B. 해당 수업들의 성별 카운트 증가
-        if (gender === 'male' || gender === 'female') {
-          await Promise.all(
-            Array.from(selectedIds).map(id => incrementClassCounts(id, gender))
-          );
-        }
+        // B. (No longer needed: counts are calculated on the fly from registrations)
 
         // 3. Success handling
         localStorage.removeItem('my_tango_classes');

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { getRegistrations, getClasses, Registration, TangoClass } from '@/lib/db';
+import { Registration, TangoClass } from '@/lib/db';
 
 export default function RegistrationAdmin() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
@@ -19,47 +19,16 @@ export default function RegistrationAdmin() {
       const [regs, cls] = await Promise.all([getRegistrations(), getClasses()]);
       setRegistrations(regs);
       setClasses(cls);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Fetch Admin Data Error:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleFixGenders = async () => {
-    if (!window.confirm("현재 성별 정보가 없는 모든 신청자를 '리더(남성)'로 일괄 설정하시겠습니까?")) return;
-    
-    setIsLoading(true);
-    try {
-      const { fixExistingGenders } = await import('@/lib/db');
-      await fixExistingGenders();
-      alert("성별 데이터 보정이 완료되었습니다!");
-      fetchData();
-    } catch (error) {
-      console.error("Fix Gender Error:", error);
-      alert("데이터 보정 중 오류가 발생했습니다.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
-  const handleRecalculate = async () => {
-    if (!window.confirm("모든 수업의 리더/팔로워 카운트를 현재 신청 내역 기준으로 다시 계산하시겠습니까?")) return;
-    
-    setIsLoading(true);
-    try {
-      const { recalculateClassCounts } = await import('@/lib/db');
-      await recalculateClassCounts();
-      alert("카운트 재계산 및 동기화가 완료되었습니다!");
-      fetchData();
-      window.dispatchEvent(new Event('ft_classes_updated'));
-    } catch (error) {
-      console.error("Recalculate Error:", error);
-      alert("재계산 중 오류가 발생했습니다.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+
+  // Counts are now handled automatically on the fly in the class list UI
 
   const getClassTitles = (ids: string[]) => {
     return ids.map(id => {
@@ -78,18 +47,8 @@ export default function RegistrationAdmin() {
   return (
     <div style={{ background: '#fff', borderRadius: '16px', padding: '1rem', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem', gap: '0.5rem' }}>
-        <button 
-          onClick={handleFixGenders}
-          style={{ padding: '0.6rem 1rem', background: '#eef3f6', color: '#3182f6', border: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
-        >
-          👔 기존 데이터 성별 보정
-        </button>
-        <button 
-          onClick={handleRecalculate}
-          style={{ padding: '0.6rem 1rem', background: '#f2f4f6', color: '#4e5968', border: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
-        >
-          🔄 카운트 강제 동기화 (재계산)
-        </button>
+
+        {/* Counts are now calculated on the fly, no recalibration needed */}
       </div>
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
@@ -97,6 +56,7 @@ export default function RegistrationAdmin() {
             <tr style={{ background: '#f9fafb', borderBottom: '2px solid #eee' }}>
               <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>날짜</th>
               <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>닉네임</th>
+              <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>역할</th>
               <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>신청수업</th>
               <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>구분</th>
               <th style={{ padding: '1rem', textAlign: 'left', color: '#8b95a1' }}>연락처</th>
@@ -105,13 +65,30 @@ export default function RegistrationAdmin() {
           <tbody>
             {registrations.length === 0 ? (
               <tr>
-                <td colSpan={5} style={{ padding: '3rem', textAlign: 'center', color: '#adb5bd' }}>신청 내역이 없습니다.</td>
+                <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: '#adb5bd' }}>신청 내역이 없습니다.</td>
               </tr>
             ) : (
               registrations.map(reg => (
                 <tr key={reg.id} style={{ borderBottom: '1px solid #f2f4f6' }}>
                   <td style={{ padding: '1rem', color: '#4e5968' }}>{formatDate(reg.date)}</td>
                   <td style={{ padding: '1rem', fontWeight: 700, color: '#191f28' }}>{reg.nickname}</td>
+                  <td style={{ padding: '1rem' }}>
+                    {(() => {
+                      const role = (reg.role || '').replace(/"/g, '');
+                      return (
+                        <span style={{ 
+                          padding: '0.3rem 0.6rem', 
+                          borderRadius: '8px', 
+                          fontSize: '0.75rem',
+                          background: role === 'leader' ? '#e8f3ff' : '#fff0f2',
+                          color: role === 'leader' ? '#1b64da' : '#f04452',
+                          fontWeight: 700
+                        }}>
+                          {role === 'leader' ? '리더' : '팔로워'}
+                        </span>
+                      );
+                    })()}
+                  </td>
                   <td style={{ padding: '1rem', color: '#4e5968', maxWidth: '300px' }}>{getClassTitles(reg.classIds)}</td>
                   <td style={{ padding: '1rem' }}>
                     <span style={{ 

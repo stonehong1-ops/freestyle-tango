@@ -9,11 +9,11 @@ interface RegistrationFormProps {
   onClose: () => void;
 }
 
-type Step = 'gender' | 'info' | 'success';
+type Step = 'role' | 'info' | 'success';
 
-export default function RegistrationForm({ classId, classTitle, onClose }: RegistrationFormProps) {
-  const [step, setStep] = useState<Step>('gender');
-  const [gender, setGender] = useState<'male' | 'female' | null>(null);
+export default function RegistrationForm({ classId, onClose }: RegistrationFormProps) {
+  const [step, setStep] = useState<Step>('role');
+  const [role, setRole] = useState<'leader' | 'follower' | null>(null);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
 
@@ -23,12 +23,12 @@ export default function RegistrationForm({ classId, classTitle, onClose }: Regis
       const { nickname, phone } = JSON.parse(savedUser);
       setName(nickname || '');
       setPhone(phone || '');
-      setGender('female'); // default for ease, they can change it
+      setRole('follower'); // default for ease, they can change it
     }
   }, []);
 
   const handleNext = () => {
-    if (step === 'gender' && gender) {
+    if (step === 'role' && role) {
       setStep('info');
     } else if (step === 'info' && name && phone) {
       const saved = localStorage.getItem('my_tango_classes');
@@ -46,7 +46,7 @@ export default function RegistrationForm({ classId, classTitle, onClose }: Regis
 
   const handleBack = () => {
     if (step === 'info') {
-      setStep('gender');
+      setStep('role');
     } else {
       onClose();
     }
@@ -81,29 +81,29 @@ export default function RegistrationForm({ classId, classTitle, onClose }: Regis
     <div className={styles.formContainer}>
       <div>
         <h2 className={styles.stepTitle}>
-          {step === 'gender' ? '성별을 선택해 주세요' : '연락처를 남겨주세요'}
+          {step === 'role' ? '역할을 선택해 주세요' : '연락처를 남겨주세요'}
         </h2>
         <p className={styles.stepDesc}>
-          {step === 'gender' 
-            ? '원활한 성비 균형을 위해 성별 확인이 필요합니다.' 
+          {step === 'role' 
+            ? '원활한 성비 균형을 위해 역할 확인이 필요합니다.' 
             : '신청 결과 안내를 위해 정확한 정보를 입력해 주세요.'}
         </p>
 
-        {step === 'gender' ? (
-          <div className={styles.genderGrid}>
+        {step === 'role' ? (
+          <div className={styles.roleGrid}>
             <button 
-              className={`${styles.genderBtn} ${gender === 'male' ? styles.selected : ''}`}
-              onClick={() => setGender('male')}
+              className={`${styles.roleBtn} ${role === 'leader' ? styles.selected : ''}`}
+              onClick={() => setRole('leader')}
             >
-              <span className={styles.genderIcon}>👔</span>
-              <span className={styles.genderLabel}>리더 (남성)</span>
+              <span className={styles.roleIcon}>👔</span>
+              <span className={styles.roleLabel}>리더</span>
             </button>
             <button 
-              className={`${styles.genderBtn} ${gender === 'female' ? styles.selected : ''}`}
-              onClick={() => setGender('female')}
+              className={`${styles.roleBtn} ${role === 'follower' ? styles.selected : ''}`}
+              onClick={() => setRole('follower')}
             >
-              <span className={styles.genderIcon}>👠</span>
-              <span className={styles.genderLabel}>팔로워 (여성)</span>
+              <span className={styles.roleIcon}>👠</span>
+              <span className={styles.roleLabel}>팔로워</span>
             </button>
           </div>
         ) : (
@@ -139,9 +139,9 @@ export default function RegistrationForm({ classId, classTitle, onClose }: Regis
         <button 
           className={styles.nextBtn} 
           onClick={handleNext}
-          disabled={step === 'gender' ? !gender : (!name || !phone)}
+          disabled={step === 'role' ? !role : (!name || !phone)}
         >
-          {step === 'gender' ? '다음' : '신청 완료하기'}
+          {step === 'role' ? '다음' : '신청 완료하기'}
         </button>
       </footer>
     </div>

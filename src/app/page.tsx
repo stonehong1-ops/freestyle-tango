@@ -19,7 +19,7 @@ export default function Home() {
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
   const [modalView, setModalView] = useState<'detail' | 'edit'>('detail');
   const [isLoading, setIsLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState<{ nickname: string, phone: string, gender?: 'male' | 'female' } | null>(null);
+  const [currentUser, setCurrentUser] = useState<{ nickname: string, phone: string, role?: 'leader' | 'follower' } | null>(null);
   const [appliedClassIds, setAppliedClassIds] = useState<Set<string>>(new Set());
 
   // Navigation state
@@ -102,7 +102,7 @@ export default function Home() {
     });
   };
 
-  const handleEdit = (id: string) => {
+  const handleEdit = () => {
     setModalView('edit');
   };
 
@@ -113,27 +113,29 @@ export default function Home() {
         alert('삭제되었습니다.');
         handleCloseModal();
         fetchClasses();
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("Delete Error: ", error);
-        alert('삭제 실패: ' + (error.message || error));
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        alert('삭제 실패: ' + errorMessage);
       }
     }
   };
 
-  const handleSave = async (data: any) => {
+  const handleSave = async (data: Omit<TangoClass, 'id'> | Partial<TangoClass>) => {
     try {
       if (modalView === 'edit' && selectedClassId) {
         await updateClass(selectedClassId, data);
         alert('수정되었습니다.');
         setModalView('detail');
       } else {
-        await addClass(data);
+        await addClass(data as Omit<TangoClass, 'id'>);
         alert('등록되었습니다.');
         setActiveTab('home'); // Go back home after adding
       }
       fetchClasses();
-    } catch (error) {
-      alert('저장 실패: ' + error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      alert('저장 실패: ' + errorMessage);
     }
   };
 
@@ -186,7 +188,7 @@ export default function Home() {
                       로그아웃
                     </span>
                   </div>
-                  <div className={`${styles.profilePhoto} ${currentUser.gender === 'male' ? styles.male : styles.female}`} />
+                  <div className={`${styles.profilePhoto} ${currentUser.role === 'leader' ? styles.male : styles.female}`} />
                 </>
               ) : (
                 <>
@@ -212,18 +214,28 @@ export default function Home() {
                     <h3 className={styles.dayTitle}>{day}</h3>
                     <div className={styles.cardList}>
                       {groupedClasses[day].map((cls) => {
-                        const classRegs = registrations.filter(r => r.classIds && r.classIds.includes(cls.id));
-                        const mCount = classRegs.filter(r => r.gender === 'male' || !r.gender).length;
-                        const fCount = classRegs.filter(r => r.gender === 'female').length;
-                        
+                        // Calculate counts in real-time from registrations array
+                        const leaderCount = registrations.filter(r => 
+                          r.classIds.includes(cls.id) && (r.role || '').replace(/"/g, '') === 'leader'
+                        ).length;
+                        const followerCount = registrations.filter(r => 
+                          r.classIds.includes(cls.id) && (r.role || '').replace(/"/g, '') === 'follower'
+                        ).length;
+
                         return (
                           <ClassCard 
                             key={cls.id}
-                            {...cls}
-                            maleCount={mCount}
-                            femaleCount={fCount}
-                            isApplied={appliedClassIds.has(cls.id)}
+                            id={cls.id}
+                            level={cls.level}
+                            title={cls.title}
+                            time={cls.time}
                             teacher={`${cls.teacher1}${cls.teacher2 ? ` & ${cls.teacher2}` : ''}`}
+                            imageUrl={cls.imageUrl}
+                            price={cls.price ? `${cls.price.toLocaleString()}원` : '0원'}
+                            leaderCount={leaderCount}
+                            followerCount={followerCount}
+                            maxCount={cls.maxCount || 20}
+                            isApplied={appliedClassIds.has(cls.id)}
                             onClick={handleCardClick}
                           />
                         );
