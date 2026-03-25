@@ -42,14 +42,19 @@ export default function ClassCard({
           ✅ 선택됨
         </div>
       )}
-      <div className={styles.imageArea}>
-        {imageUrl ? (
-          <img src={imageUrl} alt={teacher} />
-        ) : (
-          <div style={{ backgroundColor: '#eef3f6', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8b95a1' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{teacher}</span>
-          </div>
-        )}
+      <div className={styles.leftColumn}>
+        <div className={styles.imageArea}>
+          {imageUrl ? (
+            <img src={imageUrl} alt={teacher} />
+          ) : (
+            <div style={{ backgroundColor: '#eef3f6', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8b95a1' }}>
+              <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>TANGO</span>
+            </div>
+          )}
+        </div>
+        <div className={styles.teacherName}>
+          {teacher}
+        </div>
       </div>
       
       <div className={styles.contentArea}>

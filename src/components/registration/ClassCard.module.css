@@ -18,13 +18,30 @@
   box-shadow: none;
 }
 
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  width: 80px;
+  flex-shrink: 0;
+}
+
 .imageArea {
   width: 80px;
   height: 80px;
   border-radius: var(--radius-sm);
   background: #eee;
   overflow: hidden;
-  flex-shrink: 0;
+}
+
+.teacherName {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-main);
+  text-align: center;
+  word-break: keep-all;
+  line-height: 1.2;
 }
 
 .imageArea img {
