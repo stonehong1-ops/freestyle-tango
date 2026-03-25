@@ -13,6 +13,7 @@ interface ClassDetailProps {
   teacher2: string;
   description: string;
   curriculum: string;
+  price: string;
   imageUrl?: string;
   teacherProfile?: string;
   videoUrl?: string;
