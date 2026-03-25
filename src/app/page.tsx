@@ -254,34 +254,30 @@ export default function Home() {
       </header>
 
       <div className={styles.scrollContent}>
-        <div className={styles.titleCard}>
-          <div className={styles.titleLine1}>프리스타일탱고</div>
-          <div className={styles.titleLine2}>
-            <span className={styles.highlight}>{selectedMonth.split('-')[1]}월</span> {
+        <div className={styles.pageHeader}>
+          <h2 className={styles.pageTitle}>
+            {
               activeTab === 'home' ? '수업정보' : 
               activeTab === 'membership' ? '클럽안내' :
               activeTab === 'status' ? '마이페이지' :
               activeTab === 'lucy' ? '밀롱가Lucy' :
               '신청현황'
             }
-          </div>
+          </h2>
+          {activeTab === 'home' && (
+            <select 
+              className={styles.monthSelect}
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+            >
+              {availableMonths.map(m => (
+                <option key={m} value={m}>{m.split('-')[1]}월</option>
+              ))}
+            </select>
+          )}
         </div>
 
         {activeTab === 'home' && (
-          <>
-            {/* Month Selector Tabs */}
-            <div className={styles.monthTabs}>
-              {availableMonths.map(m => (
-                <button 
-                  key={m} 
-                  className={`${styles.monthTab} ${selectedMonth === m ? styles.activeMonth : ''}`}
-                  onClick={() => setSelectedMonth(m)}
-                >
-                  {m.split('-')[1]}월
-                </button>
-              ))}
-            </div>
-
           <main className={styles.mainContent}>
             {isLoading ? (
               <div style={{ textAlign: 'center', padding: '3rem', color: '#8b95a1' }}>로딩 중...</div>

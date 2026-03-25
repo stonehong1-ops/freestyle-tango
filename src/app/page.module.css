@@ -128,69 +128,41 @@
   text-align: center;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.titleLine1 {
-  font-size: 1.4rem;
-  font-weight: 800;
-  color: #191f28;
-  letter-spacing: -0.03em;
-  margin-bottom: 0.2rem;
-}
-
-.titleLine2 {
-  font-size: 1.4rem;
-  font-weight: 800;
-  color: #191f28;
-  letter-spacing: -0.03em;
-}
-
-.titleLine2 .highlight {
-  color: #3182f6;
+  padding: 1.5rem 1.25rem 0.75rem;
+  background: #fdfdfd;
 }
 
 .pageTitle {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 800;
-  color: #191f28;
-  margin: 1.5rem 0.5rem 1.5rem;
-  letter-spacing: -0.04em;
+  color: #1a1a1a;
+  letter-spacing: -0.5px;
 }
 
-.monthTabs {
-  display: flex;
-  gap: 0.6rem;
-  padding: 0 1.25rem 1.25rem;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-
-.monthTabs::-webkit-scrollbar {
-  display: none;
-}
-
-.monthTab {
-  padding: 0.5rem 1.1rem;
-  border-radius: 100px;
-  border: none;
-  background: #f2f4f6;
-  color: #8b95a1;
-  font-weight: 700;
-  font-size: 0.85rem;
-  white-space: nowrap;
-  transition: all 0.2s;
+.monthSelect {
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  border-radius: 10px;
+  border: 1.5px solid #eee;
+  background: #fff url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%238B95A1' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 0.75rem center;
+  appearance: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #333d4b;
   cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
 }
 
-.monthTab.activeMonth {
-  background: #3182f6;
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(49, 130, 246, 0.15);
+.monthSelect:focus {
+  border-color: #3182f6;
+}
+
+.mainContent {
+  padding: 0.5rem 1.25rem 6rem;
 }
 
 .daySection {
