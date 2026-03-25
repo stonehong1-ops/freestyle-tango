@@ -326,37 +326,37 @@ export default function Home() {
                 ))
             )}
           </main>
-        )}
+        </>
+      )}
 
-        {activeTab === 'membership' && (
-          <main className={styles.mainContent}>
-            <MembershipGuide />
-          </main>
-        )}
+      {activeTab === 'membership' && (
+        <main className={styles.mainContent}>
+          <MembershipGuide />
+        </main>
+      )}
 
-        {activeTab === 'status' && (
-          <main className={styles.mainContent}>
-            <RegistrationStatus 
-              classes={classes} 
-              selectedMonth={selectedMonth}
-              onClose={() => setActiveTab('home')} 
-              requireIdentity={requireIdentity}
-            />
-          </main>
-        )}
+      {activeTab === 'status' && (
+        <main className={styles.mainContent}>
+          <RegistrationStatus 
+            classes={classes} 
+            selectedMonth={selectedMonth}
+            onClose={() => setActiveTab('home')} 
+            requireIdentity={requireIdentity}
+          />
+        </main>
+      )}
 
-        {activeTab === 'lucy' && (
-          <main className={styles.mainContent}>
-            <MilongaLucy />
-          </main>
-        )}
+      {activeTab === 'lucy' && (
+        <main className={styles.mainContent}>
+          <MilongaLucy />
+        </main>
+      )}
 
-        {activeTab === 'admin_status' && (
-          <main className={styles.mainContent}>
-            <RegistrationAdmin />
-          </main>
-        )}
-      </div>
+      {activeTab === 'admin_status' && (
+        <main className={styles.mainContent}>
+          <RegistrationAdmin />
+        </main>
+      )}
       </div>
 
 
