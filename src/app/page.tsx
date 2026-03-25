@@ -10,7 +10,7 @@ import FooterMenu from '@/components/common/FooterMenu';
 import MembershipGuide from '@/components/dashboard/MembershipGuide';
 import RegistrationStatus from '@/components/dashboard/RegistrationStatus';
 import RegistrationAdmin from '@/components/admin/RegistrationAdmin';
-import { getClasses, addClass, updateClass, deleteClass, getRegistrations, TangoClass, Registration } from '@/lib/db';
+import { getClasses, addClass, updateClass, deleteClass, getRegistrations, TangoClass, Registration, CURRENT_REGISTRATION_MONTH } from '@/lib/db';
 import styles from './page.module.css';
 
 export default function Home() {
@@ -21,7 +21,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<{ nickname: string, phone: string, role?: 'leader' | 'follower' } | null>(null);
   const [appliedClassIds, setAppliedClassIds] = useState<Set<string>>(new Set());
-  const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().substring(0, 7)); // e.g. "2026-04" 
+  const [selectedMonth, setSelectedMonth] = useState(CURRENT_REGISTRATION_MONTH); 
 
   // Navigation state
   const [activeTab, setActiveTab] = useState<string>('home');

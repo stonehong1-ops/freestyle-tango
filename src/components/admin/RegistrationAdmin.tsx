@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Registration, TangoClass } from '@/lib/db';
+import { Registration, TangoClass, CURRENT_REGISTRATION_MONTH } from '@/lib/db';
 
 export default function RegistrationAdmin() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [classes, setClasses] = useState<TangoClass[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [adminMonth, setAdminMonth] = useState(new Date().toISOString().substring(0, 7)); // e.g. "2026-04"
+  const [adminMonth, setAdminMonth] = useState(CURRENT_REGISTRATION_MONTH); 
 
   const availableMonths = Array.from(new Set([
     '2026-04',

@@ -1,4 +1,5 @@
 import { db } from './firebase';
+export const CURRENT_REGISTRATION_MONTH = '2026-04';
 import { 
   collection, 
   getDocs, 

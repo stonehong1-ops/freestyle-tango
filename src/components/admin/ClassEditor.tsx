@@ -4,7 +4,7 @@ import React, { useState, useRef } from 'react';
 import styles from './ClassEditor.module.css';
 import { storage } from '@/lib/firebase';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { TangoClass } from '@/lib/db';
+import { TangoClass, CURRENT_REGISTRATION_MONTH } from '@/lib/db';
 
 interface ClassEditorProps {
   initialData?: Partial<TangoClass>;
@@ -27,7 +27,7 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
     leaderCount: initialData?.leaderCount || 0,
     followerCount: initialData?.followerCount || 0,
     maxCount: initialData?.maxCount || 15,
-    targetMonth: initialData?.targetMonth || new Date().toISOString().substring(0, 7),
+    targetMonth: initialData?.targetMonth || CURRENT_REGISTRATION_MONTH,
   });
 
   const [dates, setDates] = useState<string[]>(
