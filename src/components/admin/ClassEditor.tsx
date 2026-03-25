@@ -14,7 +14,7 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
     teacher2: initialData?.teacher2 || '',
     title: initialData?.title || '',
     type: initialData?.type || '체인지수업',
-    level: initialData?.level || '베이직수업',
+    level: initialData?.level || 'Basic',
     description: initialData?.description || '',
     imageUrl: initialData?.imageUrl || '',
     price: initialData?.price || '',
@@ -312,7 +312,7 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
       <div className={styles.inputGroup}>
         <label>레벨</label>
         <div className={styles.selectGroup}>
-          {['베이직수업', '어려움', '매우 어려움'].map(l => (
+          {['All', 'Basic', 'Trainning', 'Intermediate', 'Advanced', 'Very-Advanced'].map(l => (
             <button 
               key={l}
               className={`${styles.optionBtn} ${formData.level === l ? styles.active : ''}`}
