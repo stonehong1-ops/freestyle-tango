@@ -27,28 +27,17 @@ export default function Home() {
 
   // Navigation state
   const [activeTab, setActiveTab] = useState<string>('home');
-  const [isAdminLogged, setIsAdminLogged] = useState(false);
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
-  const [showAdminStatus, setShowAdminStatus] = useState(false);
   const [showEditorModal, setShowEditorModal] = useState(false);
   const [showStatsModal, setShowStatsModal] = useState(false);
   
-  useEffect(() => {
-    const savedAdmin = localStorage.getItem('ft_admin_logged');
-    if (savedAdmin === 'true') setIsAdminLogged(true);
-  }, []);
-
-  const handleAdminLogin = (success: boolean) => {
-    if (success) {
+  const checkAdminStatus = (user: { phone: string } | null) => {
+    if (user && user.phone.replace(/[^0-9]/g, '') === '01072092468') {
       setIsAdminLogged(true);
-      localStorage.setItem('ft_admin_logged', 'true');
     } else {
       setIsAdminLogged(false);
-      localStorage.removeItem('ft_admin_logged');
     }
   };
-
-  const [adminInputPw, setAdminInputPw] = useState('');
 
   // Identity Interceptor
   const [showIdentityForm, setShowIdentityForm] = useState(false);
@@ -76,7 +65,11 @@ export default function Home() {
     fetchClasses();
     const loadUser = () => {
       const savedUser = localStorage.getItem('ft_user');
-      if (savedUser) setCurrentUser(JSON.parse(savedUser));
+      if (savedUser) {
+        const user = JSON.parse(savedUser);
+        setCurrentUser(user);
+        checkAdminStatus(user);
+      }
       
       const savedClasses = localStorage.getItem('my_tango_classes');
       if (savedClasses) setAppliedClassIds(new Set(JSON.parse(savedClasses)));
@@ -199,7 +192,7 @@ export default function Home() {
         
         <div className={styles.headerRight}>
           <div className={styles.adminGroup}>
-            {isAdminLogged ? (
+            {isAdminLogged && (
               <div style={{ position: 'relative' }}>
                 <button 
                   className={styles.headerAdminBtn}
@@ -215,20 +208,10 @@ export default function Home() {
                     <button onClick={() => { setShowEditorModal(true); setIsAdminMenuOpen(false); }}>수업 등록</button>
                     <button onClick={() => { alert('밀롱가 편집 기능 준비 중'); setIsAdminMenuOpen(false); }}>밀롱가 등록</button>
                     <button onClick={() => { setShowStatsModal(true); setIsAdminMenuOpen(false); }}>통계 보기</button>
-                    <button onClick={() => { setShowAdminStatus(true); setIsAdminMenuOpen(false); }}>신청 현황</button>
+                    <button onClick={() => { setActiveTab('admin_status'); setIsAdminMenuOpen(false); }}>신청 현황</button>
                   </div>
                 )}
               </div>
-            ) : (
-              <button 
-                className={styles.headerAdminBtn}
-                onClick={() => setShowAdminStatus(true)} 
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="3"></circle>
-                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                </svg>
-              </button>
             )}
           </div>
 
@@ -378,41 +361,6 @@ export default function Home() {
         )}
       </FullscreenModal>
 
-      <FullscreenModal
-        isOpen={showAdminStatus}
-        onClose={() => setShowAdminStatus(false)}
-        title={isAdminLogged ? "수업 신청 현황" : "관리자 로그인"}
-      >
-        {!isAdminLogged ? (
-          <div style={{ padding: '4rem 2rem', textAlign: 'center' }}>
-            <h3 style={{ marginBottom: '1.5rem', color: '#191f28' }}>비밀번호를 입력하세요</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
-              <input 
-                type="password" 
-                placeholder="비밀번호" 
-                value={adminInputPw}
-                onChange={(e) => setAdminInputPw(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && adminInputPw === '9999' && setIsAdminLogged(true)}
-                style={{ padding: '1rem', borderRadius: '14px', border: '1px solid #ddd', width: '200px', textAlign: 'center', fontSize: '1.2rem' }}
-              />
-              <button 
-                onClick={() => {
-                  if (adminInputPw === '9999') {
-                    handleAdminLogin(true);
-                  } else {
-                    alert('비밀번호가 틀렸습니다.');
-                  }
-                }}
-                style={{ padding: '1rem 3rem', background: '#3182f6', color: '#fff', borderRadius: '14px', border: 'none', fontWeight: 800, fontSize: '1.1rem', cursor: 'pointer' }}
-              >
-                로그인
-              </button>
-            </div>
-          </div>
-        ) : (
-          <RegistrationAdmin />
-        )}
-      </FullscreenModal>
 
       <FullscreenModal
         isOpen={showEditorModal}
