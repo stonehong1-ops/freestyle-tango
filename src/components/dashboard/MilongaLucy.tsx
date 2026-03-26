@@ -13,24 +13,30 @@ export default function MilongaLucy() {
   const [requests, setRequests] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Get current Sunday's date (or coming Sunday)
-  const getNextSunday = () => {
+  // Generate next 4 Sundays
+  const upcomingSundays = Array.from({ length: 4 }).map((_, i) => {
     const d = new Date();
     const day = d.getDay();
-    const diff = d.getDate() + (day === 0 ? 0 : 7 - day);
+    const diff = d.getDate() + (day === 0 ? 0 : 7 - day) + (i * 7);
     const sun = new Date(d.setDate(diff));
     return sun.toISOString().split('T')[0];
-  };
+  });
 
-  const currentMilongaDate = getNextSunday();
+  const [selectedMilongaDate, setSelectedMilongaDate] = useState(upcomingSundays[0]);
 
   useEffect(() => {
     fetchReservations();
-  }, []);
+  }, [selectedMilongaDate]);
 
   const fetchReservations = async () => {
-    const data = await getMilongaReservations(currentMilongaDate);
+    const data = await getMilongaReservations(selectedMilongaDate);
     setReservations(data);
+  };
+
+  const formatDateLabel = (dateStr: string) => {
+    const [y, m, d] = dateStr.split('-');
+    const date = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+    return `${parseInt(m)}/${parseInt(d)} 일요일`;
   };
 
   const handleBooking = async () => {
@@ -41,7 +47,7 @@ export default function MilongaLucy() {
     setIsSubmitting(true);
     try {
       await addMilongaReservation({
-        milongaDate: currentMilongaDate,
+        milongaDate: selectedMilongaDate,
         nickname,
         option: selectedOption,
         requests,
@@ -123,13 +129,25 @@ export default function MilongaLucy() {
 
       {/* Reservation List Section */}
       <section className={styles.listSection}>
-        <h2 className={styles.sectionTitle}>예약 현황</h2>
+        <div className={styles.sectionHeaderBetween}>
+          <h2 className={styles.sectionTitle}>예약 현황</h2>
+          <select 
+            className={styles.dateSelect}
+            value={selectedMilongaDate}
+            onChange={(e) => setSelectedMilongaDate(e.target.value)}
+          >
+            {upcomingSundays.map(date => (
+              <option key={date} value={date}>{formatDateLabel(date)}</option>
+            ))}
+          </select>
+        </div>
+        
         <div className={styles.resList}>
           {reservations.length === 0 ? (
-            <div className={styles.emptyMsg}>아직 예약이 없습니다.</div>
+            <div className={styles.emptyMsg}>아직 {formatDateLabel(selectedMilongaDate)} 예약이 없습니다.</div>
           ) : (
             reservations.map((res, i) => (
-              <div key={res.id} className={styles.resItem}>
+              <div key={res.id} className={res.option === '3+1 이벤트' ? styles.resItemVip : styles.resItem}>
                 <span className={styles.resIdx}>{i + 1}</span>
                 <span className={styles.resName}>{maskNickname(res.nickname)}</span>
                 <span className={styles.resOption}>{res.option}</span>
@@ -147,6 +165,17 @@ export default function MilongaLucy() {
         title="테이블 및 이벤트 예약"
       >
         <div className={styles.formContent}>
+          <div className={styles.formField}>
+            <label>예약 일자</label>
+            <input 
+              type="text" 
+              value={formatDateLabel(selectedMilongaDate)} 
+              disabled 
+              style={{ background: '#f2f4f6', color: '#8b95a1' }}
+              className={styles.input}
+            />
+          </div>
+
           <div className={styles.formField}>
             <label>예약 옵션 선택</label>
             <div className={styles.optionGroup}>
