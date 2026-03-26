@@ -185,88 +185,84 @@ export default function Home() {
     <div className={styles.container}>
       
       {/* Global Fixed Header */}
-      {activeTab !== 'lucy' && (
-        <header className={styles.globalHeader}>
-          <div className={styles.headerLeft}>
-            <img src="/images/logo.png" alt="Logo" className={styles.logoImage} />
-            <span className={styles.studioName}>프리스타일탱고스튜디오</span>
-          </div>
-          
-          <div className={styles.headerRight}>
-            <div className={styles.adminGroup}>
-              {isAdminLogged && (
-                <div style={{ position: 'relative' }}>
-                  <button 
-                    className={styles.headerAdminBtn}
-                    onClick={() => setIsAdminMenuOpen(!isAdminMenuOpen)}
-                  >
-                    ⚙️
-                  </button>
-                  {isAdminMenuOpen && (
-                    <div className={styles.adminDropdown}>
-                      <button onClick={() => { setShowEditorModal(true); setIsAdminMenuOpen(false); }}>수업 등록</button>
-                      <button onClick={() => { alert('밀롱가 편집 기능 준비 중'); setIsAdminMenuOpen(false); }}>밀롱가 등록</button>
-                      <button onClick={() => { setShowStatsModal(true); setIsAdminMenuOpen(false); }}>통계 보기</button>
-                      <button onClick={() => { setActiveTab('admin_status'); setIsAdminMenuOpen(false); }}>신청 현황</button>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div 
-              className={styles.profileArea}
-              onClick={() => requireIdentity(() => {})}
-            >
-              {currentUser ? (
-                <>
-                  <div className={styles.profileText}>
-                    <span className={styles.nickname}>{currentUser.nickname}</span>
+      <header className={styles.globalHeader}>
+        <div className={styles.headerLeft}>
+          <img src="/images/logo.png" alt="Logo" className={styles.logoImage} />
+          <span className={styles.studioName}>프리스타일탱고스튜디오</span>
+        </div>
+        
+        <div className={styles.headerRight}>
+          <div className={styles.adminGroup}>
+            {isAdminLogged && (
+              <div style={{ position: 'relative' }}>
+                <button 
+                  className={styles.headerAdminBtn}
+                  onClick={() => setIsAdminMenuOpen(!isAdminMenuOpen)}
+                >
+                  ⚙️
+                </button>
+                {isAdminMenuOpen && (
+                  <div className={styles.adminDropdown}>
+                    <button onClick={() => { setShowEditorModal(true); setIsAdminMenuOpen(false); }}>수업 등록</button>
+                    <button onClick={() => { alert('밀롱가 편집 기능 준비 중'); setIsAdminMenuOpen(false); }}>밀롱가 등록</button>
+                    <button onClick={() => { setShowStatsModal(true); setIsAdminMenuOpen(false); }}>통계 보기</button>
+                    <button onClick={() => { setActiveTab('admin_status'); setIsAdminMenuOpen(false); }}>신청 현황</button>
                   </div>
-                  <div className={`${styles.profilePhoto} ${currentUser.role === 'leader' ? styles.male : styles.female}`} />
-                </>
-              ) : (
-                <>
-                  <div className={styles.helpIcon} style={{ marginRight: '8px', color: '#8b95a1' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                    </svg>
-                  </div>
-                  <div className={styles.profilePhotoPlaceholder} />
-                </>
-              )}
-            </div>
-          </div>
-        </header>
-      )}
-
-      <div className={activeTab === 'lucy' ? styles.mainFull : styles.scrollContent}>
-        {activeTab !== 'lucy' && (
-          <div className={styles.pageHeader}>
-            <h2 className={styles.pageTitle}>
-              {
-                activeTab === 'home' ? '수업정보' : 
-                activeTab === 'membership' ? '클럽안내' :
-                activeTab === 'status' ? '마이페이지' :
-                activeTab === 'lucy' ? '밀롱가Lucy' :
-                '신청현황'
-              }
-            </h2>
-            {activeTab === 'home' && (
-              <select 
-                className={styles.monthSelect}
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-              >
-                {availableMonths.map(m => (
-                  <option key={m} value={m}>{m.split('-')[1]}월</option>
-                ))}
-              </select>
+                )}
+              </div>
             )}
           </div>
-        )}
+
+          <div 
+            className={styles.profileArea}
+            onClick={() => requireIdentity(() => {})}
+          >
+            {currentUser ? (
+              <>
+                <div className={styles.profileText}>
+                  <span className={styles.nickname}>{currentUser.nickname}</span>
+                </div>
+                <div className={`${styles.profilePhoto} ${currentUser.role === 'leader' ? styles.male : styles.female}`} />
+              </>
+            ) : (
+              <>
+                <div className={styles.helpIcon} style={{ marginRight: '8px', color: '#8b95a1' }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                </div>
+                <div className={styles.profilePhotoPlaceholder} />
+              </>
+            )}
+          </div>
+        </div>
+      </header>
+
+      <div className={styles.scrollContent}>
+        <div className={styles.pageHeader}>
+          <h2 className={styles.pageTitle}>
+            {
+              activeTab === 'home' ? '수업정보' : 
+              activeTab === 'membership' ? '클럽안내' :
+              activeTab === 'status' ? '마이페이지' :
+              activeTab === 'lucy' ? '밀롱가Lucy' :
+              '신청현황'
+            }
+          </h2>
+          {activeTab === 'home' && (
+            <select 
+              className={styles.monthSelect}
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+            >
+              {availableMonths.map(m => (
+                <option key={m} value={m}>{m.split('-')[1]}월</option>
+              ))}
+            </select>
+          )}
+        </div>
 
         {activeTab === 'home' && (
           <main className={styles.mainContent}>
@@ -405,9 +401,7 @@ export default function Home() {
         <StatisticsView classes={classes} registrations={registrations} />
       </FullscreenModal>
 
-      {activeTab !== 'lucy' && (
-        <FooterMenu onAction={(id) => setActiveTab(id)} />
-      )}
+      <FooterMenu onAction={(id) => setActiveTab(id)} />
     </div>
   );
 }
