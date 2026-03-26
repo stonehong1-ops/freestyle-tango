@@ -165,6 +165,10 @@
   transform: scale(0.98);
 }
 
+.actionSection {
+  padding: 0.5rem 1rem 1.5rem;
+}
+
 /* Reservation List Section */
 .listSection {
   padding: 1.5rem;
@@ -327,15 +331,3 @@
   opacity: 0.6;
 }
 
-.homeBtn {
-  display: block;
-  margin: 1.5rem auto 0;
-  padding: 0.6rem 1.2rem;
-  background: #f2f4f6;
-  color: #4e5968;
-  border: none;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-}

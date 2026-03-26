@@ -4,11 +4,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import styles from './MilongaEditor.module.css';
 import { MilongaInfo, getMilongaInfo, updateMilongaInfo } from '@/lib/db';
 
-export default function MilongaEditor() {
+export default function MilongaEditor({ onClose }: { onClose?: () => void }) {
   const [formData, setFormData] = useState<Partial<MilongaInfo>>({
     posterUrl: '',
     message: '',
-    activeDates: []
+    activeDate: ''
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -23,7 +23,7 @@ export default function MilongaEditor() {
           setFormData(prev => ({ 
             ...prev, 
             ...data,
-            activeDates: data.activeDates || []
+            activeDate: data.activeDate || ''
           }));
         }
       } catch (error) {
@@ -82,28 +82,14 @@ export default function MilongaEditor() {
     reader.readAsDataURL(file);
   };
 
-  const handleAddDate = (date: string) => {
-    if (!date) return;
-    setFormData(prev => ({
-      ...prev,
-      activeDates: [...(prev.activeDates || []), date].sort()
-    }));
-  };
-
-  const handleRemoveDate = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      activeDates: (prev.activeDates || []).filter((_, i) => i !== index)
-    }));
-  };
-
   const handleSubmit = async () => {
     try {
       const dataToSave = { ...formData };
       delete dataToSave.id;
-      await updateMilongaInfo(dataToSave);
+      await updateMilongaInfo(dataToSave as MilongaInfo);
       alert('밀롱가 정보가 저장되었습니다.');
       window.dispatchEvent(new Event('ft_milonga_updated'));
+      if (onClose) onClose();
     } catch (e) {
       alert('저장 실패: ' + e);
     }
@@ -115,7 +101,7 @@ export default function MilongaEditor() {
     <div className={styles.container}>
       {/* 1. Image Processing (Base64) - Same as ClassEditor */}
       <div className={styles.inputGroup}>
-        <label>밀롱가 포스터 (클릭하여 이미지 선택)</label>
+        <label>밀롱가 포스터</label>
         <div 
           className={styles.imageBox} 
           onClick={() => fileInputRef.current?.click()}
@@ -125,7 +111,7 @@ export default function MilongaEditor() {
           ) : formData.posterUrl ? (
             <img src={formData.posterUrl} alt="Poster" className={styles.preview} />
           ) : (
-            <span>이미지 선택 (수업 신청과 동일한 방식)</span>
+            <span>이미지 선택</span>
           )}
         </div>
         <input 
@@ -139,41 +125,27 @@ export default function MilongaEditor() {
 
       {/* 2. Message Field */}
       <div className={styles.inputGroup}>
-        <label>이번주 메시지 (멀티라인)</label>
+        <label>이번주 메시지</label>
         <textarea 
           className={`${styles.input} ${styles.textarea}`} 
           name="message" 
           value={formData.message} 
           onChange={handleChange} 
           placeholder="공지 사항을 입력하세요..."
-          rows={6}
+          rows={4}
         />
       </div>
 
       {/* 3. Date Selection Section */}
       <div className={styles.inputGroup}>
-        <label>노출할 밀롱가 날짜 목록 (일요일)</label>
-        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
-          <input 
-            type="date" 
-            className={styles.input} 
-            onChange={(e) => {
-              handleAddDate(e.target.value);
-              e.target.value = ''; // Reset after selecting
-            }}
-          />
-        </div>
-        <div className={styles.dateList}>
-          {formData.activeDates?.map((date, idx) => (
-            <div key={idx} className={styles.dateItem}>
-              <span>{date} ({['일','월','화','수','목','금','토'][new Date(date).getDay()]}요일)</span>
-              <button onClick={() => handleRemoveDate(idx)}>✕</button>
-            </div>
-          ))}
-          {(!formData.activeDates || formData.activeDates.length === 0) && (
-            <div className={styles.emptyText}>날짜를 추가하면 Lucy 페이지 드롭다운에 노출됩니다.</div>
-          )}
-        </div>
+        <label>밀롱가 날짜</label>
+        <input 
+          type="date" 
+          className={styles.input} 
+          name="activeDate"
+          value={formData.activeDate}
+          onChange={handleChange}
+        />
       </div>
 
       <button className={styles.submitBtn} onClick={handleSubmit}>

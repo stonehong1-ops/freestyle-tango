@@ -48,20 +48,10 @@ export default function Home() {
   const fetchMilongaDates = async () => {
     const { getMilongaInfo } = await import('@/lib/db');
     const info = await getMilongaInfo();
-    if (info && info.activeDates && info.activeDates.length > 0) {
-      // Sort and filter active dates
-      const sortedDates = [...info.activeDates].sort();
-      setActiveLucyDates(sortedDates);
-      
-      // Auto-select the latest date if not already selected or invalid
-      if (!selectedLucyDate || !sortedDates.includes(selectedLucyDate)) {
-        // Find the date closest to today or just the first one
-        const today = new Date().toISOString().split('T')[0];
-        const upcoming = sortedDates.find(d => d >= today);
-        setSelectedLucyDate(upcoming || sortedDates[0]);
-      }
+    if (info && info.activeDate) {
+      setActiveLucyDates([info.activeDate]);
+      setSelectedLucyDate(info.activeDate);
     } else {
-      // Fallback if no dates are registered
       setActiveLucyDates([]);
       setSelectedLucyDate('');
     }
@@ -466,7 +456,7 @@ export default function Home() {
         onClose={() => setShowMilongaEditorModal(false)}
         title="밀롱가 정보 수정"
       >
-        <MilongaEditor />
+        <MilongaEditor onClose={() => setShowMilongaEditorModal(false)} />
       </FullscreenModal>
 
       <FooterMenu onAction={(id) => setActiveTab(id)} />

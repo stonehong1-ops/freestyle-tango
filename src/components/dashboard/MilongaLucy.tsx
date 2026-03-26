@@ -93,11 +93,6 @@ export default function MilongaLucy({
         <div className={styles.emptyMsg}>
           현재 등록된 밀롱가 일정이 없습니다.<br/>잠시 후 다시 확인해주세요.
         </div>
-        {onHome && (
-          <button className={styles.homeBtn} onClick={onHome}>
-            홈으로 돌아가기
-          </button>
-        )}
       </div>
     );
   }
@@ -127,10 +122,19 @@ export default function MilongaLucy({
         )}
       </section>
 
+      {/* Main Action Section - Prominent Booking Button */}
+      {selectedDate && (
+        <section className={styles.actionSection}>
+          <button className={styles.bookingBtn} onClick={() => setShowForm(true)}>
+            🎟️ 밀롱가 테이블 예약하기
+          </button>
+        </section>
+      )}
+
       {/* Event Section */}
       <section className={styles.eventSection}>
         <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>이벤트 & 테이블 예약</h2>
+            <h2 className={styles.sectionTitle}>이벤트 안내</h2>
             <p className={styles.sectionSubtitle}>루씨에서 즐거운 추억을 만드세요</p>
         </div>
 
@@ -138,25 +142,19 @@ export default function MilongaLucy({
           <div className={styles.eventCard}>
             <div className={styles.eventBadge}>기본</div>
             <h3 className={styles.eventCardTitle}>테이블 예약</h3>
-            <p className={styles.eventCardDesc}>2인 이상 테이블 신청 가능합니다. 선착순으로 배정됩니다.</p>
+            <p className={styles.eventCardDesc}>2인 이상 테이블 신청 가능합니다.</p>
           </div>
           <div className={styles.eventCard}>
             <div className={styles.eventBadge}>이벤트</div>
             <h3 className={styles.eventCardTitle}>2+1 Event</h3>
-            <p className={styles.eventCardDesc}>세 분이 오시면 한 분은 무료입니다. 예약 테이블이 기본 제공됩니다.</p>
+            <p className={styles.eventCardDesc}>세 분이 오시면 한 분은 무료입니다.</p>
           </div>
           <div className={styles.eventCard}>
             <div className={styles.eventBadge}>VIP</div>
             <h3 className={styles.eventCardTitle}>3+1 Event</h3>
-            <p className={styles.eventCardDesc}>네 분이 오시면 한 분은 무료입니다. 테이블과 와인 1병이 제공됩니다.</p>
+            <p className={styles.eventCardDesc}>네 분이 오시면 한 분은 무료입니다.</p>
           </div>
         </div>
-
-        {selectedDate && (
-          <button className={styles.bookingBtn} onClick={() => setShowForm(true)}>
-            테이블 예약 신청하기
-          </button>
-        )}
       </section>
 
       {/* Reservation List Section */}
@@ -171,7 +169,7 @@ export default function MilongaLucy({
           
           <div className={styles.resList}>
             {reservations.length === 0 ? (
-              <div className={styles.emptyMsg}>아직 예약이 없습니다. 첫 번째 예약자가 되어보세요!</div>
+              <div className={styles.emptyMsg}>아직 예약이 없습니다.</div>
             ) : (
               reservations.map((res, i) => (
                 <div key={res.id} className={styles.resWrapper}>
@@ -186,12 +184,6 @@ export default function MilongaLucy({
             )}
           </div>
         </section>
-      )}
-
-      {onHome && (
-        <button className={styles.homeBtn} onClick={onHome}>
-          Freestyle Tango 홈으로
-        </button>
       )}
 
       {/* Booking Form Modal */}

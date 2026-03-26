@@ -60,10 +60,10 @@ export interface MilongaReservation {
 }
 
 export interface MilongaInfo {
-  id: string;
+  id?: string;
   posterUrl: string;
   message: string;
-  activeDates?: string[]; // Dates to show in the Lucy page dropdown
+  activeDate: string;
 }
 
 const COLLECTION_NAME = 'tango_classes';
