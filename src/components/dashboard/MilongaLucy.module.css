@@ -76,6 +76,25 @@
   border-radius: 50px;
   font-size: 0.9rem;
   font-weight: 700;
+  margin-bottom: 2rem;
+}
+
+.homeBtn {
+  background: rgba(44, 62, 80, 0.8);
+  color: #fff;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+}
+
+.homeBtn:hover {
+  background: rgba(44, 62, 80, 1);
+  transform: translateY(-2px);
 }
 
 .eventSection {

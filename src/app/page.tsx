@@ -196,26 +196,6 @@ export default function Home() {
             {isAdminLogged && (
               <div style={{ position: 'relative' }}>
                 <button 
-                  className={styles.headerAdminBtn}
-                  onClick={() => setIsAdminMenuOpen(!isAdminMenuOpen)}
-                >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                  </svg>
-                </button>
-                {isAdminMenuOpen && (
-                  <div className={styles.adminDropdown}>
-                    <button onClick={() => { setShowEditorModal(true); setIsAdminMenuOpen(false); }}>수업 등록</button>
-                    <button onClick={() => { alert('밀롱가 편집 기능 준비 중'); setIsAdminMenuOpen(false); }}>밀롱가 등록</button>
-                    <button onClick={() => { setShowStatsModal(true); setIsAdminMenuOpen(false); }}>통계 보기</button>
-                    <button onClick={() => { setActiveTab('admin_status'); setIsAdminMenuOpen(false); }}>신청 현황</button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
           <div 
             className={styles.profileArea}
             onClick={() => requireIdentity(() => {})}
@@ -332,7 +312,7 @@ export default function Home() {
 
         {activeTab === 'lucy' && (
           <main className={styles.mainContent}>
-            <MilongaLucy />
+            <MilongaLucy onHome={() => setActiveTab('home')} />
           </main>
         )}
 

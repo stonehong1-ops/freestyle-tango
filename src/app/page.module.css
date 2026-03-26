@@ -222,6 +222,11 @@
   gap: 1rem;
 }
 
+.mainFull {
+  min-height: 100vh;
+  padding: 0;
+}
+
 @media (max-width: 768px) {
   .titleCard { padding: 3rem 1rem 2rem; border-radius: 0 0 28px 28px; }
   .titleLine1 { font-size: 1.25rem; }

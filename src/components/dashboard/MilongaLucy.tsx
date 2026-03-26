@@ -5,7 +5,7 @@ import styles from './MilongaLucy.module.css';
 import { addMilongaReservation, getMilongaReservations, MilongaReservation } from '@/lib/db';
 import FullscreenModal from '@/components/common/FullscreenModal';
 
-export default function MilongaLucy() {
+export default function MilongaLucy({ onHome }: { onHome?: () => void }) {
   const [reservations, setReservations] = useState<MilongaReservation[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [nickname, setNickname] = useState('');
@@ -92,6 +92,12 @@ export default function MilongaLucy() {
               <div className={styles.heroContact}>
                 테이블 예약 Stone 010.7209.2468
               </div>
+              
+              {onHome && (
+                <button className={styles.homeBtn} onClick={onHome}>
+                  Freestyle Tango
+                </button>
+              )}
             </div>
           </div>
         </div>
