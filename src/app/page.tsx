@@ -12,6 +12,7 @@ import RegistrationStatus from '@/components/dashboard/RegistrationStatus';
 import RegistrationAdmin from '@/components/admin/RegistrationAdmin';
 import MilongaLucy from '@/components/dashboard/MilongaLucy';
 import StatisticsView from '@/components/admin/StatisticsView';
+import MilongaEditor from '@/components/admin/MilongaEditor';
 import { getClasses, addClass, updateClass, deleteClass, getRegistrations, TangoClass, Registration, CURRENT_REGISTRATION_MONTH } from '@/lib/db';
 import styles from './page.module.css';
 
@@ -427,6 +428,14 @@ export default function Home() {
         title="전체 통계 대시보드"
       >
         <StatisticsView classes={classes} registrations={registrations} />
+      </FullscreenModal>
+
+      <FullscreenModal
+        isOpen={showMilongaEditorModal}
+        onClose={() => setShowMilongaEditorModal(false)}
+        title="밀롱가 정보 등록/수정"
+      >
+        <MilongaEditor />
       </FullscreenModal>
 
       <FooterMenu onAction={(id) => setActiveTab(id)} />

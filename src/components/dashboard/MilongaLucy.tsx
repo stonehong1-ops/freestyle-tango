@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import styles from './MilongaLucy.module.css';
-import { addMilongaReservation, getMilongaReservations, MilongaReservation } from '@/lib/db';
+import { addMilongaReservation, getMilongaReservations, MilongaReservation, MilongaInfo, getMilongaInfo } from '@/lib/db';
 import FullscreenModal from '@/components/common/FullscreenModal';
 
 export default function MilongaLucy({ 
@@ -18,10 +18,21 @@ export default function MilongaLucy({
   const [selectedOption, setSelectedOption] = useState<'테이블 예약' | '2+1 이벤트' | '3+1 이벤트'>('테이블 예약');
   const [requests, setRequests] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [milongaInfo, setMilongaInfo] = useState<MilongaInfo | null>(null);
 
   useEffect(() => {
     fetchReservations();
+    fetchMilongaInfo();
+
+    const handleUpdate = () => fetchMilongaInfo();
+    window.addEventListener('ft_milonga_updated', handleUpdate);
+    return () => window.removeEventListener('ft_milonga_updated', handleUpdate);
   }, [selectedDate]);
+
+  const fetchMilongaInfo = async () => {
+    const info = await getMilongaInfo();
+    setMilongaInfo(info);
+  };
 
   const fetchReservations = async () => {
     const data = await getMilongaReservations(selectedDate);
@@ -71,21 +82,21 @@ export default function MilongaLucy({
       {/* Hero Visual Section */}
       <section className={styles.heroSection}>
         <div className={styles.heroImageWrapper}>
-          <img src="/images/logo.png" alt="Milonga Lucy" className={styles.heroImage} />
+          <img src={milongaInfo?.posterUrl || "/images/logo.png"} alt="Milonga Lucy" className={styles.heroImage} />
           <div className={styles.heroOverlay}>
             <div className={styles.heroContent}>
-              <h1 className={styles.heroTitle}>milonga 'LUCY'</h1>
-              <p className={styles.heroSubtitle}>every Sunday</p>
+              <h1 className={styles.heroTitle}>{milongaInfo?.title || "milonga 'LUCY'"}</h1>
+              <p className={styles.heroSubtitle}>{milongaInfo?.subtitle || "every Sunday"}</p>
               <div className={styles.heroInfo}>
-                <p> 저녁 6 - 10</p>
-                <p> 13,000won</p>
+                <p> {milongaInfo?.timeRange || "저녁 6 - 10"}</p>
+                <p> {milongaInfo?.price || "13,000won"}</p>
               </div>
               <div className={styles.heroLocation}>
-                서울마포구 합정동 386-37 지하2층<br/>
-                B2, 386-37, Hapjeong-dong, Mapo-gu, Seoul
+                {milongaInfo?.location || "서울마포구 합정동 386-37 지하2층"}<br/>
+                {milongaInfo?.locationEn || "B2, 386-37, Hapjeong-dong, Mapo-gu, Seoul"}
               </div>
               <div className={styles.heroContact}>
-                테이블 예약 Stone 010.7209.2468
+                {milongaInfo?.contact || "Stone 010.7209.2468"}
               </div>
               
               {onHome && (
