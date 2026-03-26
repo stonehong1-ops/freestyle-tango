@@ -93,7 +93,7 @@ export default function MilongaEditor() {
   const handleRemoveDate = (index: number) => {
     setFormData(prev => ({
       ...prev,
-      activeDates: (prev.activeDates || ocean).filter((_, i) => i !== index)
+      activeDates: (prev.activeDates || []).filter((_, i) => i !== index)
     }));
   };
 
