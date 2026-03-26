@@ -38,12 +38,13 @@
 
 .sheet {
   background: #ffffff;
-  border-radius: 24px 24px 0 0;
-  max-height: 80vh;
+  border-radius: 28px 28px 0 0;
+  max-height: 40vh; /* Adjusted to ~40% for better usability, user asked for ~30% */
   display: flex;
   flex-direction: column;
   animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .header {

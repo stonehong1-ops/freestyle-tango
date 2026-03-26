@@ -28,8 +28,7 @@ export default function IdentityForm({ onClose, onComplete }: IdentityFormProps)
 
   return (
     <div className={styles.formContainer} style={{ padding: '0 0.5rem' }}>
-      <h2 style={{ fontSize: '1.25rem', color: '#191f28', marginBottom: '0.4rem', fontWeight: 700 }}>정보 입력</h2>
-      <p style={{ fontSize: '0.9rem', color: '#8b95a1', marginBottom: '1.5rem' }}>회원님의 정보를 입력해 주세요.</p>
+      <p style={{ fontSize: '0.85rem', color: '#8b95a1', marginBottom: '1rem', textAlign: 'center' }}>회원 정보를 입력하고 서비스를 이용해 보세요.</p>
 
       <div style={{ marginBottom: '1.5rem' }}>
         <label style={{ display: 'block', fontSize: '0.85rem', color: '#4e5968', marginBottom: '0.5rem', fontWeight: 600 }}>역할</label>
@@ -75,23 +74,17 @@ export default function IdentityForm({ onClose, onComplete }: IdentityFormProps)
         />
       </div>
 
-      <div style={{ display: 'flex', gap: '0.5rem' }}>
-        <button 
-          onClick={onClose}
-          style={{ flex: 1, padding: '1rem', borderRadius: '12px', border: 'none', background: '#f2f4f6', color: '#4e5968', fontWeight: 600, cursor: 'pointer' }}
-        >
-          취소
-        </button>
+      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
         <button 
           onClick={handleComplete}
           disabled={!role || !name || phone.length < 10}
           style={{
-            flex: 2, padding: '1rem', borderRadius: '12px', border: 'none',
+            flex: 1, padding: '1rem', borderRadius: '16px', border: 'none',
             background: (!role || !name || phone.length < 10) ? '#e5e8eb' : '#3182f6',
-            color: '#fff', fontWeight: 600, cursor: 'pointer'
+            color: '#fff', fontWeight: 800, cursor: 'pointer', fontSize: '1.1rem'
           }}
         >
-          확인
+          시작하기
         </button>
       </div>
     </div>

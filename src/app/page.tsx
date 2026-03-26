@@ -227,7 +227,16 @@ export default function Home() {
                 <div className={`${styles.profilePhoto} ${currentUser.role === 'leader' ? styles.male : styles.female}`} />
               </>
             ) : (
-              <div className={styles.profilePhotoPlaceholder} />
+              <>
+                <div className={styles.helpIcon} style={{ marginRight: '8px', color: '#8b95a1' }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                </div>
+                <div className={styles.profilePhotoPlaceholder} />
+              </>
             )}
           </div>
         </div>
@@ -361,6 +370,17 @@ export default function Home() {
         )}
       </FullscreenModal>
 
+      <FullscreenModal
+        isOpen={showIdentityForm}
+        onClose={() => setShowIdentityForm(false)}
+        title="본인 인증"
+        isBottomSheet={true}
+      >
+        <IdentityForm 
+          onClose={() => setShowIdentityForm(false)}
+          onComplete={handleIdentityComplete}
+        />
+      </FullscreenModal>
 
       <FullscreenModal
         isOpen={showEditorModal}
