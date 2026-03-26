@@ -47,21 +47,46 @@ export default function MilongaEditor() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (file.size > 10 * 1024 * 1024) {
+      alert("이미지 파일이 너무 큽니다. (최대 10MB)");
+      return;
+    }
+
     setIsUploading(true);
-    const storageRef = ref(storage, `milonga/poster_${Date.now()}`);
+    setUploadProgress(0);
+
+    const storageRef = ref(storage, `milonga/poster_${Date.now()}_${file.name}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
-    uploadTask.on('state_changed', null, 
+    const timeoutId = setTimeout(() => {
+      if (uploadProgress === 0 && isUploading) {
+        alert("업로드가 시작되지 않습니다 (0%).\n\n확인 필요:\n1. Firebase Storage 규칙에서 'allow read, write: if true' 설정이 되어있나요?\n2. Vercel 환경변수(Storage Bucket)가 정확한지 확인해주세요.");
+        setIsUploading(false);
+      }
+    }, 15000);
+
+    uploadTask.on('state_changed',
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setUploadProgress(Math.round(progress));
+      },
       (error) => {
-        console.error(error);
-        alert('업로드 실패: ' + error.message);
+        clearTimeout(timeoutId);
+        console.error("Upload failed", error);
+        alert(`업로드 실패: ${error.message}\n(Firebase Storage 권한 설정을 확인해주세요)`);
         setIsUploading(false);
-      }, 
+      },
       async () => {
-        const url = await getDownloadURL(uploadTask.snapshot.ref);
-        setFormData(prev => ({ ...prev, posterUrl: url }));
-        setIsUploading(false);
-        alert('포스터가 업로드되었습니다!');
+        clearTimeout(timeoutId);
+        try {
+          const url = await getDownloadURL(uploadTask.snapshot.ref);
+          setFormData(prev => ({ ...prev, posterUrl: url }));
+          setIsUploading(false);
+          alert('포스터가 업로드되었습니다!');
+        } catch (err: any) {
+          alert('URL 가져오기 실패: ' + err.message);
+          setIsUploading(false);
+        }
       }
     );
   };
@@ -87,7 +112,12 @@ export default function MilongaEditor() {
           onClick={() => fileInputRef.current?.click()}
         >
           {isUploading ? (
-            <span>업로드 중...</span>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '0.9rem', marginBottom: '0.5rem' }}>업로드 중... ({uploadProgress}%)</div>
+              <div style={{ width: '120px', height: '6px', background: '#e5e8eb', borderRadius: '3px', overflow: 'hidden' }}>
+                <div style={{ width: `${uploadProgress}%`, height: '100%', background: '#3182f6', transition: 'width 0.3s' }}></div>
+              </div>
+            </div>
           ) : formData.posterUrl ? (
             <img src={formData.posterUrl} alt="Poster" className={styles.preview} />
           ) : (
