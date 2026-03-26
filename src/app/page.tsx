@@ -433,7 +433,7 @@ export default function Home() {
       <FullscreenModal
         isOpen={showMilongaEditorModal}
         onClose={() => setShowMilongaEditorModal(false)}
-        title="밀롱가 정보 등록/수정"
+        title="밀롱가 정보 수정"
       >
         <MilongaEditor />
       </FullscreenModal>

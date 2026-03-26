@@ -24,9 +24,16 @@ export default function MilongaEditor() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getMilongaInfo();
-      if (data) setFormData(data);
-      setIsLoading(false);
+      try {
+        const data = await getMilongaInfo();
+        if (data) {
+          setFormData(prev => ({ ...prev, ...data }));
+        }
+      } catch (error) {
+        console.error("Fetch Milonga Info Error:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchData();
   }, []);
