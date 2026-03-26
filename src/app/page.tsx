@@ -31,6 +31,17 @@ export default function Home() {
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
   const [showEditorModal, setShowEditorModal] = useState(false);
   const [showStatsModal, setShowStatsModal] = useState(false);
+  const [showMilongaEditorModal, setShowMilongaEditorModal] = useState(false);
+  
+  // Lucy Date Logic
+  const upcomingSundays = Array.from({ length: 4 }).map((_, i) => {
+    const d = new Date();
+    const day = d.getDay();
+    const diff = d.getDate() + (day === 0 ? 0 : 7 - day) + (i * 7);
+    const sun = new Date(new Date().setDate(diff));
+    return sun.toISOString().split('T')[0];
+  });
+  const [selectedLucyDate, setSelectedLucyDate] = useState(upcomingSundays[0]);
   
   const checkAdminStatus = (user: { phone: string } | null) => {
     if (user && user.phone.replace(/[^0-9]/g, '') === '01072092468') {
@@ -204,7 +215,7 @@ export default function Home() {
                 {isAdminMenuOpen && (
                   <div className={styles.adminDropdown}>
                     <button onClick={() => { setShowEditorModal(true); setIsAdminMenuOpen(false); }}>수업 등록</button>
-                    <button onClick={() => { alert('밀롱가 편집 기능 준비 중'); setIsAdminMenuOpen(false); }}>밀롱가 등록</button>
+                    <button onClick={() => { setShowMilongaEditorModal(true); setIsAdminMenuOpen(false); }}>밀롱가 등록</button>
                     <button onClick={() => { setShowStatsModal(true); setIsAdminMenuOpen(false); }}>통계 보기</button>
                     <button onClick={() => { setActiveTab('admin_status'); setIsAdminMenuOpen(false); }}>신청 현황</button>
                   </div>
@@ -260,6 +271,20 @@ export default function Home() {
               {availableMonths.map(m => (
                 <option key={m} value={m}>{m.split('-')[1]}월</option>
               ))}
+            </select>
+          )}
+          {activeTab === 'lucy' && (
+            <select 
+              className={styles.monthSelect}
+              value={selectedLucyDate}
+              onChange={(e) => setSelectedLucyDate(e.target.value)}
+            >
+              {upcomingSundays.map(date => {
+                const [y, m, d] = date.split('-');
+                return (
+                  <option key={date} value={date}>{parseInt(m)}/{parseInt(d)} 일요일</option>
+                );
+              })}
             </select>
           )}
         </div>
@@ -329,7 +354,10 @@ export default function Home() {
 
         {activeTab === 'lucy' && (
           <main className={styles.mainContent}>
-            <MilongaLucy onHome={() => setActiveTab('home')} />
+            <MilongaLucy 
+              selectedDate={selectedLucyDate} 
+              onHome={() => setActiveTab('home')} 
+            />
           </main>
         )}
 

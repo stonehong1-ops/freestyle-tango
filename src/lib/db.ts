@@ -59,6 +59,19 @@ export interface MilongaReservation {
   timestamp: string;
 }
 
+export interface MilongaInfo {
+  id: string;
+  posterUrl: string;
+  title: string;
+  subtitle: string;
+  timeRange: string;
+  price: string;
+  location: string;
+  locationEn: string;
+  contact: string;
+  sundays?: string[]; // Optional override for available dates
+}
+
 const COLLECTION_NAME = 'tango_classes';
 
 export const getClasses = async (): Promise<TangoClass[]> => {
@@ -173,4 +186,24 @@ export const getMilongaReservations = async (date: string): Promise<MilongaReser
     id: docSnap.id,
     ...docSnap.data()
   } as MilongaReservation));
+};
+
+const MILONGA_INFO_COLLECTION = 'milonga_info';
+
+export const getMilongaInfo = async (): Promise<MilongaInfo | null> => {
+  const q = query(collection(db, MILONGA_INFO_COLLECTION), limit(1));
+  const querySnapshot = await getDocs(q);
+  if (querySnapshot.empty) return null;
+  const docSnap = querySnapshot.docs[0];
+  return { id: docSnap.id, ...docSnap.data() } as MilongaInfo;
+};
+
+export const updateMilongaInfo = async (info: Partial<MilongaInfo>) => {
+  const existing = await getMilongaInfo();
+  if (existing) {
+    const docRef = doc(db, MILONGA_INFO_COLLECTION, existing.id);
+    return await updateDoc(docRef, info);
+  } else {
+    return await addDoc(collection(db, MILONGA_INFO_COLLECTION), info);
+  }
 };
