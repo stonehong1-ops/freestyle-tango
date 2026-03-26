@@ -27,6 +27,7 @@ export default function Home() {
 
   // Navigation state
   const [activeTab, setActiveTab] = useState<string>('home');
+  const [isAdminLogged, setIsAdminLogged] = useState(false);
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
   const [showEditorModal, setShowEditorModal] = useState(false);
   const [showStatsModal, setShowStatsModal] = useState(false);
