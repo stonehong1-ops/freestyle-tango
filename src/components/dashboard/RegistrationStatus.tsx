@@ -34,8 +34,9 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
       if (savedUser) {
         try {
           const { phone } = JSON.parse(savedUser);
+          const normalizedPhone = phone.replace(/[^0-9]/g, ''); // Normalize phone number
           const { getAllRegistrationsByPhone } = await import('@/lib/db');
-          const regs = await getAllRegistrationsByPhone(phone);
+          const regs = await getAllRegistrationsByPhone(normalizedPhone);
           setDbRegs(regs);
         } catch (error) {
           console.error("DB Fetch Error:", error);
@@ -65,7 +66,7 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
         await addRegistration({
           date: new Date().toISOString(),
           nickname,
-          phone,
+          phone: phone.replace(/[^0-9]/g, ''),
           role,
           classIds: Array.from(selectedIds),
           type: typeDisplay as '개별신청' | '1개월 신청' | '6개월 멤버쉽',
@@ -302,17 +303,21 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
       </div>
 
       <div className={styles.footer}>
-        {selectedIds.size === 1 && (
-          <button className={styles.actionBtn} onClick={() => handleRegister('single')}>
-            12만원 개별수업신청
+        <button 
+          className={selectedIds.size > 0 ? styles.actionBtnPrimary : styles.actionBtnDisabled} 
+          onClick={() => {
+            if (selectedIds.size === 0) return;
+            handleRegister(selectedIds.size >= 2 ? 'month1' : 'single');
+          }}
+          disabled={selectedIds.size === 0}
+        >
+          {selectedIds.size === 0 ? '신청할 수업을 선택하세요' : '수업 신청하기'}
+        </button>
+        {selectedIds.size > 0 && (
+          <button className={styles.actionBtnMembership} onClick={() => handleRegister('month6')}>
+            6개월 멤버쉽 신청하기
           </button>
         )}
-        <button className={styles.actionBtnPrimary} onClick={() => handleRegister('month1')}>
-          {selectedIds.size >= 2 ? '18만원 1개월 수강신청' : '18만원 1개월 멤버쉽신청'}
-        </button>
-        <button className={styles.actionBtnMembership} onClick={() => handleRegister('month6')}>
-          6개월 멤버쉽신청
-        </button>
       </div>
 
       {/* Payment Confirmation Bottom Sheet */}

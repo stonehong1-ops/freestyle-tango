@@ -108,6 +108,17 @@
   background: #191f28;
   color: #fff;
 }
+.actionBtnDisabled {
+  background: #e5e8eb;
+  color: #adb5bd;
+  cursor: not-allowed;
+  width: 100%;
+  padding: 1rem;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+}
 
 .sectionTitle {
   font-size: 1.25rem;

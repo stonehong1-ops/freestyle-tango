@@ -27,7 +27,7 @@ export default function Home() {
   const [selectedMonth, setSelectedMonth] = useState(CURRENT_REGISTRATION_MONTH); 
 
   // Navigation state
-  const [activeTab, setActiveTab] = useState<string>('home');
+  const [activeTab, setActiveTab] = useState<string>('lucy');
   const [isAdminLogged, setIsAdminLogged] = useState(false);
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
   const [showEditorModal, setShowEditorModal] = useState(false);
