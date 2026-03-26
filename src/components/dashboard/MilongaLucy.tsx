@@ -83,29 +83,17 @@ export default function MilongaLucy({
       <section className={styles.heroSection}>
         <div className={styles.heroImageWrapper}>
           <img src={milongaInfo?.posterUrl || "/images/logo.png"} alt="Milonga Lucy" className={styles.heroImage} />
-          <div className={styles.heroOverlay}>
-            <div className={styles.heroContent}>
-              <h1 className={styles.heroTitle}>{milongaInfo?.title || "milonga 'LUCY'"}</h1>
-              <p className={styles.heroSubtitle}>{milongaInfo?.subtitle || "every Sunday"}</p>
-              <div className={styles.heroInfo}>
-                <p> {milongaInfo?.timeRange || "저녁 6 - 10"}</p>
-                <p> {milongaInfo?.price || "13,000won"}</p>
-              </div>
-              <div className={styles.heroLocation}>
-                {milongaInfo?.location || "서울마포구 합정동 386-37 지하2층"}<br/>
-                {milongaInfo?.locationEn || "B2, 386-37, Hapjeong-dong, Mapo-gu, Seoul"}
-              </div>
-              <div className={styles.heroContact}>
-                {milongaInfo?.contact || "Stone 010.7209.2468"}
-              </div>
-              
-              {onHome && (
-                <button className={styles.homeBtn} onClick={onHome}>
-                  Freestyle Tango
-                </button>
-              )}
-            </div>
-          </div>
+        </div>
+        <div className={styles.messageArea}>
+          <p className={styles.milongaMessage}>
+            {milongaInfo?.message || "이번주 일요일, 밀롱가 Lucy에서 만나요!"}
+          </p>
+          
+          {onHome && (
+            <button className={styles.homeBtn} onClick={onHome}>
+              Freestyle Tango
+            </button>
+          )}
         </div>
       </section>
 

@@ -62,14 +62,7 @@ export interface MilongaReservation {
 export interface MilongaInfo {
   id: string;
   posterUrl: string;
-  title: string;
-  subtitle: string;
-  timeRange: string;
-  price: string;
-  location: string;
-  locationEn: string;
-  contact: string;
-  sundays?: string[]; // Optional override for available dates
+  message: string;
 }
 
 const COLLECTION_NAME = 'tango_classes';

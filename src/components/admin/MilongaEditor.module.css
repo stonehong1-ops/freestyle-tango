@@ -33,13 +33,10 @@
   background: #fff;
 }
 
-.row {
-  display: flex;
-  gap: 1rem;
-}
-
-.row > div {
-  flex: 1;
+.textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.6;
 }
 
 .imageBox {

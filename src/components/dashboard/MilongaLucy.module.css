@@ -1,324 +1,132 @@
 .container {
-  color: #1a1a1a;
-  padding-bottom: 5rem;
+  min-height: 100dvh;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
 }
 
 .heroSection {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .heroImageWrapper {
   width: 100%;
-  height: 100%;
-  position: relative;
+  background: #000;
 }
 
 .heroImage {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  display: block;
+  object-fit: contain;
 }
 
-.heroOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.7));
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: #fff;
-  text-align: center;
-  padding: 2rem;
+.messageArea {
+  padding: 1.5rem 1.25rem;
+  background: #fff;
+  border-bottom: 8px solid #f2f4f6;
 }
 
-.heroContent {
-  max-width: 400px;
-}
-
-.heroTitle {
-  font-size: 2.8rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  margin-bottom: 0.5rem;
-  letter-spacing: -2px;
-}
-
-.heroSubtitle {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 1.5rem;
-  color: #eee;
-}
-
-.heroInfo {
-  font-size: 1.2rem;
-  font-weight: 800;
-  margin-bottom: 1.5rem;
-}
-
-.heroLocation {
-  font-size: 0.85rem;
-  line-height: 1.6;
-  opacity: 0.8;
-  margin-bottom: 1rem;
-}
-
-.heroContact {
-  background: rgba(49, 130, 246, 0.9);
-  padding: 0.5rem 1rem;
-  border-radius: 50px;
-  font-size: 0.9rem;
-  font-weight: 700;
-  margin-bottom: 2rem;
+.milongaMessage {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: #333d4b;
+  white-space: pre-wrap;
+  letter-spacing: -0.01em;
 }
 
 .homeBtn {
-  background: rgba(44, 62, 80, 0.8);
-  color: #fff;
-  border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 8px;
+  margin-top: 1.5rem;
+  padding: 0.6rem 1.2rem;
+  background: rgba(49, 130, 246, 0.1);
+  color: #3182f6;
+  border: 1px solid rgba(49, 130, 246, 0.2);
+  border-radius: 20px;
+  font-size: 0.85rem;
   font-weight: 700;
-  font-size: 0.9rem;
   cursor: pointer;
-  transition: all 0.2s;
-  backdrop-filter: blur(4px);
 }
 
-.homeBtn:hover {
-  background: rgba(44, 62, 80, 1);
-  transform: translateY(-2px);
-}
-
-.eventSection {
-  padding: 2rem 1.25rem;
-}
-
-.sectionHeader {
-  margin-bottom: 1.5rem;
+.bookingSection {
+  flex: 1;
+  padding: 1.5rem 1.25rem;
+  background: #fff;
 }
 
 .sectionTitle {
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 800;
-  margin-bottom: 0.5rem;
-}
-
-.sectionSubtitle {
-  font-size: 0.9rem;
-  color: #8b95a1;
-}
-
-.eventGrid {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.eventCard {
-  background: #fdfdfd;
-  padding: 1.25rem;
-  border-radius: 16px;
-  border: 1.5px solid #f2f4f6;
-  position: relative;
-}
-
-.eventBadge {
-  position: absolute;
-  top: 1.25rem;
-  right: 1.25rem;
-  font-size: 0.75rem;
-  font-weight: 800;
-  background: #f2f4f6;
-  padding: 0.2rem 0.6rem;
-  border-radius: 4px;
-}
-
-.eventCardTitle {
-  font-size: 1.1rem;
-  font-weight: 800;
-  margin-bottom: 0.5rem;
-}
-
-.eventCardDesc {
-  font-size: 0.9rem;
-  color: #4e5968;
-  line-height: 1.5;
-}
-
-.bookingBtn {
-  width: 100%;
-  padding: 1.1rem;
-  background: #3182f6;
-  color: #fff;
-  border: none;
-  border-radius: 16px;
-  font-size: 1.1rem;
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(49, 130, 246, 0.2);
-}
-
-.sectionHeaderBetween {
+  color: #191f28;
+  margin-bottom: 1.25rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.dateBadge {
+  font-size: 0.9rem;
+  color: #3182f6;
+  background: #eff6ff;
+  padding: 0.2rem 0.6rem;
+  border-radius: 8px;
+}
+
+.optionsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
   margin-bottom: 1.5rem;
 }
 
-.selectedDateBadge {
-  background: var(--primary-light);
-  color: var(--primary);
-  padding: 0.4rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
+.optionCard {
+  padding: 1rem;
+  border: 2px solid #f2f4f6;
+  border-radius: 16px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
 }
 
-.dateSelect {
-  padding: 0.5rem 1.5rem 0.5rem 0.75rem;
-  border-radius: 10px;
-  border: 1.5px solid #eee;
-  background: #fff url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%238B95A1' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 0.75rem center;
-  appearance: none;
-  font-size: 0.9rem;
+.optionCard.active {
+  border-color: #3182f6;
+  background: #f9fbff;
+}
+
+.optionLabel {
+  font-size: 0.95rem;
   font-weight: 700;
   color: #333d4b;
-  cursor: pointer;
 }
 
-.resList {
+.optionCard.active .optionLabel {
+  color: #3182f6;
+}
+
+.inputGroup {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-}
-
-.resItem, .resItemVip {
-  background: #fff;
-  padding: 1rem;
-  border-radius: 12px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.75rem;
-  border: 1px solid #f2f4f6;
-  position: relative;
-  overflow: hidden;
-}
-
-.resItemVip {
-  border-color: #ff4b82;
-  background: #fff9fb;
-}
-
-.resItemVip::after {
-  content: 'VIP';
-  position: absolute;
-  top: 0;
-  right: 0;
-  background: #ff4b82;
-  color: #fff;
-  font-size: 0.65rem;
-  font-weight: 900;
-  padding: 0.2rem 0.5rem;
-  border-bottom-left-radius: 8px;
-}
-
-.resIdx {
-  color: #8b95a1;
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
-.resName {
-  font-weight: 700;
-  font-size: 1rem;
-  min-width: 60px;
-}
-
-.resOption {
-  background: #e8f3ff;
-  color: #3182f6;
-  font-size: 0.8rem;
-  font-weight: 800;
-  padding: 0.2rem 0.6rem;
-  border-radius: 6px;
-}
-
-.resReq {
-    width: 100%;
-    margin-top: 0.5rem;
-    font-size: 0.85rem;
-    color: #4e5968;
-    background: #f9fafb;
-    padding: 0.75rem;
-    border-radius: 8px;
-}
-
-.emptyMsg {
-  text-align: center;
-  padding: 3rem;
-  color: #8b95a1;
-}
-
-.formContent {
-  padding: 1rem 1.5rem 3rem;
-}
-
-.formField {
+  gap: 0.5rem;
   margin-bottom: 1.5rem;
 }
 
-.formField label {
-  display: block;
+.inputGroup label {
   font-size: 0.9rem;
-  font-weight: 700;
-  margin-bottom: 0.75rem;
+  font-weight: 600;
   color: #4e5968;
 }
 
-.optionGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.optionBtn {
-  padding: 1rem;
-  border-radius: 12px;
-  border: 2px solid #f2f4f6;
-  background: #fff;
-  text-align: left;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.activeOption {
-  border-color: #3182f6;
-  background: #f0f7ff;
-  color: #3182f6;
-}
-
-.input, .textarea {
-  width: 100%;
-  padding: 1rem;
-  border-radius: 12px;
-  border: 1.5px solid #eee;
-  outline: none;
-  font-size: 1rem;
-}
-
 .textarea {
-  height: 100px;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e5e8eb;
+  border-radius: 12px;
+  background: #f9fafb;
+  font-size: 0.95rem;
+  outline: none;
   resize: none;
 }
 
@@ -329,7 +137,64 @@
   color: #fff;
   border: none;
   border-radius: 16px;
-  font-size: 1.1rem;
-  font-weight: 800;
+  font-size: 1.05rem;
+  font-weight: 700;
   cursor: pointer;
+  margin-bottom: 2rem;
+}
+
+.submitBtn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.reservationList {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #f2f4f6;
+}
+
+.listHeader {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #191f28;
+  margin-bottom: 1rem;
+}
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.reservationCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f9fafb;
+}
+
+.resInfo {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.resNickname {
+  font-weight: 700;
+  color: #333d4b;
+}
+
+.resOption {
+  font-size: 0.8rem;
+  color: #8b95a1;
+  background: #f2f4f6;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.resRequests {
+  font-size: 0.85rem;
+  color: #6b7684;
 }
