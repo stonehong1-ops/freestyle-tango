@@ -63,6 +63,7 @@ export interface MilongaInfo {
   id: string;
   posterUrl: string;
   message: string;
+  activeDates?: string[]; // Dates to show in the Lucy page dropdown
 }
 
 const COLLECTION_NAME = 'tango_classes';

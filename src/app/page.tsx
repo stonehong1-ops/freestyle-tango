@@ -43,6 +43,19 @@ export default function Home() {
     return sun.toISOString().split('T')[0];
   });
   const [selectedLucyDate, setSelectedLucyDate] = useState(upcomingSundays[0]);
+  const [activeLucyDates, setActiveLucyDates] = useState<string[]>(upcomingSundays);
+  
+  const fetchMilongaDates = async () => {
+    const { getMilongaInfo } = await import('@/lib/db');
+    const info = await getMilongaInfo();
+    if (info && info.activeDates && info.activeDates.length > 0) {
+      setActiveLucyDates(info.activeDates);
+      // Auto-select the latest date if not already selected
+      if (!selectedLucyDate || !info.activeDates.includes(selectedLucyDate)) {
+        setSelectedLucyDate(info.activeDates[info.activeDates.length - 1]);
+      }
+    }
+  };
   
   const checkAdminStatus = (user: { phone: string } | null) => {
     if (user && user.phone.replace(/[^0-9]/g, '') === '01072092468') {
@@ -92,10 +105,14 @@ export default function Home() {
     window.addEventListener('ft_user_updated', loadUser);
     window.addEventListener('ft_classes_updated', fetchClasses);
     window.addEventListener('ft_registrations_updated', fetchClasses);
+    window.addEventListener('ft_milonga_updated', fetchMilongaDates);
+    fetchMilongaDates();
+
     return () => {
       window.removeEventListener('ft_user_updated', loadUser);
       window.removeEventListener('ft_classes_updated', fetchClasses);
       window.removeEventListener('ft_registrations_updated', fetchClasses);
+      window.removeEventListener('ft_milonga_updated', fetchMilongaDates);
     };
   }, []);
 
@@ -274,20 +291,20 @@ export default function Home() {
               ))}
             </select>
           )}
-          {activeTab === 'lucy' && (
+          {activeTab === 'lucy' && ( activeLucyDates.length > 0 && (
             <select 
               className={styles.monthSelect}
               value={selectedLucyDate}
               onChange={(e) => setSelectedLucyDate(e.target.value)}
             >
-              {upcomingSundays.map(date => {
+              {activeLucyDates.map(date => {
                 const [y, m, d] = date.split('-');
                 return (
                   <option key={date} value={date}>{parseInt(m)}/{parseInt(d)} 일요일</option>
                 );
               })}
             </select>
-          )}
+          ))}
         </div>
 
         {activeTab === 'home' && (
