@@ -194,10 +194,14 @@ export const getMilongaInfo = async (): Promise<MilongaInfo | null> => {
 
 export const updateMilongaInfo = async (info: Partial<MilongaInfo>) => {
   const existing = await getMilongaInfo();
+  // Remove id from the data to be saved/updated
+  const dataToSave = { ...info };
+  delete dataToSave.id;
+  
   if (existing) {
     const docRef = doc(db, MILONGA_INFO_COLLECTION, existing.id);
-    return await updateDoc(docRef, info);
+    return await updateDoc(docRef, dataToSave);
   } else {
-    return await addDoc(collection(db, MILONGA_INFO_COLLECTION), info);
+    return await addDoc(collection(db, MILONGA_INFO_COLLECTION), dataToSave as MilongaInfo);
   }
 };

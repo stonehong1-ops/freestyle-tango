@@ -7,10 +7,14 @@ import FullscreenModal from '@/components/common/FullscreenModal';
 
 export default function MilongaLucy({ 
   selectedDate, 
-  onHome 
+  onHome,
+  isAdmin,
+  onEdit
 }: { 
   selectedDate: string;
-  onHome?: () => void 
+  onHome?: () => void;
+  isAdmin?: boolean;
+  onEdit?: () => void;
 }) {
   const [reservations, setReservations] = useState<MilongaReservation[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -21,7 +25,11 @@ export default function MilongaLucy({
   const [milongaInfo, setMilongaInfo] = useState<MilongaInfo | null>(null);
 
   useEffect(() => {
-    fetchReservations();
+    if (selectedDate) {
+      fetchReservations();
+    } else {
+      setReservations([]);
+    }
     fetchMilongaInfo();
 
     const handleUpdate = () => fetchMilongaInfo();
@@ -40,9 +48,11 @@ export default function MilongaLucy({
   };
 
   const formatDateLabel = (dateStr: string) => {
+    if (!dateStr) return '일정 준비중';
     const [y, m, d] = dateStr.split('-');
     const date = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
-    return `${parseInt(m)}/${parseInt(d)} 일요일`;
+    const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+    return `${parseInt(m)}/${parseInt(d)} ${dayNames[date.getDay()]}요일`;
   };
 
   const handleBooking = async () => {
@@ -77,24 +87,44 @@ export default function MilongaLucy({
     return name[0] + '*'.repeat(name.length - 2) + name[name.length - 1];
   };
 
+  if (!selectedDate && !isAdmin) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.emptyMsg}>
+          현재 등록된 밀롱가 일정이 없습니다.<br/>잠시 후 다시 확인해주세요.
+        </div>
+        {onHome && (
+          <button className={styles.homeBtn} onClick={onHome}>
+            홈으로 돌아가기
+          </button>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       {/* Hero Visual Section */}
       <section className={styles.heroSection}>
         <div className={styles.heroImageWrapper}>
           <img src={milongaInfo?.posterUrl || "/images/logo.png"} alt="Milonga Lucy" className={styles.heroImage} />
-        </div>
-        <div className={styles.messageArea}>
-          <p className={styles.milongaMessage}>
-            {milongaInfo?.message || "이번주 일요일, 밀롱가 Lucy에서 만나요!"}
-          </p>
           
-          {onHome && (
-            <button className={styles.homeBtn} onClick={onHome}>
-              Freestyle Tango
-            </button>
+          {isAdmin && onEdit && (
+            <div className={styles.editOverlay}>
+              <button className={styles.editBtn} onClick={onEdit}>
+                ✍️ 포스터/텍스트 수정
+              </button>
+            </div>
           )}
         </div>
+        
+        {milongaInfo?.message && (
+          <div className={styles.messageArea}>
+            <p className={styles.milongaMessage}>
+              {milongaInfo.message}
+            </p>
+          </div>
+        )}
       </section>
 
       {/* Event Section */}
@@ -108,7 +138,7 @@ export default function MilongaLucy({
           <div className={styles.eventCard}>
             <div className={styles.eventBadge}>기본</div>
             <h3 className={styles.eventCardTitle}>테이블 예약</h3>
-            <p className={styles.eventCardDesc}>2인 이상 테이블 신청 가능합니다. VIP테이블을 제외하면 무조건 선착순입니다.</p>
+            <p className={styles.eventCardDesc}>2인 이상 테이블 신청 가능합니다. 선착순으로 배정됩니다.</p>
           </div>
           <div className={styles.eventCard}>
             <div className={styles.eventBadge}>이벤트</div>
@@ -118,45 +148,58 @@ export default function MilongaLucy({
           <div className={styles.eventCard}>
             <div className={styles.eventBadge}>VIP</div>
             <h3 className={styles.eventCardTitle}>3+1 Event</h3>
-            <p className={styles.eventCardDesc}>네 분이 오시면 한 분은 무료입니다. 테이블과 와인 1병(요청시)이 제공됩니다.</p>
+            <p className={styles.eventCardDesc}>네 분이 오시면 한 분은 무료입니다. 테이블과 와인 1병이 제공됩니다.</p>
           </div>
         </div>
 
-        <button className={styles.bookingBtn} onClick={() => setShowForm(true)}>
-          테이블 예약 신청하기
-        </button>
+        {selectedDate && (
+          <button className={styles.bookingBtn} onClick={() => setShowForm(true)}>
+            테이블 예약 신청하기
+          </button>
+        )}
       </section>
 
       {/* Reservation List Section */}
-      <section className={styles.listSection}>
-        <div className={styles.sectionHeaderBetween}>
-          <h2 className={styles.sectionTitle}>예약 현황</h2>
-          <div className={styles.selectedDateBadge}>
-            {formatDateLabel(selectedDate)}
+      {selectedDate && (
+        <section className={styles.listSection}>
+          <div className={styles.sectionHeaderBetween}>
+            <h2 className={styles.sectionTitle}>예약 현황</h2>
+            <div className={styles.selectedDateBadge}>
+              {formatDateLabel(selectedDate)}
+            </div>
           </div>
-        </div>
-        
-        <div className={styles.resList}>
-          {reservations.length === 0 ? (
-            <div className={styles.emptyMsg}>아직 {formatDateLabel(selectedDate)} 예약이 없습니다.</div>
-          ) : (
-            reservations.map((res, i) => (
-              <div key={res.id} className={res.option === '3+1 이벤트' ? styles.resItemVip : styles.resItem}>
-                <span className={styles.resIdx}>{i + 1}</span>
-                <span className={styles.resName}>{maskNickname(res.nickname)}</span>
-                <span className={styles.resOption}>{res.option}</span>
-                {res.requests && <div className={styles.resReq}>{res.requests}</div>}
-              </div>
-            ))
-          )}
-        </div>
-      </section>
+          
+          <div className={styles.resList}>
+            {reservations.length === 0 ? (
+              <div className={styles.emptyMsg}>아직 예약이 없습니다. 첫 번째 예약자가 되어보세요!</div>
+            ) : (
+              reservations.map((res, i) => (
+                <div key={res.id} className={styles.resWrapper}>
+                   <div className={res.option === '3+1 이벤트' ? styles.resItemVip : styles.resItem}>
+                    <span className={styles.resIdx}>{i + 1}</span>
+                    <span className={styles.resName}>{maskNickname(res.nickname)}</span>
+                    <span className={styles.resOption}>{res.option}</span>
+                  </div>
+                  {res.requests && <div className={styles.resReq}>💬 {res.requests}</div>}
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+      )}
+
+      {onHome && (
+        <button className={styles.homeBtn} onClick={onHome}>
+          Freestyle Tango 홈으로
+        </button>
+      )}
 
       {/* Booking Form Modal */}
       <FullscreenModal
         isOpen={showForm}
         onClose={() => setShowForm(false)}
         title="테이블 및 이벤트 예약"
+        isBottomSheet={true}
       >
         <div className={styles.formContent}>
           <div className={styles.formField}>
@@ -203,6 +246,7 @@ export default function MilongaLucy({
               value={requests}
               onChange={(e) => setRequests(e.target.value)}
               className={styles.textarea}
+              rows={3}
             />
           </div>
 

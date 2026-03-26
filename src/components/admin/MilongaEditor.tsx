@@ -99,7 +99,9 @@ export default function MilongaEditor() {
 
   const handleSubmit = async () => {
     try {
-      await updateMilongaInfo(formData);
+      const dataToSave = { ...formData };
+      delete dataToSave.id;
+      await updateMilongaInfo(dataToSave);
       alert('밀롱가 정보가 저장되었습니다.');
       window.dispatchEvent(new Event('ft_milonga_updated'));
     } catch (e) {

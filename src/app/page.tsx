@@ -49,11 +49,21 @@ export default function Home() {
     const { getMilongaInfo } = await import('@/lib/db');
     const info = await getMilongaInfo();
     if (info && info.activeDates && info.activeDates.length > 0) {
-      setActiveLucyDates(info.activeDates);
-      // Auto-select the latest date if not already selected
-      if (!selectedLucyDate || !info.activeDates.includes(selectedLucyDate)) {
-        setSelectedLucyDate(info.activeDates[info.activeDates.length - 1]);
+      // Sort and filter active dates
+      const sortedDates = [...info.activeDates].sort();
+      setActiveLucyDates(sortedDates);
+      
+      // Auto-select the latest date if not already selected or invalid
+      if (!selectedLucyDate || !sortedDates.includes(selectedLucyDate)) {
+        // Find the date closest to today or just the first one
+        const today = new Date().toISOString().split('T')[0];
+        const upcoming = sortedDates.find(d => d >= today);
+        setSelectedLucyDate(upcoming || sortedDates[0]);
       }
+    } else {
+      // Fallback if no dates are registered
+      setActiveLucyDates([]);
+      setSelectedLucyDate('');
     }
   };
   
@@ -291,7 +301,7 @@ export default function Home() {
               ))}
             </select>
           )}
-          {activeTab === 'lucy' && ( activeLucyDates.length > 0 && (
+          {activeTab === 'lucy' && ( activeLucyDates.length > 0 ? (
             <select 
               className={styles.monthSelect}
               value={selectedLucyDate}
@@ -304,6 +314,8 @@ export default function Home() {
                 );
               })}
             </select>
+          ) : (
+            <div className={styles.noDateBadge}>일정 준비중</div>
           ))}
         </div>
 
@@ -375,6 +387,8 @@ export default function Home() {
             <MilongaLucy 
               selectedDate={selectedLucyDate} 
               onHome={() => setActiveTab('home')} 
+              isAdmin={isAdminLogged}
+              onEdit={() => setShowMilongaEditorModal(true)}
             />
           </main>
         )}
