@@ -68,7 +68,7 @@ export default function RegistrationForm({ classId, onClose }: RegistrationFormP
         </p>
         <div style={{ background: '#f2f4f6', padding: '1.5rem', borderRadius: '16px', marginBottom: '2rem', width: '100%' }}>
           <span style={{ display: 'block', fontSize: '0.85rem', color: '#8b95a1', marginBottom: '0.5rem' }}>계좌번호</span>
-          <span style={{ display: 'block', fontSize: '1.1rem', fontWeight: 800, color: '#191f28' }}>카카오뱅크 3333-14-3169646 홍병석</span>
+          <span style={{ display: 'block', fontSize: '1.1rem', fontWeight: 800, color: '#191f28' }}>카카오뱅크 3333-14-3159646 홍병석</span>
         </div>
         <button className={styles.nextBtn} onClick={onClose} style={{ width: '100%' }}>
           확인

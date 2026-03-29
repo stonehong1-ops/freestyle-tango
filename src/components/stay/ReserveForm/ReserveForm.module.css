@@ -1,0 +1,198 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--background);
+}
+
+.header {
+  padding: 2rem 1.5rem;
+  background-color: var(--muted);
+  position: relative;
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  padding: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.backBtn:hover {
+  color: var(--foreground);
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 1rem 0 0.5rem 0;
+  color: var(--foreground);
+}
+
+.routeDesc {
+  font-size: 1rem;
+  color: var(--primary);
+  font-weight: 600;
+  margin: 0;
+}
+
+.content {
+  padding: 2rem 1.5rem 5rem;
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.formSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.paymentGuide {
+  background-color: rgba(16, 185, 129, 0.05);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  padding: 1.25rem;
+  border-radius: var(--radius);
+}
+
+.paymentGuide h3 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+}
+
+.account {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.warning {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+
+.warning strong {
+  color: #ef4444;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formGroup label {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.required {
+  color: #ef4444;
+}
+
+.phoneInputContainer {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.countrySelect {
+  width: 90px;
+  flex-shrink: 0;
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+.submitBtn {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: var(--radius);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+}
+
+/* Complete View */
+.completeCard {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.completeIcon {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+}
+
+.completeTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.completeDesc {
+  color: var(--muted-foreground);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.smsSection {
+  background-color: rgba(16, 185, 129, 0.05);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  margin-bottom: 2rem;
+}
+
+.smsBtn {
+  display: block;
+  background-color: #10b981;
+  color: white;
+  padding: 1rem;
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.homeBtn {
+  background-color: var(--primary);
+  color: white;
+  padding: 0.75rem;
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-weight: 600;
+}

@@ -1,0 +1,89 @@
+.container {
+  padding: 4rem 1.5rem 6rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 0.5rem;
+}
+
+.desc {
+  font-size: 1.1rem;
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+.contactGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 600px) {
+  .contactGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.contactCard {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  color: var(--foreground);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.contactCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary);
+}
+
+.icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.contactCard h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+}
+
+.contactCard p {
+  font-size: 0.95rem;
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+/* Specific Brands */
+.kakao:hover {
+  border-color: #FEE500;
+  box-shadow: 0 10px 15px -3px rgba(254, 229, 0, 0.2);
+}
+
+.whatsapp:hover {
+  border-color: #25D366;
+  box-shadow: 0 10px 15px -3px rgba(37, 211, 102, 0.2);
+}
+
+.messenger:hover {
+  border-color: #0084FF;
+  box-shadow: 0 10px 15px -3px rgba(0, 132, 255, 0.2);
+}

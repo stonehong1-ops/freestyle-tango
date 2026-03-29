@@ -19,10 +19,18 @@ export default function MilongaLucy({
   const [reservations, setReservations] = useState<MilongaReservation[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [nickname, setNickname] = useState('');
+  const [phone, setPhone] = useState('');
   const [selectedOption, setSelectedOption] = useState<'테이블 예약' | '2+1 이벤트' | '3+1 이벤트'>('테이블 예약');
   const [requests, setRequests] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [milongaInfo, setMilongaInfo] = useState<MilongaInfo | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [myPhone, setMyPhone] = useState('');
+
+  useEffect(() => {
+    const savedPhone = localStorage.getItem('ft_milonga_phone');
+    if (savedPhone) setMyPhone(savedPhone);
+  }, []);
 
   useEffect(() => {
     if (selectedDate) {
@@ -34,8 +42,19 @@ export default function MilongaLucy({
 
     const handleUpdate = () => fetchMilongaInfo();
     window.addEventListener('ft_milonga_updated', handleUpdate);
-    return () => window.removeEventListener('ft_milonga_updated', handleUpdate);
-  }, [selectedDate]);
+    
+    const handlePopState = () => {
+      if (showForm) {
+        setShowForm(false);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('ft_milonga_updated', handleUpdate);
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [selectedDate, showForm]);
 
   const fetchMilongaInfo = async () => {
     const info = await getMilongaInfo();
@@ -60,24 +79,70 @@ export default function MilongaLucy({
       alert('닉네임을 입력해주세요.');
       return;
     }
+    if (!phone || phone.length < 10) {
+      alert('올바른 핸드폰 번호를 입력해주세요.');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await addMilongaReservation({
+      const cleanPhone = phone.replace(/[^0-9]/g, '');
+      const reservationData = {
         milongaDate: selectedDate,
         nickname,
+        phone: cleanPhone,
         option: selectedOption,
         requests,
         timestamp: new Date().toISOString()
-      });
-      alert('예약이 완료되었습니다!');
+      };
+
+      if (editingId) {
+        await import('@/lib/db').then(m => m.updateMilongaReservation(editingId, reservationData));
+        alert('예약이 수정되었습니다!');
+      } else {
+        await addMilongaReservation(reservationData);
+        alert('예약이 완료되었습니다!');
+      }
+
+      localStorage.setItem('ft_milonga_phone', cleanPhone);
+      setMyPhone(cleanPhone);
       setShowForm(false);
-      setNickname('');
-      setRequests('');
+      resetForm();
       fetchReservations();
     } catch (e) {
-      alert('예약 실패: ' + e);
+      alert('처리 실패: ' + e);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const resetForm = () => {
+    setNickname('');
+    const savedPhone = localStorage.getItem('ft_milonga_phone') || '';
+    setPhone(savedPhone);
+    setRequests('');
+    setSelectedOption('테이블 예약');
+    setEditingId(null);
+  };
+
+  const handleEdit = (res: MilongaReservation) => {
+    setNickname(res.nickname);
+    setPhone(res.phone);
+    setSelectedOption(res.option);
+    setRequests(res.requests || '');
+    setEditingId(res.id);
+    setShowForm(true);
+    window.history.pushState({ modal: 'milongaForm' }, '', '');
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+    try {
+      await import('@/lib/db').then(m => m.deleteMilongaReservation(id));
+      alert('삭제되었습니다.');
+      fetchReservations();
+    } catch (e) {
+      alert('삭제 실패: ' + e);
     }
   };
 
@@ -102,12 +167,14 @@ export default function MilongaLucy({
       {/* Hero Visual Section */}
       <section className={styles.heroSection}>
         <div className={styles.heroImageWrapper}>
-          <img src={milongaInfo?.posterUrl || "/images/logo.png"} alt="Milonga Lucy" className={styles.heroImage} />
+          {milongaInfo?.posterUrl && (
+            <img src={milongaInfo.posterUrl} alt="Milonga Lucy" className={styles.heroImage} />
+          )}
           
           {isAdmin && onEdit && (
             <div className={styles.editOverlay}>
               <button className={styles.editBtn} onClick={onEdit}>
-                ✍️ 포스터/텍스트 수정
+                수정
               </button>
             </div>
           )}
@@ -116,7 +183,7 @@ export default function MilongaLucy({
         {milongaInfo?.message && (
           <div className={styles.messageArea}>
             <p className={styles.milongaMessage}>
-              {milongaInfo.message}
+              &quot;{milongaInfo.message}&quot;
             </p>
           </div>
         )}
@@ -125,7 +192,7 @@ export default function MilongaLucy({
       {/* Main Action Section - Prominent Booking Button */}
       {selectedDate && (
         <section className={styles.actionSection}>
-          <button className={styles.bookingBtn} onClick={() => setShowForm(true)}>
+          <button className={styles.bookingBtn} onClick={() => { resetForm(); setShowForm(true); window.history.pushState({ modal: 'milongaForm' }, '', ''); }}>
             🎟️ 밀롱가 테이블 예약하기
           </button>
         </section>
@@ -171,16 +238,25 @@ export default function MilongaLucy({
             {reservations.length === 0 ? (
               <div className={styles.emptyMsg}>아직 예약이 없습니다.</div>
             ) : (
-              reservations.map((res, i) => (
-                <div key={res.id} className={styles.resWrapper}>
-                   <div className={res.option === '3+1 이벤트' ? styles.resItemVip : styles.resItem}>
-                    <span className={styles.resIdx}>{i + 1}</span>
-                    <span className={styles.resName}>{maskNickname(res.nickname)}</span>
-                    <span className={styles.resOption}>{res.option}</span>
+              reservations.map((res, i) => {
+                const isMyRes = res.phone === myPhone || isAdmin || myPhone === '01072092468';
+                return (
+                  <div key={res.id} className={styles.resWrapper}>
+                    <div className={res.option === '3+1 이벤트' ? styles.resItemVip : styles.resItem}>
+                      <span className={styles.resIdx}>{i + 1}</span>
+                      <span className={styles.resName}>{maskNickname(res.nickname)}</span>
+                      <span className={styles.resOption}>{res.option}</span>
+                      {isMyRes && (
+                        <div className={styles.resActions}>
+                          <button className={styles.resActionBtn} onClick={() => handleEdit(res)}>수정</button>
+                          <button className={`${styles.resActionBtn} ${styles.deleteBtn}`} onClick={() => handleDelete(res.id)}>삭제</button>
+                        </div>
+                      )}
+                    </div>
+                    {res.requests && <div className={styles.resReq}>💬 {res.requests}</div>}
                   </div>
-                  {res.requests && <div className={styles.resReq}>💬 {res.requests}</div>}
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </section>
@@ -190,7 +266,7 @@ export default function MilongaLucy({
       <FullscreenModal
         isOpen={showForm}
         onClose={() => setShowForm(false)}
-        title="테이블 및 이벤트 예약"
+        title={editingId ? "예약 수정하기" : "테이블 및 이벤트 예약"}
         isBottomSheet={true}
       >
         <div className={styles.formContent}>
@@ -232,6 +308,17 @@ export default function MilongaLucy({
           </div>
 
           <div className={styles.formField}>
+            <label>핸드폰 번호 (예약 확인용)</label>
+            <input 
+              type="tel" 
+              placeholder="010-0000-0000" 
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className={styles.input}
+            />
+          </div>
+
+          <div className={styles.formField}>
             <label>기타 요청사항 (선택)</label>
             <textarea 
               placeholder="요청사항을 입력하세요 (예: 와인 요청)" 
@@ -247,7 +334,7 @@ export default function MilongaLucy({
             onClick={handleBooking}
             disabled={isSubmitting}
           >
-            {isSubmitting ? '처리 중...' : '예약 완료하기'}
+            {isSubmitting ? '처리 중...' : editingId ? '수정 완료하기' : '예약 완료하기'}
           </button>
         </div>
       </FullscreenModal>

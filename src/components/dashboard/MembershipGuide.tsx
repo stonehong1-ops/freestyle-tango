@@ -6,7 +6,7 @@ export default function MembershipGuide() {
   const [showToast, setShowToast] = useState(false);
 
   const handleCopy = () => {
-    const accountNumber = "3333143169646";
+    const accountNumber = "3333143159646";
     navigator.clipboard.writeText(accountNumber).then(() => {
       setShowToast(true);
       setTimeout(() => setShowToast(false), 2000);
@@ -25,14 +25,14 @@ export default function MembershipGuide() {
         </div>
       </section>
 
-      {/* Benefits Card */}
-      <section className={styles.card}>
-        <h2 className={styles.cardTitle}>💎 멤버십 혜택</h2>
+      {/* Benefits Section */}
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>💎 멤버십 혜택</h2>
         <ul className={styles.list}>
           <li className={styles.listItem}>
              <span className={styles.bullet}>•</span>
             <div>
-              <strong style={{ color: '#191f28', fontSize: '1rem' }}>월 멤버십 : 18만</strong><br/>
+              <strong style={{ color: '#191f28' }}>월 멤버십 : 18만</strong><br/>
               모든 수업 수강 가능 / 해외 워크샵 D.C<br/>
               <span style={{ color: '#ef4444', fontSize: '0.9rem', fontWeight: 600, display: 'block', marginTop: '0.25rem' }}>🔥 처음 오시는 분 6개월 멤버십 20% D.C (86만원)</span>
             </div>
@@ -61,9 +61,9 @@ export default function MembershipGuide() {
         </ul>
       </section>
 
-      {/* Culture Card */}
-      <section className={`${styles.card} ${styles.cultureCard}`}>
-        <h2 className={`${styles.cardTitle} ${styles.cultureTitle}`}>🌱 이런 문화 꼭 만들거에요!</h2>
+      {/* Culture Section */}
+      <section className={styles.section}>
+        <h2 className={`${styles.sectionTitle} ${styles.cultureTitle}`}>🌱 이런 문화 꼭 만들거에요!</h2>
         <ul className={styles.list}>
           <li className={styles.listItem}>
             <span className={styles.bullet}>✓</span>
@@ -83,16 +83,16 @@ export default function MembershipGuide() {
       </section>
 
       {/* Location Map Section */}
-      <section className={styles.card}>
+      <section className={styles.section}>
         <LocationSection />
       </section>
 
       {/* Bank Account Section */}
-      <section className={styles.bankCard}>
-        <h2 className={styles.accountTitle}>💰 계좌 안내</h2>
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>💰 계좌 안내</h2>
         <div className={styles.bankAccountBox}>
           <span className={styles.bankName}>카카오뱅크 (홍병석)</span>
-          <span className={styles.accountNumber}>3333-14-3169646</span>
+          <span className={styles.accountNumber}>3333-14-3159646</span>
           <button className={styles.copyBtn} onClick={handleCopy}>
             복사하기
           </button>
@@ -102,38 +102,37 @@ export default function MembershipGuide() {
         </p>
       </section>
 
-      {/* Host / Contact Section like TangoStay */}
-      <section className={styles.card} style={{ marginTop: '2rem', border: 'none', background: '#f8f9fa', padding: '2rem 1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-          <div style={{ width: '60px', height: '60px', borderRadius: '50%', overflow: 'hidden', background: '#eee' }}>
+      {/* Host / Contact Section */}
+      <section className={styles.hostSection}>
+        <div className={styles.hostHeader}>
+          <div className={styles.hostPhoto}>
              <img src="/images/stone.jpg" alt="Stone" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
-          <div>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#191f28' }}>Stone | 홍병석</h3>
-            <p style={{ margin: '0.2rem 0 0', fontSize: '0.9rem', color: '#4e5968' }}>Tango Instructor (010.7209.2468)</p>
+          <div className={styles.hostInfo}>
+            <h3>Stone | 홍병석</h3>
+            <p>Tango Instructor (010.7209.2468)</p>
           </div>
         </div>
 
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
+        <div className={styles.contactGrid}>
           <a href="tel:010-7209-2468" className={styles.contactBtn}>📞 전화</a>
-          <a href="https://open.kakao.com/me/StoneHong" target="_blank" rel="noopener noreferrer" className={styles.contactBtn} style={{ background: '#FEE500', color: '#000', border: 'none' }}>💬 카카오톡</a>
-          <a href="https://wa.me/821072092468" target="_blank" rel="noopener noreferrer" className={styles.contactBtn} style={{ background: '#25D366', color: '#fff', border: 'none' }}>🟩 와츠앱</a>
+          <a href="https://open.kakao.com/me/StoneHong" target="_blank" rel="noopener noreferrer" className={styles.contactBtn} style={{ background: '#FEE500', color: '#000', border: 'none' }}>💬 카톡</a>
+          <a href="https://wa.me/821072092468" target="_blank" rel="noopener noreferrer" className={styles.contactBtn} style={{ background: '#25D366', color: '#fff', border: 'none' }}>🟩 WhatsApp</a>
         </div>
 
-        {/* Open Chat Banner (Now at the bottom) */}
-        <div style={{ marginTop: '1.5rem' }}>
+        {/* Open Chat Banner */}
+        <div className={styles.openChatBanner}>
           <a href="https://open.kakao.com/o/glYslQvc" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
-            <div style={{ padding: '1.25rem', background: '#FEE500', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-              <img src="/images/kakaotalk_openchat.png" alt="KakaoTalk" style={{ width: '48px', height: '48px', borderRadius: '12px' }} />
-              <span style={{ color: '#3c1e1e', fontWeight: 800, fontSize: '0.82rem', lineHeight: 1.4, textAlign: 'left' }}>
+            <div className={styles.openChatBox}>
+              <img src="/images/kakaotalk_openchat.png" alt="KakaoTalk" style={{ width: '40px', height: '40px', borderRadius: '10px' }} />
+              <span className={styles.openChatText}>
                 신청하신 분은 &apos;오픈톡방&apos;에 반드시 들어오셔야 수업 안내를 받으실 수 있어요! (클릭)
               </span>
             </div>
           </a>
         </div>
-        <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-          <p style={{ fontSize: '0.75rem', color: '#adb5bd' }}>© {new Date().getFullYear()} FreestyleTango. All rights reserved.</p>
+        <div className={styles.footerText}>
+          <p className={styles.copyright}>© {new Date().getFullYear()} FreestyleTango. All rights reserved.</p>
         </div>
       </section>
 

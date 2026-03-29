@@ -1,0 +1,70 @@
+.overlay {
+  position: fixed;
+  bottom: 100px;
+  left: 20px;
+  right: 20px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  z-index: 10000;
+  padding: 1.25rem;
+  animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border: 1px solid #f2f4f6;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #191f28;
+}
+
+.header button {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: #adb5bd;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.container p {
+  margin: 0 0 1.25rem;
+  font-size: 0.95rem;
+  color: #4e5968;
+  line-height: 1.5;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: #f9fafb;
+  padding: 1rem;
+  border-radius: 14px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333d4b;
+}
+
+.icon {
+  font-size: 1.2rem;
+}

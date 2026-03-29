@@ -1,89 +1,232 @@
 .container {
-  padding: 1.5rem;
-  color: #1a1a1a;
+  padding: var(--space-6);
+  background: var(--bg-base);
 }
 
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
 }
 
 .statCard {
-  background: #f9fafb;
-  padding: 1.25rem 1rem;
-  border-radius: 16px;
-  border: 1px solid #f2f4f6;
+  background: var(--bg-secondary);
+  padding: var(--space-4) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
 }
 
 .label {
-  font-size: 0.85rem;
-  color: #8b95a1;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-1);
+  font-weight: 700;
 }
 
 .value {
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: #3182f6;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent);
 }
 
 .listTitle {
   font-size: 1.1rem;
   font-weight: 800;
-  margin-bottom: 1rem;
+  color: var(--text-primary);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-2);
+  border-bottom: 2px solid var(--bg-secondary);
 }
 
+/* Milonga Grid */
+.milongaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
+}
+
+.milongaCard {
+  background: var(--bg-secondary);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  text-align: center;
+}
+
+.milongaDate {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-2);
+}
+
+.milongaCount {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* Class List */
 .classList {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-6);
 }
 
-.classItem {
-  background: #fff;
-  padding: 1rem;
-  border-radius: 14px;
-  border: 1px solid #eee;
+.classSection {
+  background: var(--bg-base);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-medium);
+  overflow: hidden;
+}
+
+.classHeader {
+  padding: var(--space-4);
+  background: #f8f9fa;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .className {
-  font-weight: 700;
+  font-weight: 800;
   font-size: 1rem;
-  margin-bottom: 0.2rem;
+  color: var(--accent);
 }
 
 .classSub {
   font-size: 0.8rem;
-  color: #8b95a1;
+  color: var(--text-tertiary);
 }
 
 .classCount {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: var(--space-3);
   font-size: 0.85rem;
   font-weight: 700;
 }
 
-.leader { color: #3182f6; }
-.follower { color: #f04452; }
-.total { 
-  background: #f2f4f6; 
-  padding: 0.2rem 0.5rem; 
-  border-radius: 4px;
-  color: #4e5968;
+.applicantList {
+  padding: var(--space-4);
+  background: white;
 }
 
-@media (max-width: 480px) {
-    .classItem {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.75rem;
-    }
+.applicantGroup {
+  margin-bottom: var(--space-3);
 }
+
+.applicantGroup:last-child {
+  margin-bottom: 0;
+}
+
+.groupLabel {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-2);
+  text-transform: uppercase;
+}
+
+.nameCloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.nameTag {
+  background: var(--bg-secondary);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
+}
+
+.leader { color: var(--accent); }
+.follower { color: var(--error); }
+.total { 
+  background: var(--bg-secondary); 
+  padding: 2px 6px; 
+  border-radius: var(--radius-xs);
+  color: var(--text-secondary);
+}
+
+.emptyText {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--space-8);
+  color: var(--text-tertiary);
+}
+
+/* Applicant Table Styles */
+.tableContainer {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.applicantTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin-top: var(--space-4);
+}
+
+.applicantTable th,
+.applicantTable td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.applicantTable th {
+  background: var(--bg-secondary);
+  font-weight: 800;
+  color: var(--text-tertiary);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.applicantTable td {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.regDate {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.statusPaid {
+  background: #e6fcf5;
+  color: #0ca678;
+}
+
+.statusWaiting {
+  background: #fff5f5;
+  color: #fa5252;
+}
+
+.classCountBadge {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+

@@ -1,58 +1,60 @@
 .form {
-  padding: 1.5rem;
+  padding: var(--space-6);
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--space-6);
+  background: var(--bg-base);
 }
 
 .inputGroup {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .inputGroup label {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #4e5968;
+  color: var(--text-secondary);
 }
 
 .input {
   width: 100%;
-  padding: 0.85rem 1rem;
-  border-radius: 12px;
-  border: 1px solid #f2f4f6;
-  background: #f9fafb;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  background: var(--bg-secondary);
   font-size: 1rem;
-  color: #191f28;
+  color: var(--text-primary);
   outline: none;
   transition: border-color 0.2s;
 }
 
 .input:focus {
-  border-color: #3182f6;
+  border-color: var(--accent);
+  background: var(--bg-base);
 }
 
 /* Image Upload specific styles */
 .imageUploadBox {
   width: 100%;
-  height: 160px;
-  border-radius: 12px;
-  border: 2px dashed #d1d6db;
-  background: #f9fafb;
+  height: 140px;
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border-medium);
+  background: var(--bg-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #8b95a1;
-  font-size: 0.95rem;
+  color: var(--text-tertiary);
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   overflow: hidden;
   transition: background 0.2s;
 }
 
-.imageUploadBox:hover {
-  background: #f2f4f6;
+.imageUploadBox:active {
+  background: var(--bg-tertiary);
 }
 
 .imagePreview {
@@ -65,33 +67,33 @@
 .datesGrid, .curriculumGrid {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .dateRow, .curriculumRow {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 .weekLabel {
-  min-width: 45px;
+  min-width: 40px;
   font-size: 0.85rem;
   font-weight: 700;
-  color: #3182f6;
+  color: var(--accent);
 }
 
 .actionLinks {
   display: flex;
-  gap: 0.8rem;
+  gap: var(--space-4);
 }
 
 .textBtn {
   background: none;
   border: none;
-  color: #3182f6;
+  color: var(--accent);
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   padding: 0;
 }
@@ -99,55 +101,49 @@
 .checkboxGroup {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
 }
 
 .checkboxGroup input[type="checkbox"] {
-  width: 1.2rem;
-  height: 1.2rem;
-  accent-color: #3182f6;
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--accent);
 }
 
 .curriculumContainer {
-  background: #f9fafb;
-  padding: 1rem;
-  border-radius: 12px;
-  border: 1px solid #f2f4f6;
-}
-
-.selectGroup {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+  background: var(--bg-secondary);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
 }
 
 .optionBtn {
   flex: 1;
-  padding: 0.8rem;
-  border-radius: 12px;
-  border: 1px solid #f2f4f6;
-  background: #fff;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  background: var(--bg-base);
   font-size: 0.85rem;
   font-weight: 600;
-  color: #4e5968;
+  color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s;
   text-align: center;
 }
 
 .optionBtn.active {
-  background: #3182f6;
+  background: var(--accent);
   color: #fff;
-  border-color: #3182f6;
+  border-color: var(--accent);
 }
 
 .submitBtn {
-  margin-top: 1rem;
-  padding: 1rem;
-  border-radius: 12px;
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-sm);
   border: none;
-  background: #3182f6;
+  background: var(--accent);
   color: #fff;
   font-size: 1rem;
   font-weight: 700;
@@ -156,4 +152,6 @@
 
 .submitBtn:active {
   transform: scale(0.98);
+  opacity: 0.9;
 }
+

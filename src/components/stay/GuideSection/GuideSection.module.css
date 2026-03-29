@@ -1,0 +1,177 @@
+.container {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.header {
+  margin-bottom: 2.5rem;
+  text-align: left;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #191f28;
+  margin-bottom: 0.75rem;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: #8b95a1;
+  font-weight: 500;
+  word-break: keep-all;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.accordion {
+  border: 1px solid #f2f4f6;
+  border-radius: 16px;
+  background-color: #ffffff;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.accordion summary {
+  padding: 1.25rem 1.5rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  background-color: #f9fafb;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #333d4b;
+}
+
+.accordion summary::-webkit-details-marker {
+  display: none;
+}
+
+.accordion summary::after {
+  content: '+';
+  font-size: 1.25rem;
+  color: #adb5bd;
+}
+
+.accordion[open] summary::after {
+  content: '−';
+}
+
+.accordion[open] summary {
+  border-bottom: 1px solid #f2f4f6;
+}
+
+.accordionContent {
+  padding: 1.5rem;
+  line-height: 1.6;
+  color: #4e5968;
+  font-size: 1rem;
+}
+
+.customList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.customList li {
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.customList li::before {
+  content: '•';
+  color: #3182f6;
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.customList li strong {
+  color: #191f28;
+  display: block;
+  font-size: 1.05rem;
+  margin-bottom: 0.4rem;
+  font-weight: 700;
+}
+
+.quote {
+  padding: 1.25rem;
+  background-color: #f9fafb;
+  border-left: 4px solid #3182f6;
+  margin-top: 1.5rem;
+  font-weight: 600;
+  color: #3182f6;
+  border-radius: 0 12px 12px 0;
+}
+
+.globalHostQuote {
+  margin-top: 2rem;
+  font-weight: 700;
+  color: #3182f6;
+  text-align: center;
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 16px;
+  font-size: 1.05rem;
+}
+
+.gridList {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.gridCol h4 {
+  font-size: 1rem;
+  margin: 0 0 0.75rem 0;
+  color: #191f28;
+  border-bottom: 1px solid #f2f4f6;
+  padding-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.gridCol p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #4e5968;
+}
+
+.amenityBox {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1px solid #e5e8eb;
+}
+
+.amenityBox strong {
+  display: block;
+  margin-bottom: 0.6rem;
+  color: #3182f6;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+@media (max-width: 768px) {
+  .gridList {
+    grid-template-columns: 1fr;
+  }
+  .title {
+    font-size: 1.5rem;
+  }
+  .accordion summary {
+    padding: 1.1rem;
+    font-size: 1rem;
+  }
+}

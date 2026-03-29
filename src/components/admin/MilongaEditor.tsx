@@ -4,26 +4,29 @@ import React, { useState, useEffect, useRef } from 'react';
 import styles from './MilongaEditor.module.css';
 import { MilongaInfo, getMilongaInfo, updateMilongaInfo } from '@/lib/db';
 
-export default function MilongaEditor({ onClose }: { onClose?: () => void }) {
+export default function MilongaEditor({ onClose, isNew }: { onClose?: () => void, isNew?: boolean }) {
   const [formData, setFormData] = useState<Partial<MilongaInfo>>({
     posterUrl: '',
     message: '',
     activeDate: ''
   });
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!isNew);
   const [isImageProcessing, setIsImageProcessing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    if (isNew) {
+      setIsLoading(false);
+      return;
+    }
     const fetchData = async () => {
       try {
         const data = await getMilongaInfo();
         if (data) {
           setFormData(prev => ({ 
             ...prev, 
-            ...data,
-            activeDate: data.activeDate || ''
+            ...data
           }));
         }
       } catch (error) {
@@ -33,12 +36,7 @@ export default function MilongaEditor({ onClose }: { onClose?: () => void }) {
       }
     };
     fetchData();
-  }, []);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+  }, [isNew]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -86,6 +84,14 @@ export default function MilongaEditor({ onClose }: { onClose?: () => void }) {
     try {
       const dataToSave = { ...formData };
       delete dataToSave.id;
+      
+      // Ensure activeDates is an array for backend compatibility
+      if (dataToSave.activeDate) {
+        dataToSave.activeDates = [dataToSave.activeDate];
+      } else {
+        dataToSave.activeDates = [];
+      }
+      
       await updateMilongaInfo(dataToSave as MilongaInfo);
       alert('밀롱가 정보가 저장되었습니다.');
       window.dispatchEvent(new Event('ft_milonga_updated'));
@@ -99,19 +105,19 @@ export default function MilongaEditor({ onClose }: { onClose?: () => void }) {
 
   return (
     <div className={styles.container}>
-      {/* 1. Image Processing (Base64) - Same as ClassEditor */}
+      {/* 1. Image Processing (Base64) */}
       <div className={styles.inputGroup}>
-        <label>밀롱가 포스터</label>
+        <label>밀롱가 포스터 (이미지 업로드)</label>
         <div 
-          className={styles.imageBox} 
+          className={styles.imageUploadBox}
           onClick={() => fileInputRef.current?.click()}
         >
           {isImageProcessing ? (
-            <span>이미지 처리 중...</span>
+            <span>업로드 중...</span>
           ) : formData.posterUrl ? (
-            <img src={formData.posterUrl} alt="Poster" className={styles.preview} />
+            <img src={formData.posterUrl} alt="포스터 미리보기" className={styles.imagePreview} />
           ) : (
-            <span>이미지 선택</span>
+            <span>여기를 클릭하여 이미지 선택</span>
           )}
         </div>
         <input 
@@ -130,26 +136,26 @@ export default function MilongaEditor({ onClose }: { onClose?: () => void }) {
           className={`${styles.input} ${styles.textarea}`} 
           name="message" 
           value={formData.message} 
-          onChange={handleChange} 
+          onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))} 
           placeholder="공지 사항을 입력하세요..."
           rows={4}
         />
       </div>
 
-      {/* 3. Date Selection Section */}
+      {/* 3. Single Date Selection Section */}
       <div className={styles.inputGroup}>
-        <label>밀롱가 날짜</label>
+        <label>밀롱가 진행 일자</label>
         <input 
           type="date" 
           className={styles.input} 
           name="activeDate"
-          value={formData.activeDate}
-          onChange={handleChange}
+          value={formData.activeDate || ''}
+          onChange={(e) => setFormData(prev => ({ ...prev, activeDate: e.target.value }))}
         />
       </div>
 
       <button className={styles.submitBtn} onClick={handleSubmit}>
-        밀롱가 정보 저장하기
+        밀롱가 등록
       </button>
     </div>
   );

@@ -5,42 +5,39 @@
 }
 
 .globalHeader {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
-  height: 64px;
-  background: #ffffff;
+  height: 60px;
+  background: var(--bg-base);
+  border-bottom: 1px solid var(--border-light);
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 0 1.5rem;
+  align-items: center;
+  padding: 0 var(--space-4);
   z-index: 1000;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
 }
 
 .headerLeft {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: var(--space-2);
 }
 
 .logoIcon {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
 }
 
 .studioName {
   font-size: 0.95rem;
-  font-weight: 800;
-  color: #191f28;
+  font-weight: 700;
+  color: var(--text-primary);
   letter-spacing: -0.02em;
 }
 
 .headerRight {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-3);
 }
 
 .adminGroup {
@@ -148,20 +145,20 @@
 }
 
 .scrollContent {
-  padding-top: 64px;
+  padding-top: 4px;
   padding-bottom: 90px;
 }
 
 .mainContent {
-  padding: 1rem 1rem 0;
+  padding: 0.25rem 1.25rem 6rem;
 }
 
 .pageHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 1.25rem 0.75rem;
-  background: #fdfdfd;
+  padding: 0.25rem 1.25rem 0.1rem;
+  background: transparent;
 }
 
 .logoImage {
@@ -173,10 +170,10 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 .pageTitle {
-  font-size: 1.4rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: #1a1a1a;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.01em;
 }
 
 .monthSelect {
@@ -197,9 +194,42 @@
   border-color: #3182f6;
 }
 
-.mainContent {
-  padding: 0.5rem 1.25rem 6rem;
+.adminActionBtn {
+  background: #3182f6;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 0.8rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
 }
+
+.adminActionBtn:hover {
+  background: #1b64da;
+}
+
+.adminActionBtn:active {
+  transform: scale(0.95);
+}
+
+.backActionBtn {
+  background: #f2f4f6;
+  color: #4e5968;
+  border: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.backActionBtn:hover {
+  background: #e5e8eb;
+}
+
 
 .daySection {
   margin-bottom: 2rem;
@@ -229,4 +259,149 @@
   .titleCard { padding: 3rem 1rem 2rem; border-radius: 0 0 28px 28px; }
   .titleLine1 { font-size: 1.25rem; }
   .titleLine2 { font-size: 1.25rem; }
+}
+
+.exitToast {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  padding: 0.8rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  z-index: 10000;
+  white-space: nowrap;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translate(-50%, 10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.monthNoticeContainer {
+  margin: 1rem 1.25rem 0.5rem;
+  padding: 1.25rem;
+  background: #f8f9fa;
+  border-radius: 18px;
+  border: 1px dashed #d1d8df;
+  position: relative;
+}
+
+.noticeDisplayArea {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.noticeContent {
+  color: #4e5968;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.noticeAddPlaceholder {
+  color: #8b95a1;
+  font-size: 0.9rem;
+  font-style: italic;
+  cursor: pointer;
+  text-align: center;
+  padding: 1rem;
+}
+
+.noticeEditBtn {
+  align-self: flex-end;
+  background: #fff;
+  border: 1px solid #e5e8eb;
+  padding: 0.4rem 0.8rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #4e5968;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.noticeEditArea {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.noticeTextarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 1rem;
+  border-radius: 14px;
+  border: 1.5px solid #3182f6;
+  font-size: 0.95rem;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+}
+
+.noticeEditBtns {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.noticeSaveBtn {
+  background: #3182f6;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.noticeCancelBtn {
+  background: #f2f4f6;
+  color: #4e5968;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.exportBtnContainer {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 1.25rem 3rem;
+  background: #ffffff;
+}
+
+.exportBtn {
+  width: 100%;
+  max-width: 400px;
+  padding: 1.2rem;
+  background: #3182f6;
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(49, 130, 246, 0.2);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.exportBtn:hover {
+  background: #1b64da;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(49, 130, 246, 0.3);
+}
+
+.exportBtn:active {
+  transform: scale(0.98);
 }

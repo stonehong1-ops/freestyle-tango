@@ -1,10 +1,28 @@
-// v1.0.2 - Final Production Sync
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 
 export const metadata: Metadata = {
-  title: "FreestyleTango | 프리스타일 탱고",
-  description: "Experience the ultimate freedom of Argentine Tango",
+  title: "프리스타일탱고 | FreestyleTango",
+  description: "합정 & 덕은동 프리스타일탱고 - 밀롱가, 클래스, 스테이 예약",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "프리스타일탱고",
+    startupImage: "/images/logo.png"
+  },
+  icons: {
+    apple: "/images/logo.png"
+  }
+};
+
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
@@ -15,7 +33,9 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        {children}
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

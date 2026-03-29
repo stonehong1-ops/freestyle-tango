@@ -1,36 +1,37 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  padding: 1rem 0;
+  gap: var(--space-5);
+  padding: var(--space-4) 0;
 }
 
 .inputGroup {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .inputGroup label {
   font-size: 0.85rem;
-  font-weight: 600;
-  color: #4e5968;
+  font-weight: 700;
+  color: var(--text-secondary);
 }
 
 .input {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #e5e8eb;
-  border-radius: 12px;
-  background: #f9fafb;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
   font-size: 0.95rem;
+  color: var(--text-primary);
   outline: none;
   transition: all 0.2s;
 }
 
 .input:focus {
-  border-color: #3182f6;
-  background: #fff;
+  border-color: var(--accent);
+  background: var(--bg-base);
 }
 
 .textarea {
@@ -42,15 +43,15 @@
 .imageBox {
   width: 100%;
   aspect-ratio: 4 / 5;
-  border: 2px dashed #e5e8eb;
-  border-radius: 16px;
+  border: 1px dashed var(--border-medium);
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   overflow: hidden;
-  background: #f9fafb;
-  color: #8b95a1;
+  background: var(--bg-secondary);
+  color: var(--text-tertiary);
   font-size: 0.9rem;
 }
 
@@ -62,64 +63,66 @@
 
 .submitBtn {
   width: 100%;
-  padding: 1rem;
-  background: #3182f6;
+  padding: var(--space-4);
+  background: var(--accent);
   color: #fff;
   border: none;
-  border-radius: 16px;
+  border-radius: var(--radius-sm);
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  margin-top: 1rem;
+  margin-top: var(--space-4);
   transition: opacity 0.2s;
 }
 
 .submitBtn:active {
   opacity: 0.8;
+  transform: scale(0.98);
 }
 
 .loading {
   text-align: center;
-  padding: 2rem;
-  color: #8b95a1;
+  padding: var(--space-8);
+  color: var(--text-tertiary);
 }
 
 .dateList {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2);
   max-height: 200px;
   overflow-y: auto;
-  padding: 0.5rem;
-  background: #f9fafb;
-  border-radius: 12px;
+  padding: var(--space-2);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
 }
 
 .dateItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 1rem;
-  background: #fff;
-  border-radius: 10px;
-  border: 1px solid #e5e8eb;
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-base);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
   font-size: 0.9rem;
   font-weight: 600;
-  color: #333d4b;
+  color: var(--text-primary);
 }
 
 .dateItem button {
   background: none;
   border: none;
-  color: #ef4444;
-  font-size: 1.1rem;
+  color: var(--error);
+  font-size: 1rem;
   cursor: pointer;
-  padding: 0.2rem 0.5rem;
+  padding: var(--space-1) var(--space-2);
 }
 
 .emptyText {
-  padding: 1rem;
+  padding: var(--space-4);
   text-align: center;
   font-size: 0.85rem;
-  color: #8b95a1;
+  color: var(--text-tertiary);
 }
+

@@ -1,37 +1,33 @@
 .container {
   min-height: 100dvh;
-  background: #f8f9fa;
+  background: var(--bg-base);
   display: flex;
   flex-direction: column;
-  color: #1a1f27;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  padding-bottom: 80px; /* For footer menu */
+  padding-bottom: 80px;
 }
-
-/* Glassmorphism Header Effects could be added here if needed, but we use page header */
 
 .heroSection {
   position: relative;
   width: 100%;
-  background: #000;
+  background: var(--bg-base);
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .heroImageWrapper {
   width: 100%;
-  min-height: 300px;
+  min-height: 240px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #111;
+  background: var(--bg-tertiary);
   position: relative;
 }
 
 .heroImage {
   width: 100%;
   height: auto;
-  max-height: 70vh;
+  max-height: 60vh;
   display: block;
   object-fit: contain;
 }
@@ -44,120 +40,117 @@
 }
 
 .editBtn {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  color: #333d4b;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: all 0.2s;
 }
 
 .editBtn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: translateY(-2px);
+  background: #fff;
+  transform: translateY(-1px);
+}
+
+.editBtn:active {
+  transform: translateY(0) scale(0.95);
 }
 
 .messageArea {
-  padding: 2rem 1.5rem;
-  background: #ffffff;
-  border-radius: 0 0 24px 24px;
-  margin-bottom: 1rem;
+  padding: var(--space-6) var(--space-4);
+  background: var(--bg-base);
 }
 
 .milongaMessage {
-  font-size: 1.1rem;
-  line-height: 1.7;
-  color: #333d4b;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--text-primary);
   white-space: pre-wrap;
   letter-spacing: -0.02em;
-  font-weight: 500;
+  font-weight: 600;
   text-align: center;
 }
 
-/* Event Section */
 .eventSection {
-  padding: 1.5rem;
-  background: #fff;
-  margin: 0 1rem 1rem;
-  border-radius: 24px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  padding: var(--space-4);
+  background: var(--bg-base);
+  border-bottom: 8px solid var(--bg-secondary);
 }
 
 .sectionHeader {
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-4);
 }
 
 .sectionTitle {
-  font-size: 1.35rem;
-  font-weight: 800;
-  color: #191f28;
-  margin-bottom: 0.5rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
 }
 
 .sectionSubtitle {
-  font-size: 0.9rem;
-  color: #8b95a1;
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
 }
 
 .eventGrid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
 }
 
 .eventCard {
-  padding: 1.25rem;
-  border: 1px solid #f2f4f6;
-  border-radius: 20px;
-  background: #f9fafb;
-  position: relative;
-  transition: transform 0.2s;
-}
-
-.eventCard:hover {
-  transform: scale(1.02);
+  padding: var(--space-4);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
 }
 
 .eventBadge {
   display: inline-block;
-  padding: 4px 10px;
-  background: #eef3ff;
-  color: #3182f6;
-  font-size: 0.75rem;
+  padding: 2px 8px;
+  background: var(--accent-light);
+  color: var(--accent);
+  font-size: 0.7rem;
   font-weight: 700;
-  border-radius: 8px;
-  margin-bottom: 0.75rem;
+  border-radius: var(--radius-xs);
+  margin-bottom: var(--space-2);
 }
 
 .eventCardTitle {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
-  color: #333d4b;
-  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
 }
 
 .eventCardDesc {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   line-height: 1.5;
-  color: #6b7684;
+  color: var(--text-secondary);
+}
+
+.actionSection {
+  padding: var(--space-2) var(--space-4) var(--space-6);
 }
 
 .bookingBtn {
   width: 100%;
-  padding: 1.1rem;
-  background: #3182f6;
+  padding: var(--space-4);
+  background: var(--accent);
   color: #fff;
   border: none;
-  border-radius: 18px;
-  font-size: 1.05rem;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(49, 130, 246, 0.2);
   transition: all 0.2s;
 }
 
@@ -165,17 +158,11 @@
   transform: scale(0.98);
 }
 
-.actionSection {
-  padding: 0.5rem 1rem 1.5rem;
-}
 
-/* Reservation List Section */
 .listSection {
   padding: 1.5rem;
   background: #fff;
-  margin: 0 1rem 1.5rem;
-  border-radius: 24px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  margin: 0;
 }
 
 .sectionHeaderBetween {
@@ -210,10 +197,9 @@
 .resItem, .resItemVip {
   display: flex;
   align-items: center;
-  padding: 1rem;
-  border-radius: 16px;
-  background: #f9fafb;
-  border: 1px solid #f2f4f6;
+  padding: 0.75rem 0;
+  background: #fff;
+  border-bottom: 1px solid #f2f4f6;
 }
 
 .resItemVip {
@@ -256,6 +242,36 @@
   font-size: 0.85rem;
   color: #8b95a1;
   padding-left: 24px;
+}
+
+.resActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 0.75rem;
+}
+
+.resActionBtn {
+  background: #f2f4f6;
+  color: #4e5968;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.resActionBtn:hover {
+  background: #e5e8eb;
+}
+
+.deleteBtn {
+  color: #ef4444;
+}
+
+.deleteBtn:hover {
+  background: #fee2e2;
 }
 
 /* Form Styles */

@@ -9,9 +9,18 @@ interface IdentityFormProps {
 }
 
 export default function IdentityForm({ onClose, onComplete }: IdentityFormProps) {
-  const [role, setRole] = useState<'leader' | 'follower' | null>(null);
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [role, setRole] = useState<'leader' | 'follower' | null>(() => {
+    const saved = typeof window !== 'undefined' ? localStorage.getItem('ft_user') : null;
+    return saved ? JSON.parse(saved).role : null;
+  });
+  const [name, setName] = useState(() => {
+    const saved = typeof window !== 'undefined' ? localStorage.getItem('ft_user') : null;
+    return saved ? JSON.parse(saved).nickname : '';
+  });
+  const [phone, setPhone] = useState(() => {
+    const saved = typeof window !== 'undefined' ? localStorage.getItem('ft_user') : null;
+    return saved ? JSON.parse(saved).phone : '';
+  });
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 11);
@@ -26,31 +35,46 @@ export default function IdentityForm({ onClose, onComplete }: IdentityFormProps)
     }
   };
 
-  return (
-    <div className={styles.formContainer} style={{ padding: '0 0.5rem' }}>
-      <p style={{ fontSize: '0.85rem', color: '#8b95a1', marginBottom: '1rem', textAlign: 'center' }}>회원 정보를 입력하고 서비스를 이용해 보세요.</p>
+  const isFormValid = role && name.trim() !== '' && phone.length >= 10;
 
-      <div style={{ marginBottom: '1.5rem' }}>
-        <label style={{ display: 'block', fontSize: '0.85rem', color: '#4e5968', marginBottom: '0.5rem', fontWeight: 600 }}>역할</label>
+  return (
+    <div className={styles.formContainer} style={{ gap: '1rem', padding: '0 0.5rem' }}>
+      <p style={{ 
+        fontSize: '0.95rem', 
+        color: '#4e5968', 
+        marginBottom: '0.5rem', 
+        textAlign: 'center',
+        lineHeight: '1.5',
+        wordBreak: 'keep-all'
+      }}>
+        내 닉네임과 전화번호가 필요한 서비스입니다.
+      </p>
+
+      <div style={{ marginBottom: '0.75rem' }}>
+        <label style={{ display: 'block', fontSize: '0.85rem', color: '#8b95a1', marginBottom: '0.4rem', fontWeight: 600 }}>역할</label>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           <button 
             onClick={() => setRole('leader')}
-            style={{
-              flex: 1, padding: '0.8rem', borderRadius: '12px', border: 'none',
-              background: role === 'leader' ? '#3182f6' : '#f2f4f6',
+            className={`${styles.roleBtn} ${role === 'leader' ? styles.selected : ''}`}
+            style={{ 
+              flex: 1, padding: '0.75rem', borderRadius: '12px', border: '1px solid #f2f4f6',
+              background: role === 'leader' ? '#3182f6' : '#f9fafb',
               color: role === 'leader' ? '#fff' : '#4e5968',
-              fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s'
+              fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s',
+              aspectRatio: 'unset', height: 'auto', flexDirection: 'row', gap: '0'
             }}
           >
             리더
           </button>
           <button 
             onClick={() => setRole('follower')}
-            style={{
-              flex: 1, padding: '0.8rem', borderRadius: '12px', border: 'none',
-              background: role === 'follower' ? '#3182f6' : '#f2f4f6',
+            className={`${styles.roleBtn} ${role === 'follower' ? styles.selected : ''}`}
+            style={{ 
+              flex: 1, padding: '0.75rem', borderRadius: '12px', border: '1px solid #f2f4f6',
+              background: role === 'follower' ? '#3182f6' : '#f9fafb',
               color: role === 'follower' ? '#fff' : '#4e5968',
-              fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s'
+              fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s',
+              aspectRatio: 'unset', height: 'auto', flexDirection: 'row', gap: '0'
             }}
           >
             팔로워
@@ -58,35 +82,44 @@ export default function IdentityForm({ onClose, onComplete }: IdentityFormProps)
         </div>
       </div>
 
-      <div style={{ marginBottom: '1.5rem' }}>
-        <label style={{ display: 'block', fontSize: '0.85rem', color: '#4e5968', marginBottom: '0.5rem', fontWeight: 600 }}>이름</label>
+      <div style={{ marginBottom: '0.75rem' }}>
+        <label style={{ display: 'block', fontSize: '0.85rem', color: '#8b95a1', marginBottom: '0.4rem', fontWeight: 600 }}>이름 (닉네임)</label>
         <input 
-          type="text" placeholder="홍길동" value={name} onChange={(e) => setName(e.target.value)}
-          style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '1px solid #eef3f6', background: '#f9fafb', fontSize: '1rem' }}
+          type="text" 
+          placeholder="사용하실 닉네임을 입력해주세요" 
+          value={name} 
+          onChange={(e) => setName(e.target.value)}
+          className={styles.input}
+          style={{ padding: '0.8rem 1rem', borderRadius: '12px', background: '#f9fafb', border: '1px solid #f2f4f6' }}
         />
       </div>
 
-      <div style={{ marginBottom: '2rem' }}>
-        <label style={{ display: 'block', fontSize: '0.85rem', color: '#4e5968', marginBottom: '0.5rem', fontWeight: 600 }}>휴대폰 번호 (숫자만)</label>
+      <div style={{ marginBottom: '1.25rem' }}>
+        <label style={{ display: 'block', fontSize: '0.85rem', color: '#8b95a1', marginBottom: '0.4rem', fontWeight: 600 }}>휴대폰 번호 (숫자만)</label>
         <input 
-          type="tel" placeholder="01012345678" value={phone} onChange={handlePhoneChange}
-          style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '1px solid #eef3f6', background: '#f9fafb', fontSize: '1rem' }}
+          type="tel" 
+          placeholder="01012345678" 
+          value={phone} 
+          onChange={handlePhoneChange}
+          className={styles.input}
+          style={{ padding: '0.8rem 1rem', borderRadius: '12px', background: '#f9fafb', border: '1px solid #f2f4f6' }}
         />
       </div>
 
-      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
-        <button 
-          onClick={handleComplete}
-          disabled={!role || !name || phone.length < 10}
-          style={{
-            flex: 1, padding: '1rem', borderRadius: '16px', border: 'none',
-            background: (!role || !name || phone.length < 10) ? '#e5e8eb' : '#3182f6',
-            color: '#fff', fontWeight: 800, cursor: 'pointer', fontSize: '1.1rem'
-          }}
-        >
-          시작하기
-        </button>
-      </div>
+      <button 
+        onClick={handleComplete}
+        disabled={!isFormValid}
+        className={styles.nextBtn}
+        style={{ 
+          marginTop: '0', 
+          padding: '1rem', 
+          borderRadius: '16px',
+          background: !isFormValid ? '#e5e8eb' : '#3182f6',
+          fontSize: '1.05rem'
+        }}
+      >
+        확인
+      </button>
     </div>
   );
 }

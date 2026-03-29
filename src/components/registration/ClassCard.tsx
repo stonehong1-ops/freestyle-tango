@@ -14,6 +14,7 @@ interface ClassCardProps {
   leaderCount: number;
   followerCount: number;
   maxCount: number;
+  curriculum?: string;
   isApplied?: boolean;
   onClick: (id: string) => void;
 }
@@ -23,6 +24,7 @@ export default function ClassCard({
   level,
   title,
   time,
+  curriculum,
   teacher,
   imageUrl,
   price,
@@ -60,6 +62,7 @@ export default function ClassCard({
       <div className={styles.contentArea}>
         <div className={styles.level}>{level}</div>
         <h3 className={styles.title}>{title}</h3>
+        {curriculum && <div className={styles.curriculum}>{curriculum}</div>}
         <div className={styles.time}>{time}</div>
         
         <div className={styles.footerArea}>

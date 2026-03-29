@@ -1,0 +1,656 @@
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  padding: 1rem 0 2rem;
+  text-align: left;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  color: #191f28;
+}
+
+.desc {
+  font-size: 1rem;
+  color: #4e5968;
+  margin: 0;
+}
+
+.content {
+  padding: 0;
+  max-width: 100%;
+  margin: 0;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+}
+
+@media (min-width: 1024px) {
+  .content {
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: start;
+  }
+}
+
+/* Calendar Section (Flat) */
+.calendarSection {
+  background-color: #ffffff;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.calHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.calTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  color: #191f28;
+}
+
+.calNav {
+  background: #f9fafb;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  color: #4e5968;
+  transition: all 0.2s;
+}
+
+.calNav:hover {
+  background-color: #f2f4f6;
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #8b95a1;
+  margin-bottom: 0.75rem;
+}
+
+.daysGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+
+.dayBtn {
+  aspect-ratio: 1 / 1;
+  background-color: #f9fafb;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #191f28;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+}
+
+.dayBtn:hover:not(.booked):not(.past) {
+  background-color: #e5e8eb;
+}
+
+.dayBtn.selected {
+  background-color: #3182f6;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.dayBtn.inRange {
+  background-color: #e8f3ff;
+  color: #3182f6;
+  border-radius: 0;
+}
+
+.dayBtn.booked {
+  background-color: #fff0f6;
+  color: #ff4b82;
+  text-decoration: line-through;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.dayBtn.past {
+  color: #e5e8eb;
+  cursor: not-allowed;
+}
+
+.dayBtn.today {
+  border: 1.5px solid #3182f6;
+}
+
+.legend {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: flex-start;
+  gap: 1.5rem;
+  font-size: 0.85rem;
+  color: #8b95a1;
+}
+
+.legItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.box {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.box.booked {
+  background-color: #ff4b82;
+}
+
+.box.selected {
+  background-color: #3182f6;
+}
+
+/* Reservation Action Area (Flat) */
+.reserveAction {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background-color: #ffffff;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+}
+
+.stayInfoBox {
+  background-color: #f9fafb;
+  color: #191f28;
+  padding: 1.25rem;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  border: 1px solid #f2f4f6;
+}
+
+.stayDates {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.stayNights {
+  font-size: 0.9rem;
+  color: #4e5968;
+}
+
+.pricingCard {
+  background-color: #f9fafb;
+  border: none;
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.priceTotal {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e8eb;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #191f28;
+}
+
+.primaryReserveBtn {
+  width: 100%;
+  background-color: #3182f6;
+  color: #ffffff;
+  border: none;
+  padding: 1.2rem;
+  border-radius: 16px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.primaryReserveBtn:hover {
+  background-color: #1b64da;
+}
+
+.guestSelect {
+  padding: 0.8rem 1rem;
+  border: 1px solid #e5e8eb;
+  border-radius: 12px;
+  font-size: 1rem;
+  background-color: #ffffff;
+  color: #191f28;
+  width: 100%;
+  outline: none;
+}
+
+.guestSelect:focus {
+  border-color: #3182f6;
+}
+
+/* Base Info (Intro) List */
+.baseInfoList h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0 0 1rem;
+  color: #191f28;
+}
+
+.baseInfoList ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.baseInfoList li {
+  font-size: 1rem;
+  color: #4e5968;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.baseInfoList li::before {
+  content: "•";
+  color: #3182f6;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 1.5rem;
+  }
+  .daysGrid {
+    gap: 0.25rem;
+  }
+  .dayBtn {
+    font-size: 0.9rem;
+    border-radius: 8px;
+  }
+}
+/* Inline/Monthly List Section */
+.inlineListSection {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #f2f4f6;
+}
+
+.inlineListHeader {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.inlineListTitle {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #191f28;
+  margin-bottom: 0.5rem;
+}
+
+.inlineListDesc {
+  font-size: 1rem;
+  color: #8b95a1;
+}
+
+.inlineMonthGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.monthRow {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.monthLabel {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #191f28;
+  padding-left: 0.5rem;
+  border-left: 4px solid #3182f6;
+}
+
+.monthDays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.gridDay {
+  aspect-ratio: 1 / 1;
+  background-color: #f9fafb;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #4e5968;
+  cursor: default;
+  transition: all 0.2s;
+}
+
+.gridDay.booked {
+  background-color: #fff0f6;
+  color: #ff4b82;
+  text-decoration: line-through;
+}
+
+.gridDay.available {
+  background-color: #e8f3ff;
+  color: #3182f6;
+  border: 1px solid rgba(49, 130, 246, 0.2);
+}
+
+.gridDay.today {
+  box-shadow: inset 0 0 0 1.5px #3182f6;
+}
+
+@media (max-width: 600px) {
+  .monthDays {
+    gap: 2px;
+  }
+  .gridDay {
+    font-size: 0.7rem;
+  }
+}
+
+/* Mini Calendar Grid (for Popup/Inline List) */
+.inlineMonthCard {
+  background: #ffffff;
+  border: 1px solid #f2f4f6;
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.inlineMonthTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #191f28;
+}
+
+.miniWeekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #adb5bd;
+  margin-bottom: 0.5rem;
+}
+
+.miniCalendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.miniDay {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.miniDayAvailable {
+  background-color: #f9fafb;
+  color: #adb5bd;
+}
+
+.miniDayBooked {
+  background-color: #fff0f6;
+  color: #ff4b82;
+  font-weight: 700;
+}
+
+.miniDayStart {
+  background-color: #ff4b82;
+  color: #ffffff;
+}
+
+.miniDayEmpty {
+  background-color: transparent;
+  cursor: default;
+}
+
+/* Detail Modal in CalendarSection */
+.detailBody {
+  padding: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.detailRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.detailLabel {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #8b95a1;
+}
+
+.detailValue {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #191f28;
+}
+
+.nightCount {
+  margin-left: 0.5rem;
+  font-size: 0.9rem;
+  color: #3182f6;
+}
+
+.modalFooter {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.secondaryBtn {
+  flex: 1;
+  background: #f2f4f6;
+  color: #4e5968;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.editBtn {
+  background: #ffffff;
+  border: 1px solid #3182f6;
+  color: #3182f6;
+}
+
+.deleteBtn {
+  flex: 1;
+  background: #fff0f6;
+  color: #f04452;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.saveBtn {
+  flex: 1;
+  background: #3182f6;
+  color: #ffffff;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.editInput {
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: 1px solid #e5e8eb;
+  font-size: 1rem;
+  background: #f9fafb;
+}
+
+.editTextarea {
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: 1px solid #e5e8eb;
+  min-height: 100px;
+  font-size: 1rem;
+  background: #f9fafb;
+  resize: vertical;
+}
+
+/* Modal Overlay & Content for Detail/List */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000; /* Higher than FullscreenModal which is 2000 */
+}
+
+.modalContent {
+  background: white;
+  width: 90%;
+  max-width: 500px;
+  max-height: 85vh;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.modalHeader {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f2f4f6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modalHeader h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #191f28;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #8b95a1;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.listView {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.monthSection {
+  margin-bottom: 2rem;
+}
+
+.monthHeader {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #191f28;
+}
+
+.monthList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.itemAvailable {
+  padding: 0.75rem 1rem;
+  background: #f9fafb;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #8b95a1;
+}
+
+.itemBooked {
+  padding: 0.75rem 1rem;
+  background: #fff0f6;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #ff4b82;
+  font-weight: 600;
+}
+
+.continuedItem {
+  color: #ff4b82;
+}
+
+.detailText {
+  white-space: pre-wrap;
+  font-size: 1rem;
+  color: #4e5968;
+  line-height: 1.5;
+  margin: 0;
+  background: #f9fafb;
+  padding: 1rem;
+  border-radius: 12px;
+}

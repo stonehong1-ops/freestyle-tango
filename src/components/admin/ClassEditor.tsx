@@ -75,7 +75,8 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
       setFormData(prev => ({ ...prev, price: '' }));
       return;
     }
-    // Format with commas and append '원'
+    
+    // 포맷팅된 결과에 '원'이 중복되지 않도록 처리
     const formatted = parseInt(rawValue, 10).toLocaleString('ko-KR') + '원';
     setFormData(prev => ({ ...prev, price: formatted }));
   };
@@ -270,14 +271,6 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
           style={{ display: 'none' }} 
           onChange={handleImageUpload} 
         />
-        <input 
-          className={styles.input} 
-          style={{ marginTop: '0.5rem', fontSize: '0.8rem' }}
-          name="imageUrl" 
-          value={formData.imageUrl} 
-          onChange={handleChange} 
-          placeholder="또는 이미지 주소(URL) 직접 입력"
-        />
       </div>
 
       {/* 1.1 Video Upload */}
@@ -288,11 +281,13 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
           style={{ height: '120px', borderStyle: 'dashed' }}
           onClick={() => videoInputRef.current?.click()}
         >
-          {isVideoUploading && uploadProgress < 100 ? (
+          {isVideoUploading ? (
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '0.9rem', marginBottom: '0.5rem' }}>동영상 업로드 중... ({uploadProgress}%)</div>
+              <div style={{ fontSize: '0.9rem', marginBottom: '0.5rem' }}>
+                {uploadProgress < 100 ? `동영상 업로드 중... (${uploadProgress}%)` : '파일 처리 중...'}
+              </div>
               <div style={{ width: '200px', height: '6px', background: '#f2f4f6', borderRadius: '3px', overflow: 'hidden' }}>
-                <div style={{ width: `${uploadProgress}%`, height: '100%', background: '#3182f6' }}></div>
+                <div style={{ width: `${uploadProgress}%`, height: '100%', background: '#3182f6', transition: 'width 0.3s ease' }}></div>
               </div>
             </div>
           ) : formData.videoUrl ? (
@@ -313,14 +308,6 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
           ref={videoInputRef} 
           style={{ display: 'none' }} 
           onChange={handleVideoUpload} 
-        />
-        <input 
-          className={styles.input} 
-          style={{ marginTop: '0.5rem', fontSize: '0.8rem' }}
-          name="videoUrl" 
-          value={formData.videoUrl} 
-          onChange={handleChange} 
-          placeholder="또는 동영상 주소(URL) 직접 입력"
         />
       </div>
 

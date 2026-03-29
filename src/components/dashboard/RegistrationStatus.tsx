@@ -17,6 +17,7 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
   const [showToast, setShowToast] = useState(false);
   const [paymentSheet, setPaymentSheet] = useState<{ isOpen: boolean, regId: string, type: string } | null>(null);
   const [selectedOption, setSelectedOption] = useState<string>('');
+  const [editingRegId, setEditingRegId] = useState<string | null>(null);
   // Remove manual name/phone state as it's handled by IdentityForm
 
 
@@ -58,29 +59,40 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
       const role = (rawRole || '').replace(/"/g, '');
 
       const typeDisplay = 
-        regType === 'month6' ? '6개월 멤버쉽' :
         regType === 'month1' ? '1개월 신청' : '개별신청';
 
       try {
-        const { addRegistration } = await import('@/lib/db');
-        await addRegistration({
-          date: new Date().toISOString(),
-          nickname,
-          phone: phone.replace(/[^0-9]/g, ''),
-          role,
-          classIds: Array.from(selectedIds),
-          type: typeDisplay as '개별신청' | '1개월 신청' | '6개월 멤버쉽',
-          month: selectedMonth, // Tie to the current selected month from Home
-          status: 'waiting'
-        });
+        const { addRegistration, updateRegistration } = await import('@/lib/db');
+        
+        if (editingRegId) {
+          await updateRegistration(editingRegId, {
+            classIds: Array.from(selectedIds),
+            type: typeDisplay as '개별신청' | '1개월 신청' | '6개월 멤버쉽',
+            date: new Date().toISOString()
+          });
+          alert("신청 내역이 수정되었습니다.");
+          setEditingRegId(null);
+        } else {
+          await addRegistration({
+            date: new Date().toISOString(),
+            nickname,
+            phone: phone.replace(/[^0-9]/g, ''),
+            role,
+            classIds: Array.from(selectedIds),
+            type: typeDisplay as '개별신청' | '1개월 신청',
+            month: selectedMonth, 
+            status: 'waiting'
+          });
+          setIsSuccess(true);
+        }
 
         localStorage.removeItem('my_tango_classes');
         setSelectedIds(new Set());
         window.dispatchEvent(new Event('ft_user_updated'));
+        window.dispatchEvent(new Event('ft_registrations_updated'));
         
-        // After success, wait for user to click "Confirm" in success screen
-        // But the user wants it triggered from success screen or history
-        setIsSuccess(true);
+        const regs = await (await import('@/lib/db')).getAllRegistrationsByPhone(phone.replace(/[^0-9]/g, ''));
+        setDbRegs(regs);
       } catch (error) {
         console.error("Registration Error:", error);
         alert("신청 중 오류가 발생했습니다.");
@@ -91,9 +103,20 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
     else action();
   };
 
+  useEffect(() => {
+    const handlePopState = () => {
+      if (paymentSheet?.isOpen) {
+        setPaymentSheet(null);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [paymentSheet]);
+
   const handlePaymentConfirm = (id: string, type: string) => {
     setPaymentSheet({ isOpen: true, regId: id, type });
     setSelectedOption('');
+    window.history.pushState({ modal: 'paymentSheet' }, '', '');
   };
 
   const submitPayment = async () => {
@@ -143,8 +166,30 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
     if (newSelected.has(id)) newSelected.delete(id);
     else newSelected.add(id);
     setSelectedIds(newSelected);
-    localStorage.setItem('my_tango_classes', JSON.stringify(Array.from(newSelected)));
+    if (!editingRegId) {
+      localStorage.setItem('my_tango_classes', JSON.stringify(Array.from(newSelected)));
+    }
     window.dispatchEvent(new Event('ft_user_updated'));
+  };
+
+  const handleDeleteRegistration = async (id: string) => {
+    if (!confirm('정말 신청 내역을 삭제하시겠습니까?')) return;
+    try {
+      const { deleteRegistration } = await import('@/lib/db');
+      await deleteRegistration(id);
+      setDbRegs(prev => prev.filter(r => r.id !== id));
+      alert('삭제되었습니다.');
+      window.dispatchEvent(new Event('ft_registrations_updated'));
+      window.dispatchEvent(new Event('ft_user_updated'));
+    } catch (e) {
+      alert('오류가 발생했습니다.');
+    }
+  };
+
+  const handleEditRegistration = (reg: Registration) => {
+    setEditingRegId(reg.id);
+    setSelectedIds(new Set(reg.classIds));
+    document.getElementById('selection-section')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   // Filter classes for the current selection month
@@ -158,7 +203,7 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
   }, {} as Record<string, TangoClass[]>);
 
   const handleCopySuccess = () => {
-    const accountNumber = "3333143169646";
+    const accountNumber = "3333143159646";
     navigator.clipboard.writeText(accountNumber).then(() => {
       setShowToast(true);
       setTimeout(() => setShowToast(false), 2000);
@@ -181,7 +226,7 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
         </p>
         <div className={styles.bankBox}>
           <span className={styles.bankLabel}>계좌번호</span>
-          <span className={styles.bankNumber}>카카오뱅크 3333-14-3169646 홍병석</span>
+          <span className={styles.bankNumber}>카카오뱅크 3333-14-3159646 홍병석</span>
           <button className={styles.copyBtnSmall} onClick={handleCopySuccess}>
             복사하기
           </button>
@@ -203,6 +248,7 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
   }
 
   const daysOrdered = ['월요일','화요일','수요일','목요일','금요일','토요일','일요일','기타'];
+  const existingRegForMonth = dbRegs.find(r => r.month === selectedMonth);
 
   return (
     <div className={styles.container}>
@@ -217,8 +263,20 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
           <div className={styles.historyList}>
             {dbRegs.map(reg => {
               const monthName = reg.month ? reg.month.split('-')[1] : '4';
-              const memberMonth = calculateMembershipMonth(reg);
-              const regClasses = classes.filter(c => reg.classIds.includes(c.id));
+              const dayMap: Record<string, number> = {
+                '월요일': 0, '화요일': 1, '수요일': 2, '목요일': 3, '금요일': 4, '토요일': 5, '일요일': 6, '기타': 7
+              };
+              const dayShort: Record<string, string> = {
+                '월요일': '월', '화요일': '화', '수요일': '수', '목요일': '목', '금요일': '금', '토요일': '토', '일요일': '일', '기타': '기타'
+              };
+
+              const regClasses = classes
+                .filter(c => reg.classIds.includes(c.id))
+                .sort((a, b) => {
+                  const dayA = a.time.match(/([월화수목금토일]요일)/)?.[1] || '기타';
+                  const dayB = b.time.match(/([월화수목금토일]요일)/)?.[1] || '기타';
+                  return dayMap[dayA] - dayMap[dayB];
+                });
 
               return (
                 <div key={reg.id} className={styles.historyCard}>
@@ -237,29 +295,51 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
                   </div>
 
                   <div className={styles.regClasses}>
-                    {regClasses.map(c => (
-                      <div key={c.id} className={styles.regClassInner}>
-                        • {c.title} ({c.time.split(' ')[0]})
-                      </div>
-                    ))}
+                    {regClasses.map(c => {
+                      const dayName = c.time.match(/([월화수목금토일]요일)/)?.[1] || '기타';
+                      return (
+                        <div key={c.id} className={styles.regClassInner}>
+                          • {dayShort[dayName]} : {c.title}
+                        </div>
+                      );
+                    })}
                   </div>
 
-                  {reg.status === 'paid' ? (
-                    <div className={styles.paidArea}>
-                      <div className={styles.paidMessage}>
-                        {reg.type} {reg.amount?.toLocaleString()}원을 입금함
-                        {memberMonth && <span className={styles.memberTag}> ({memberMonth}개월차)</span>}
+                  <div className={styles.cardActions}>
+                    {reg.status === 'paid' ? (
+                      <div className={styles.paidArea}>
+                        <div className={styles.paidMessage}>
+                          {reg.type} {reg.amount?.toLocaleString()}원을 입금함
+                        </div>
+                        <div className={styles.paidDate}>확인일: {new Date(reg.paidAt!).toLocaleString()}</div>
                       </div>
-                      <div className={styles.paidDate}>확인일: {new Date(reg.paidAt!).toLocaleString()}</div>
-                    </div>
-                  ) : (
-                    <button 
-                      className={styles.confirmPayBtn}
-                      onClick={() => handlePaymentConfirm(reg.id, reg.type)}
-                    >
-                      입금완료 버튼 클릭
-                    </button>
-                  )}
+                    ) : (
+                      <div className={styles.unpaidActions}>
+                        <div className={styles.unpaidHeader}>
+                          <button 
+                            className={styles.confirmPayBtn}
+                            onClick={() => handlePaymentConfirm(reg.id, reg.type)}
+                          >
+                            입금완료 버튼 클릭
+                          </button>
+                          <div className={styles.editDeleteGroup}>
+                            <button 
+                              className={styles.editBtn}
+                              onClick={() => handleEditRegistration(reg)}
+                            >
+                              수정
+                            </button>
+                            <button 
+                              className={styles.deleteBtn}
+                              onClick={() => handleDeleteRegistration(reg.id)}
+                            >
+                              삭제
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               );
             })}
@@ -270,55 +350,62 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
       <div className={styles.divider} />
 
       {/* 2. Current Selection Section */}
-      <div className={styles.selectionSection}>
-        <h3 className={styles.sectionTitle}>✍️ {selectedMonth.split('-')[1]}월 신규 신청하기</h3>
-        <p className={styles.sectionDesc}>원하는 수업을 체크하고 하단 버튼을 눌러주세요.</p>
-        
-        <div className={styles.listContainer}>
-          {daysOrdered.map(day => {
-            if (!grouped[day] || grouped[day].length === 0) return null;
-            return (
-              <div key={day} className={styles.dayGroup}>
-                <h4 className={styles.dayTitle}>{day}</h4>
-                <div className={styles.classList}>
-                  {grouped[day].map(cls => (
-                    <label key={cls.id} className={styles.classItem}>
-                      <input 
-                        type="checkbox" 
-                        className={styles.checkbox}
-                        checked={selectedIds.has(cls.id)}
-                        onChange={() => toggleSelection(cls.id)}
-                      />
-                      <div className={styles.classInfo}>
-                        <div className={styles.classTitle}>{cls.title}</div>
-                        <div className={styles.classMeta}>{cls.time} | 강사: {cls.teacher1}</div>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      {(editingRegId || !existingRegForMonth) ? (
+        <>
+          <div id="selection-section" className={styles.selectionSection}>
+            <h3 className={styles.sectionTitle}>
+              {editingRegId ? '🔄 신청 내역 수정하기' : `✍️ ${selectedMonth.split('-')[1]}월 신규 신청하기`}
+            </h3>
+            {editingRegId && (
+              <button className={styles.cancelEditBtn} onClick={() => {
+                setEditingRegId(null);
+                setSelectedIds(new Set());
+              }}>수정 취소</button>
+            )}
+            <p className={styles.sectionDesc}>원하는 수업을 체크하고 하단 버튼을 눌러주세요.</p>
+            
+            <div className={styles.listContainer}>
+              {daysOrdered.map(day => {
+                if (!grouped[day] || grouped[day].length === 0) return null;
+                return (
+                  <div key={day} className={styles.dayGroup}>
+                    <h4 className={styles.dayTitle}>{day}</h4>
+                    <div className={styles.classList}>
+                      {grouped[day].map(cls => (
+                        <label key={cls.id} className={styles.classItem}>
+                          <input 
+                            type="checkbox" 
+                            className={styles.checkbox}
+                            checked={selectedIds.has(cls.id)}
+                            onChange={() => toggleSelection(cls.id)}
+                          />
+                          <div className={styles.classInfo}>
+                            <div className={styles.classTitle}>{cls.title}</div>
+                            <div className={styles.classMeta}>{cls.time} | 강사: {cls.teacher1}</div>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
 
-      <div className={styles.footer}>
-        <button 
-          className={selectedIds.size > 0 ? styles.actionBtnPrimary : styles.actionBtnDisabled} 
-          onClick={() => {
-            if (selectedIds.size === 0) return;
-            handleRegister(selectedIds.size >= 2 ? 'month1' : 'single');
-          }}
-          disabled={selectedIds.size === 0}
-        >
-          {selectedIds.size === 0 ? '신청할 수업을 선택하세요' : '수업 신청하기'}
-        </button>
-        {selectedIds.size > 0 && (
-          <button className={styles.actionBtnMembership} onClick={() => handleRegister('month6')}>
-            6개월 멤버쉽 신청하기
-          </button>
-        )}
-      </div>
+          <div className={styles.footer}>
+            <button 
+              className={selectedIds.size > 0 ? styles.actionBtnPrimary : styles.actionBtnDisabled} 
+              onClick={() => {
+                if (selectedIds.size === 0) return;
+                handleRegister(selectedIds.size >= 2 ? 'month1' : 'single');
+              }}
+              disabled={selectedIds.size === 0}
+            >
+              {selectedIds.size === 0 ? '신청할 수업을 선택하세요' : (editingRegId ? '신청 내역 수정 완료' : '수업 신청하기')}
+            </button>
+          </div>
+        </>
+      ) : null}
 
       {/* Payment Confirmation Bottom Sheet */}
       {paymentSheet?.isOpen && (
@@ -337,12 +424,12 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
               <option value="">선택해주세요</option>
               <option value="1개월수강 18만원 입금하였습니다.">1개월수강 18만원 입금하였습니다.</option>
               <option value="단일수업 신청 12만원 입금하였습니다.">단일수업 신청 12만원 입금하였습니다.</option>
-              <option value="6개월 멤버쉽 86만원 입금하였고 1개월차입니다.">6개월 멤버쉽 86만원 입금하였고 1개월차입니다.</option>
-              <option value="현재 6개월 멤버쉽 2개월차입니다.">현재 6개월 멤버쉽 2개월차입니다.</option>
-              <option value="현재 6개월 멤버쉽 3개월차입니다.">현재 6개월 멤버쉽 3개월차입니다.</option>
-              <option value="현재 6개월 멤버쉽 4개월차입니다.">현재 6개월 멤버쉽 4개월차입니다.</option>
-              <option value="현재 6개월 멤버쉽 5개월차입니다.">현재 6개월 멤버쉽 5개월차입니다.</option>
-              <option value="현재 6개월 멤버쉽 6개월차입니다.">현재 6개월 멤버쉽 6개월차입니다.</option>
+              <option value="6개월 멤버쉽 86만원을 입금하였습니다">6개월 멤버쉽 86만원을 입금하였습니다</option>
+              <option value="기존 6개월 멤버쉽 2개월차입니다">기존 6개월 멤버쉽 2개월차입니다</option>
+              <option value="기존 6개월 멤버쉽 3개월차입니다">기존 6개월 멤버쉽 3개월차입니다</option>
+              <option value="기존 6개월 멤버쉽 4개월차입니다">기존 6개월 멤버쉽 4개월차입니다</option>
+              <option value="기존 6개월 멤버쉽 5개월차입니다">기존 6개월 멤버쉽 5개월차입니다</option>
+              <option value="기존 6개월 멤버쉽 마지막 월입니다">기존 6개월 멤버쉽 마지막 월입니다</option>
             </select>
 
             <div className={styles.sheetFooter}>

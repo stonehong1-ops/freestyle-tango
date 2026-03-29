@@ -1,0 +1,135 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: var(--background);
+  border-bottom: 1px solid var(--border);
+}
+
+.container {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.rightActions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.reserveBtn {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  padding: 0.5rem 1.15rem;
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.2s;
+  font-size: 0.95rem;
+}
+
+.reserveBtn:hover {
+  opacity: 0.9;
+}
+
+.hamburgerBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 24px;
+  height: 20px;
+  padding: 0;
+  z-index: 60;
+}
+
+.hamburgerLine {
+  width: 24px;
+  height: 2px;
+  background-color: var(--foreground);
+  border-radius: 2px;
+  transition: all 0.3s linear;
+  transform-origin: 1px;
+}
+
+.hamburgerLine.open:first-child {
+  transform: rotate(45deg);
+}
+.hamburgerLine.open:nth-child(2) {
+  opacity: 0;
+  transform: translateX(20px);
+}
+.hamburgerLine.open:nth-child(3) {
+  transform: rotate(-45deg);
+}
+
+.mobileMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--background);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 0;
+  animation: slideDown 0.2s ease-out;
+}
+
+.mobileNav {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobileNav a {
+  padding: 1rem 1.5rem;
+  text-decoration: none;
+  color: var(--foreground);
+  font-weight: 600;
+  font-size: 1.05rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.mobileNav a:last-child {
+  border-bottom: none;
+}
+
+.mobileNav a:active {
+  background-color: var(--muted);
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0.8rem 1.5rem;
+  }
+  
+  .logo {
+    flex: 1;
+  }
+
+  .reserveBtn {
+    width: 100%;
+    order: 10;
+    text-align: center;
+    margin-top: 0.5rem;
+    padding: 0.6rem;
+  }
+}

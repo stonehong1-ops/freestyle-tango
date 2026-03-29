@@ -1,60 +1,54 @@
 .container {
-  padding: 1.5rem;
-  background-color: #f9fafb;
-  min-height: 100vh;
+  background-color: var(--bg-base);
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  font-family: 'Pretendard', sans-serif;
+  padding-bottom: 80px;
 }
 
 /* Hero Section */
 .hero {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 1rem;
+  gap: var(--space-2);
+  padding: var(--space-12) var(--space-6) var(--space-6);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .title {
-  font-size: 2.2rem;
-  font-weight: 800;
-  color: #191f28;
-  letter-spacing: -0.5px;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
   line-height: 1.2;
 }
 
 .highlightBadge {
   display: inline-block;
-  background: linear-gradient(135deg, #ffb800 0%, #ff8a00 100%);
-  color: #fff;
-  padding: 0.6rem 1.2rem;
-  border-radius: 20px;
-  font-weight: 800;
-  font-size: 1rem;
-  box-shadow: 0 6px 16px rgba(255, 138, 0, 0.25);
+  color: var(--accent);
+  padding: var(--space-2) 0;
+  font-weight: 700;
+  font-size: 0.95rem;
   align-self: flex-start;
-  margin-top: 0.5rem;
 }
 
-/* Card Style */
-.card {
-  background: #fff;
-  border-radius: 24px;
-  padding: 1.5rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+/* Section Style */
+.section {
+  padding: var(--space-8) var(--space-6);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--space-4);
+  background: var(--bg-base);
+  border-bottom: 8px solid var(--bg-secondary);
 }
 
-.cardTitle {
+.sectionTitle {
   font-size: 1.2rem;
-  font-weight: 800;
-  color: #191f28;
+  font-weight: 700;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .list {
@@ -63,156 +57,161 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: var(--space-5);
 }
 
 .listItem {
   display: flex;
-  gap: 0.75rem;
+  gap: var(--space-3);
   align-items: flex-start;
-  color: #4e5968;
+  color: var(--text-secondary);
   font-size: 0.95rem;
-  line-height: 1.5;
-  letter-spacing: -0.3px;
+  line-height: 1.6;
 }
 
 .bullet {
-  color: #3182f6;
-  font-weight: 800;
-  margin-top: 2px;
-}
-
-/* Culture specific card */
-.cultureCard {
-  background: linear-gradient(145deg, #f0f6ff 0%, #e6f0ff 100%);
-  border: none;
+  color: var(--accent);
+  font-weight: 700;
 }
 
 .cultureTitle {
-  color: #3182f6;
+  color: var(--accent);
 }
 
-/* Contact Section */
-.contactCard {
-  background: #191f28;
-  color: #fff;
-  box-shadow: 0 12px 32px rgba(25, 31, 40, 0.2);
-}
-
-.contactTitle {
-  color: #fff;
-}
-
-.contactItem {
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  padding-bottom: 0.75rem;
-  font-size: 0.95rem;
-}
-
-.contactItem:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.contactLabel {
-  color: #8b95a1;
-}
-
-.contactValue {
-  font-weight: 600;
-  color: #f9fafb;
-}
-
-.bankValue {
-  color: #fdda24; /* KakaoBank Yellow */
-}
-.contactBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.8rem;
-  background: #fff;
-  border: 1px solid #e5e8eb;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #4e5968;
-  text-decoration: none;
-  transition: all 0.2s;
-  text-align: center;
-}
-
-.contactBtn:hover {
-  background: #f2f4f6;
-}
-
-/* Bank Account Card */
-.bankCard {
-  background: #fff;
-  border-radius: 24px;
-  padding: 1.5rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  position: relative;
-  overflow: hidden;
-  border: 1px solid #eef0f3;
-}
-
-.accountTitle {
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: #191f28;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
+/* Bank Account Section */
 .bankAccountBox {
-  background: #f9fafb;
-  border-radius: 16px;
-  padding: 1.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: var(--space-6) var(--space-4);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-2);
+  margin: var(--space-2) 0;
 }
 
 .bankName {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  color: #8b95a1;
+  color: var(--text-tertiary);
 }
 
 .accountNumber {
   font-size: 1.25rem;
-  font-weight: 800;
-  color: #191f28;
-  letter-spacing: -0.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
 .copyBtn {
   width: 100%;
-  padding: 0.8rem;
-  background: #3182f6;
+  padding: var(--space-4);
+  background: var(--accent);
   color: #fff;
   border: none;
-  border-radius: 14px;
-  font-size: 0.95rem;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .copyBtn:active {
-  transform: scale(0.96);
+  transform: scale(0.98);
+}
+
+/* Host / Contact Section */
+.hostSection {
+  padding: var(--space-12) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-base);
+}
+
+.hostHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  margin-bottom: var(--space-8);
+}
+
+.hostPhoto {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
+}
+
+.hostInfo h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.hostInfo p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: var(--space-1);
+}
+
+.contactGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.contactBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3);
+  background: var(--bg-base);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.contactBtn:active {
+  background: var(--bg-secondary);
+}
+
+.openChatBox {
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  background: #FEE500;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  cursor: pointer;
+}
+
+.openChatText {
+  color: #3c1e1e;
+  font-weight: 700;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.footerText {
+  margin-top: var(--space-12);
+  text-align: center;
+}
+
+.copyright {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
 }
 
 .copyToast {
@@ -220,19 +219,21 @@
   bottom: 100px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.8);
-  color: #fff;
-  padding: 0.8rem 1.5rem;
-  border-radius: 30px;
+  background: var(--text-primary);
+  color: var(--bg-base);
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-xl);
   font-size: 0.9rem;
   font-weight: 600;
-  z-index: 1000;
+  z-index: 2000;
+  box-shadow: var(--shadow-md);
   animation: fadeInOut 2s forwards;
 }
 
 @keyframes fadeInOut {
-  0% { opacity: 0; transform: translate(-50%, 20px); }
-  15% { opacity: 1; transform: translate(-50%, 0); }
-  85% { opacity: 1; transform: translate(-50%, 0); }
-  100% { opacity: 0; transform: translate(-50%, -20px); }
+  0% { opacity: 0; transform: translate(-50%, 10px); }
+  20% { opacity: 1; transform: translate(-50%, 0); }
+  80% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -10px); }
 }
+

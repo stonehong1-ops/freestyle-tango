@@ -9,6 +9,7 @@ interface FullscreenModalProps {
   title: string;
   children: React.ReactNode;
   isBottomSheet?: boolean;
+  heightMode?: 'full' | 'half';
 }
 
 export default function FullscreenModal({
@@ -16,7 +17,8 @@ export default function FullscreenModal({
   onClose,
   title,
   children,
-  isBottomSheet = false
+  isBottomSheet = false,
+  heightMode = 'full'
 }: FullscreenModalProps) {
   if (!isOpen) return null;
 
@@ -27,8 +29,9 @@ export default function FullscreenModal({
         if (isBottomSheet && e.target === e.currentTarget) onClose();
       }}
     >
-      <div className={isBottomSheet ? styles.sheet : styles.fullContent}>
-        <header className={styles.header}>
+      <div className={`${isBottomSheet ? styles.sheet : styles.fullContent} ${isBottomSheet && heightMode === 'half' ? styles.half : ''}`}>
+        {isBottomSheet && <div className={styles.handle} />}
+        <header className={isBottomSheet ? styles.sheetHeader : styles.header}>
           <button className={styles.closeBtn} onClick={onClose}>✕</button>
           <h2 className={styles.title}>{title}</h2>
           <div style={{ width: '40px' }} /> {/* Spacer to center title */}
