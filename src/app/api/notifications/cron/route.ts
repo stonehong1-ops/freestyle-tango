@@ -34,52 +34,32 @@ export async function GET(req: NextRequest) {
  * 오전 10시: 오늘 일정이 있는 사용자에게 알림
  */
 async function handleMorningSchedule() {
-  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-  const notificationsSent = [];
+  const now = new Date();
+  const kstOffset = 9 * 60 * 60 * 1000;
+  const kstToday = new Date(now.getTime() + kstOffset).toISOString().split('T')[0]; // YYYY-MM-DD (KST)
 
-  // 1. 오늘 날짜가 포함된 클래스 찾기
-  const classesSnap = await adminDb.collection('tango_classes')
-    .where('dates', 'array-contains', today)
-    .get();
-  
-  const classIds = classesSnap.docs.map(d => d.id);
-  const classTitles: Record<string, string> = {};
-  classesSnap.docs.forEach(d => { classTitles[d.id] = d.data().title; });
+  // 1. 오늘 날짜의 일정이 하나라도 있는지 확인 (수업 / 밀롱가 등)
+  const [classesSnap, milongaSnap] = await Promise.all([
+    adminDb.collection('tango_classes')
+      .where('dates', 'array-contains', kstToday)
+      .limit(1)
+      .get(),
+    adminDb.collection('milonga_reservations')
+      .where('milongaDate', '==', kstToday)
+      .limit(1)
+      .get()
+  ]);
 
-  // 2. 해당 클래스를 신청한 사용자들 찾기
-  const targetPhones = new Set<string>();
-  if (classIds.length > 0) {
-    const regsSnap = await adminDb.collection('registrations')
-      .where('classIds', 'array-contains-any', classIds)
-      .get();
-    regsSnap.docs.forEach(doc => {
-      const phone = doc.data().phone?.replace(/[^0-9]/g, '');
-      if (phone) targetPhones.add(phone);
-    });
+  const hasEvent = !classesSnap.empty || !milongaSnap.empty;
+
+  if (!hasEvent) {
+    return NextResponse.json({ message: '오늘 등록된 일정이 없습니다.' });
   }
 
-  // 3. 오늘 밀롱가 예약자 추가
-  const milongaSnap = await adminDb.collection('milonga_reservations')
-    .where('milongaDate', '==', today)
-    .get();
-  milongaSnap.docs.forEach(doc => {
-    const phone = doc.data().phone?.replace(/[^0-9]/g, '');
-    if (phone) targetPhones.add(phone);
-  });
+  // 2. 전체 사용자(토큰)에게 알림 발송
+  const allTokensSnap = await adminDb.collection('fcm_tokens').get();
+  const tokens = allTokensSnap.docs.map(d => d.data().token);
 
-  // 4. 기타 일정 포함 여부 (추가 가능)
-
-  if (targetPhones.size === 0) {
-    return NextResponse.json({ message: '오늘 일정이 있는 사용자가 없습니다.' });
-  }
-
-  // 5. 알림 발송 (전화번호 기반 토큰 조회 및 발송)
-  const phoneList = Array.from(targetPhones);
-  const tokensSnap = await adminDb.collection('fcm_tokens')
-    .where('userId', 'in', phoneList)
-    .get();
-  
-  const tokens = tokensSnap.docs.map(d => d.data().token);
   if (tokens.length > 0) {
     await adminMessaging.sendEachForMulticast({
       tokens,
@@ -97,7 +77,12 @@ async function handleMorningSchedule() {
     });
   }
 
-  return NextResponse.json({ success: true, count: tokens.length, targets: phoneList.length });
+  return NextResponse.json({ 
+    success: true, 
+    recipients: tokens.length, 
+    date: kstToday,
+    eventCheck: hasEvent
+  });
 }
 
 /**
