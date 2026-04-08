@@ -11,7 +11,6 @@
   color: #4e5968;
   font-size: 0.95rem;
   background: #fff;
-  border-bottom: 1px solid #f2f4f6;
   margin: 0;
 }
 .listContainer {
@@ -39,7 +38,6 @@
   gap: 1rem;
   background: #fff;
   padding: 1rem 0;
-  border-bottom: 1px solid #f2f4f6;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -62,6 +60,12 @@
   font-weight: 700;
   color: #191f28;
   font-size: 1rem;
+}
+.classInstructor {
+  color: #3182f6;
+  font-weight: 800;
+  font-size: 0.95rem;
+  margin-left: 4px;
 }
 .classMeta {
   color: #8b95a1;
@@ -114,8 +118,11 @@
   padding: 1rem;
   border-radius: 14px;
   font-size: 1rem;
-  font-weight: 700;
   border: none;
+}
+
+.footerHidden {
+  display: none;
 }
 
 .sectionTitle {
@@ -144,7 +151,6 @@
 .historyCard {
   background: #fff;
   padding: 1rem 0;
-  border-bottom: 1px solid #f2f4f6;
 }
 
 .cardHeader {
@@ -269,6 +275,7 @@
 .editDeleteGroup {
   display: flex;
   gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 .editBtn, .deleteBtn {
@@ -555,4 +562,101 @@
 
 .editFlowBtn:active {
   transform: scale(0.96);
+}
+
+.typeSelectorHeader {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.typeSelectorTitle {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #191f28;
+}
+
+.typeOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.typeBtn, .typeBtnActive {
+  width: 100%;
+  padding: 1.25rem;
+  border-radius: 18px;
+  border: 2px solid #f2f4f6;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: #4e5968;
+}
+
+.typeBtnActive {
+  border-color: #3182f6;
+  background: #f0f6ff;
+  color: #3182f6;
+  box-shadow: 0 4px 12px rgba(49, 130, 246, 0.08);
+}
+
+.priceEstimate {
+  font-size: 0.9rem;
+  color: #8b95a1;
+  font-weight: 500;
+}
+
+.typeBtnActive .priceEstimate {
+  color: #3182f6;
+  opacity: 0.8;
+}
+
+.installmentSelect {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.installment, .installmentActive {
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: #f2f4f6;
+  color: #8b95a1;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.installmentActive {
+  background: #3182f6;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(49, 130, 246, 0.2);
+}
+
+.priceDisplay {
+  margin: 1.5rem 1rem;
+  padding: 1.25rem;
+  background: #f2f4f6;
+  border-radius: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #e5e8eb;
+}
+
+.priceLabel {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #4e5968;
+}
+
+.priceValue {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #3182f6;
 }

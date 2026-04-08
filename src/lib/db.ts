@@ -1,16 +1,26 @@
 import { db } from './firebase';
-export const CURRENT_REGISTRATION_MONTH = new Date().toISOString().substring(0, 7); // Dynamic month YYYY-MM
+
+export const CURRENT_REGISTRATION_MONTH = (() => {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  return `${year}-${month}`;
+})(); // Dynamic month YYYY-MM in local time
 import { 
   collection, 
   getDocs, 
+  getDoc,
   addDoc, 
   updateDoc, 
   deleteDoc, 
   doc, 
+  setDoc,
+  serverTimestamp,
   query, 
   where,
   orderBy,
-  limit
+  limit,
+  increment
 } from 'firebase/firestore';
 
 export interface TangoClass {
@@ -42,12 +52,13 @@ export interface Registration {
   phone: string;
   role: 'leader' | 'follower';
   classIds: string[];
-  type: '개별신청' | '1개월 신청' | '6개월 멤버쉽';
+  type: '개별수강' | '1개월멤버쉽' | '6개월멤버쉽(1-6개월차)' | string;
   month?: string; // YYYY-MM
   status?: 'waiting' | 'paid';
   paidAt?: string;
   amount?: number;
   paymentNote?: string;
+  photoURL?: string; // Profile photo URL
 }
 
 export interface MilongaReservation {
@@ -64,10 +75,60 @@ export interface MilongaReservation {
 export interface MilongaInfo {
   id?: string;
   posterUrl: string;
+  sourcePhotoUrl?: string; // Original photo without text
   message: string;
-  activeDate?: string;
-  activeDates?: string[];
+  activeDate: string; // Required for indexing
+  activeDates?: string[]; // Kept for legacy support
+  djName?: string;
+  timeInfo?: string;
+  startTime?: string;
+  endTime?: string;
 }
+
+export interface ExtraSchedule {
+  id: string;
+  title: string;
+  date: string; // YYYY-MM-DD
+  time: string; // HH:mm
+  startTime?: string; // HH:mm
+  endTime?: string;   // HH:mm
+  memo: string;
+}
+
+export interface MediaItem {
+  id?: string;
+  type: 'youtube' | 'demonstration' | 'general' | 'image' | 'video';
+  title: string;
+  description?: string;
+  videoUrl: string; // Youtube ID or Storage URL
+  thumbnailUrl?: string;
+  relatedClassId?: string; // ID of the class
+  relatedMilongaDate?: string; // YYYY-MM-DD
+  uploaderNickname: string;
+  uploaderPhone: string;
+  createdAt: string;
+  viewCount: number;
+  likeCount: number;
+  commentCount: number;
+}
+
+export interface MediaComment {
+  id?: string;
+  mediaId: string;
+  nickname: string;
+  phone: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface UserCouponUsage {
+  id?: string;
+  phone: string;
+  couponType: string; // 'membership_discount' | 'milonga_free'
+  month: string;      // YYYY-MM
+  usedAt: string;
+}
+
 
 // --- Stay Reservation Types ---
 export interface StayReservationRequest {
@@ -92,6 +153,24 @@ export interface BlockedDateInfo {
   maskedName: string;
   checkIn: string;
   checkOut: string;
+}
+
+export interface User {
+  phone: string;
+  nickname: string;
+  photoURL?: string;
+  role?: string;
+  lastVisit: any; // Firestore Timestamp
+  createdAt?: any;
+  device?: 'ios' | 'android' | 'pc' | 'unknown';
+  visitCount?: number;
+  dwellMinutes?: number;
+  settings?: {
+    pushEnabled: boolean;
+    openChat: boolean;
+    privateChat: boolean;
+    token?: string;
+  }
 }
 
 const COLLECTION_NAME = 'tango_classes';
@@ -133,12 +212,27 @@ export const addRegistration = async (regData: Omit<Registration, 'id'>) => {
 
 export const updatePaymentStatus = async (id: string, amount: number, paymentNote?: string) => {
   const docRef = doc(db, REG_COLLECTION, id);
-  return await updateDoc(docRef, {
+  const updates: any = {
     status: 'paid',
     paidAt: new Date().toISOString(),
     amount: amount,
     paymentNote: paymentNote || ''
-  });
+  };
+
+  if (paymentNote) {
+    if (paymentNote.includes('1개월')) {
+      updates.type = '1개월멤버쉽';
+    } else if (paymentNote.includes('6개월')) {
+      // Extract installment number (e.g., "1차", "2차")
+      const turnMatch = paymentNote.match(/(\d+)차/);
+      const turn = turnMatch ? turnMatch[1] : '1';
+      updates.type = `6개월멤버쉽(${turn}차)`;
+    } else if (paymentNote.includes('개별')) {
+      updates.type = '개별수강';
+    }
+  }
+
+  return await updateDoc(docRef, updates);
 };
 
 export const deleteRegistration = async (id: string) => {
@@ -186,6 +280,50 @@ export const getAllRegistrationsByPhone = async (phone: string): Promise<Registr
     id: docSnap.id,
     ...docSnap.data()
   } as Registration));
+};
+
+export const updateRegistrationPhoto = async (phone: string, photoURL: string) => {
+  const cleanPhone = phone.replace(/[^0-9]/g, '');
+  
+  // 1. Update in registrations
+  const q = query(
+    collection(db, REG_COLLECTION), 
+    where('phone', '==', cleanPhone),
+    orderBy('date', 'desc'),
+    limit(5)
+  );
+  const snap = await getDocs(q);
+  const regPromises = snap.docs.map(docSnap => 
+    updateDoc(doc(db, REG_COLLECTION, docSnap.id), { photoURL })
+  );
+  
+  // 2. Update in users
+  const userRef = doc(db, USERS_COLLECTION, cleanPhone);
+  const userPromise = updateDoc(userRef, { photoURL });
+  
+  return await Promise.all([...regPromises, userPromise]);
+};
+
+export const updateUserProfile = async (phone: string, data: { nickname?: string, photoURL?: string, role?: string }) => {
+  const cleanPhone = phone.replace(/[^0-9]/g, '');
+  
+  // 1. Update in registrations (nickname, photoURL, role)
+  const q = query(
+    collection(db, REG_COLLECTION), 
+    where('phone', '==', cleanPhone),
+    orderBy('date', 'desc'),
+    limit(10)
+  );
+  const snap = await getDocs(q);
+  const regPromises = snap.docs.map(docSnap => 
+    updateDoc(doc(db, REG_COLLECTION, docSnap.id), data)
+  );
+  
+  // 2. Update in users
+  const userRef = doc(db, USERS_COLLECTION, cleanPhone);
+  const userPromise = updateDoc(userRef, { ...data, lastVisit: serverTimestamp() });
+  
+  return await Promise.all([...regPromises, userPromise]);
 };
 
 export const getClassesByMonth = async (month: string): Promise<TangoClass[]> => {
@@ -245,52 +383,70 @@ export const deleteMilongaReservation = async (id: string) => {
 
 const MILONGA_INFO_COLLECTION = 'milonga_info';
 
-export const getMilongaInfo = async (): Promise<MilongaInfo | null> => {
-  const q = query(collection(db, MILONGA_INFO_COLLECTION), limit(1));
-  const querySnapshot = await getDocs(q);
-  if (querySnapshot.empty) return null;
-  const docSnap = querySnapshot.docs[0];
-  const data = docSnap.data();
-  const info = { id: docSnap.id, ...data } as MilongaInfo;
-  
-  // Normalize: ensure activeDates is an array and activeDate is set
-  if (info.activeDates) {
-    if (typeof info.activeDates === 'string') {
-      info.activeDates = [info.activeDates];
+export const getMilongaInfo = async (date?: string): Promise<MilongaInfo | null> => {
+  if (date) {
+    const q = query(collection(db, MILONGA_INFO_COLLECTION), where('activeDate', '==', date), limit(1));
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      return { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() } as MilongaInfo;
     }
-  } else {
-    info.activeDates = info.activeDate ? [info.activeDate] : [];
+    return null;
   }
 
-  if (info.activeDates.length > 0 && !info.activeDate) {
-    info.activeDate = info.activeDates[0];
-  } else if (info.activeDate && info.activeDates.length === 0) {
-    info.activeDates = [info.activeDate];
+  // Next upcoming or latest
+  const today = new Date().toISOString().split('T')[0];
+  const q = query(
+    collection(db, MILONGA_INFO_COLLECTION), 
+    where('activeDate', '>=', today),
+    orderBy('activeDate', 'asc'),
+    limit(1)
+  );
+  const querySnapshot = await getDocs(q);
+  if (!querySnapshot.empty) {
+    return { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() } as MilongaInfo;
   }
-  
-  return info;
+
+  // If no future milonga, get the absolute latest one
+  const qLatest = query(
+    collection(db, MILONGA_INFO_COLLECTION),
+    orderBy('activeDate', 'desc'),
+    limit(1)
+  );
+  const latestSnapshot = await getDocs(qLatest);
+  if (!latestSnapshot.empty) {
+    return { id: latestSnapshot.docs[0].id, ...latestSnapshot.docs[0].data() } as MilongaInfo;
+  }
+
+  return null;
 };
 
-export const updateMilongaInfo = async (info: Partial<MilongaInfo>) => {
-  const existing = await getMilongaInfo();
-  // Remove id from the data to be saved/updated
+export const getAllMilongas = async (): Promise<MilongaInfo[]> => {
+  const q = query(collection(db, MILONGA_INFO_COLLECTION), orderBy('activeDate', 'desc'));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() } as MilongaInfo));
+};
+
+export const updateMilongaInfo = async (info: MilongaInfo) => {
+  if (!info.activeDate) throw new Error("Milonga date is required");
+  
+  // Try to find existing doc for this date
+  const q = query(collection(db, MILONGA_INFO_COLLECTION), where('activeDate', '==', info.activeDate), limit(1));
+  const querySnapshot = await getDocs(q);
+  
   const dataToSave = { ...info };
   delete dataToSave.id;
-
-  // Ensure activeDates is an array if we are saving dates
-  if (dataToSave.activeDate && !dataToSave.activeDates) {
-    dataToSave.activeDates = [dataToSave.activeDate];
-  } else if (dataToSave.activeDates && !dataToSave.activeDate) {
-    dataToSave.activeDate = dataToSave.activeDates[0];
-  }
   
-  if (existing) {
-    // @ts-ignore
-    const docRef = doc(db, MILONGA_INFO_COLLECTION, existing.id);
+  if (!querySnapshot.empty) {
+    const docRef = doc(db, MILONGA_INFO_COLLECTION, querySnapshot.docs[0].id);
     return await updateDoc(docRef, dataToSave);
   } else {
-    return await addDoc(collection(db, MILONGA_INFO_COLLECTION), dataToSave as MilongaInfo);
+    return await addDoc(collection(db, MILONGA_INFO_COLLECTION), dataToSave);
   }
+};
+
+export const deleteMilongaInfo = async (id: string) => {
+  const docRef = doc(db, MILONGA_INFO_COLLECTION, id);
+  return await deleteDoc(docRef);
 };
 
 // --- Stay Reservation Functions ---
@@ -312,6 +468,7 @@ export const getStayReservationList = async (stayId?: string): Promise<FullStayR
       
       let docStayId = data.stayId || 'hapjeong';
       if (docStayId === 'stayhapjeoung') docStayId = 'hapjeong';
+      if (docStayId === 'staydeokeun' || docStayId === 'deokeun' || docStayId === '덕은' || docStayId === 'deogeun') docStayId = 'deokeun';
       if (stayId && docStayId !== stayId) return;
       list.push({
         ...data,
@@ -337,6 +494,7 @@ export const getStayReservedDates = async (stayId?: string): Promise<BlockedDate
       
       let docStayId = data.stayId || 'hapjeong';
       if (docStayId === 'stayhapjeoung') docStayId = 'hapjeong';
+      if (docStayId === 'staydeokeun' || docStayId === 'deokeun' || docStayId === '덕은' || docStayId === 'deogeun') docStayId = 'deokeun';
       if (stayId && docStayId !== stayId) return;
       
       const start = new Date(data.checkIn);
@@ -362,8 +520,6 @@ export const getStayReservedDates = async (stayId?: string): Promise<BlockedDate
     return [];
   }
 };
-
-import { serverTimestamp } from 'firebase/firestore';
 
 export const submitStayReservation = async (data: StayReservationRequest) => {
   try {
@@ -434,9 +590,315 @@ export const updateMonthlyNotice = async (month: string, content: string) => {
     } else {
       await addDoc(collection(db, MONTHLY_NOTICE_COLLECTION), { month, content });
     }
+
+    // [Trigger Notification] 
+    if (typeof window !== 'undefined') {
+      fetch('/api/notifications/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          targetPhones: 'all',
+          title: '📢 월간 공지사항 업데이트',
+          body: content.length > 50 ? content.substring(0, 50) + '...' : content,
+          link: '/calendar'
+        })
+      }).catch(e => console.error("Global notice notification error:", e));
+    }
     return { success: true };
   } catch (error) {
     console.error("Error updating monthly notice: ", error);
     return { success: false, error };
   }
+};
+
+// --- Extra Schedule Functions ---
+const EXTRA_SCHEDULES_COLLECTION = 'extra_schedules';
+
+export const getExtraSchedules = async (month?: string): Promise<ExtraSchedule[]> => {
+  try {
+    let q;
+    if (month) {
+      const start = `${month}-01`;
+      const end = `${month}-31`;
+      q = query(
+        collection(db, EXTRA_SCHEDULES_COLLECTION),
+        where('date', '>=', start),
+        where('date', '<=', end)
+      );
+    } else {
+      q = query(collection(db, EXTRA_SCHEDULES_COLLECTION));
+    }
+    const querySnapshot = await getDocs(q);
+    const results = querySnapshot.docs.map(docSnap => ({
+      id: docSnap.id,
+      ...docSnap.data()
+    } as ExtraSchedule));
+    // Sort in-memory to avoid needing a composite index
+    return results.sort((a, b) => {
+      if (a.date !== b.date) return a.date.localeCompare(b.date);
+      return (a.time || '').localeCompare(b.time || '');
+    });
+  } catch (error) {
+    console.error("Error fetching extra schedules: ", error);
+    return [];
+  }
+};
+
+export const addExtraSchedule = async (data: Omit<ExtraSchedule, 'id'>) => {
+  return await addDoc(collection(db, EXTRA_SCHEDULES_COLLECTION), data);
+};
+
+export const updateExtraSchedule = async (id: string, data: Partial<ExtraSchedule>) => {
+  const docRef = doc(db, EXTRA_SCHEDULES_COLLECTION, id);
+  return await updateDoc(docRef, data);
+};
+
+export const deleteExtraSchedule = async (id: string) => {
+  const docRef = doc(db, EXTRA_SCHEDULES_COLLECTION, id);
+  return await deleteDoc(docRef);
+};
+
+// --- Media Functions ---
+const MEDIA_COLLECTION = 'media';
+const COMMENTS_COLLECTION = 'media_comments';
+const LIKES_COLLECTION = 'media_likes';
+
+export const getMedia = async (type?: string, classId?: string, milongaDate?: string): Promise<MediaItem[]> => {
+  try {
+    let q = query(collection(db, MEDIA_COLLECTION));
+    if (type) {
+      q = query(collection(db, MEDIA_COLLECTION), where('type', '==', type));
+    }
+    const querySnapshot = await getDocs(q);
+    let results = querySnapshot.docs.map(docSnap => ({
+      id: docSnap.id,
+      ...docSnap.data()
+    } as MediaItem));
+
+    // Manual sort by createdAt desc to avoid index
+    results.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+
+    if (classId) {
+      results = results.filter(m => m.relatedClassId === classId);
+    }
+    if (milongaDate) {
+      results = results.filter(m => m.relatedMilongaDate === milongaDate);
+    }
+    return results;
+  } catch (error) {
+    console.error("Error fetching media: ", error);
+    return [];
+  }
+};
+
+export const addMedia = async (data: Omit<MediaItem, 'id'>) => {
+  return await addDoc(collection(db, MEDIA_COLLECTION), data);
+};
+
+export const updateMedia = async (id: string, data: Partial<MediaItem>) => {
+  const docRef = doc(db, MEDIA_COLLECTION, id);
+  return await updateDoc(docRef, data);
+};
+
+export const deleteMedia = async (id: string) => {
+  const docRef = doc(db, MEDIA_COLLECTION, id);
+  return await deleteDoc(docRef);
+};
+
+// Modular increment for views
+export const incMediaView = async (id: string) => {
+  const docRef = doc(db, MEDIA_COLLECTION, id);
+  return await updateDoc(docRef, { viewCount: increment(1) });
+};
+
+export const getMediaComments = async (mediaId: string): Promise<MediaComment[]> => {
+  try {
+    const q = query(collection(db, COMMENTS_COLLECTION), where('mediaId', '==', mediaId), orderBy('createdAt', 'asc'));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(docSnap => ({
+      id: docSnap.id,
+      ...docSnap.data()
+    } as MediaComment));
+  } catch (error) {
+    console.warn("Could not fetch comments with orderBy (index might be missing):", error);
+    // Fallback: Fetch without orderBy and sort manually in-memory
+    const qSimple = query(collection(db, COMMENTS_COLLECTION), where('mediaId', '==', mediaId));
+    const querySnapshot = await getDocs(qSimple);
+    const results = querySnapshot.docs.map(docSnap => ({
+      id: docSnap.id,
+      ...docSnap.data()
+    } as MediaComment));
+    return results.sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
+  }
+};
+
+
+export const addMediaComment = async (data: Omit<MediaComment, 'id'>) => {
+  const docRef = await addDoc(collection(db, COMMENTS_COLLECTION), data);
+  const mediaRef = doc(db, MEDIA_COLLECTION, data.mediaId);
+  await updateDoc(mediaRef, { commentCount: increment(1) });
+  return docRef;
+};
+
+export const deleteMediaComment = async (id: string, mediaId: string) => {
+  const docRef = doc(db, COMMENTS_COLLECTION, id);
+  await deleteDoc(docRef);
+  const mediaRef = doc(db, MEDIA_COLLECTION, mediaId);
+  await updateDoc(mediaRef, { commentCount: increment(-1) });
+};
+
+export const toggleMediaLike = async (mediaId: string, phone: string) => {
+  const q = query(collection(db, LIKES_COLLECTION), where('mediaId', '==', mediaId), where('phone', '==', phone));
+  const querySnapshot = await getDocs(q);
+  
+  const mediaRef = doc(db, MEDIA_COLLECTION, mediaId);
+  
+  if (!querySnapshot.empty) {
+    // Unlike
+    await deleteDoc(doc(db, LIKES_COLLECTION, querySnapshot.docs[0].id));
+    await updateDoc(mediaRef, { likeCount: increment(-1) });
+    return false;
+  } else {
+    // Like
+    await addDoc(collection(db, LIKES_COLLECTION), { mediaId, phone });
+    await updateDoc(mediaRef, { likeCount: increment(1) });
+    return true;
+  }
+};
+
+export const checkIfLiked = async (mediaId: string, phone: string): Promise<boolean> => {
+  const q = query(collection(db, LIKES_COLLECTION), where('mediaId', '==', mediaId), where('phone', '==', phone));
+  const querySnapshot = await getDocs(q);
+  return !querySnapshot.empty;
+};
+
+export const checkClassAccess = async (phone: string, classId: string): Promise<boolean> => {
+  const regs = await getAllRegistrationsByPhone(phone);
+  // Check if any registration contains this classId
+  return regs.some(r => r.classIds && r.classIds.includes(classId));
+};
+
+// --- Coupon Functions ---
+const COUPON_COLLECTION = 'user_coupons';
+
+export const getUserCouponUsage = async (phone: string): Promise<UserCouponUsage[]> => {
+  try {
+    const q = query(
+      collection(db, COUPON_COLLECTION),
+      where('phone', '==', phone)
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(docSnap => ({
+      id: docSnap.id,
+      ...docSnap.data()
+    } as UserCouponUsage));
+  } catch (error) {
+    console.error("Error fetching coupon usage: ", error);
+    return [];
+  }
+};
+
+export const useUserCoupon = async (phone: string, couponType: string, month: string) => {
+  const { addDoc, collection } = await import('firebase/firestore');
+  return await addDoc(collection(db, COUPON_COLLECTION), {
+    phone,
+    couponType,
+    month,
+    usedAt: new Date().toISOString()
+  });
+};
+
+// --- User Table Functions ---
+const USERS_COLLECTION = 'users';
+
+export const trackUserVisit = async (phone: string, nickname: string, photoURL?: string, role?: string, device?: string) => {
+  if (!phone) return;
+  const cleanPhone = phone.replace(/[^0-9]/g, '');
+  const docRef = doc(db, USERS_COLLECTION, cleanPhone);
+  
+  const data: any = {
+    phone: cleanPhone,
+    nickname,
+    lastVisit: serverTimestamp(),
+    visitCount: increment(1),
+  };
+  if (device) data.device = device;
+  if (photoURL) data.photoURL = photoURL;
+  if (role) data.role = role;
+  
+  // Create if not exists, merge for visits
+  const docSnap = await getDoc(docRef);
+  if (!docSnap.exists()) {
+    data.createdAt = serverTimestamp();
+  }
+  
+  return await setDoc(docRef, data, { merge: true });
+};
+
+export const updateUserPulse = async (phone: string) => {
+  if (!phone) return;
+  const cleanPhone = phone.replace(/[^0-9]/g, '');
+  const docRef = doc(db, USERS_COLLECTION, cleanPhone);
+  return await updateDoc(docRef, {
+    dwellMinutes: increment(1),
+    lastVisit: serverTimestamp() // Also update last active
+  });
+};
+
+export const getUserByPhone = async (phone: string): Promise<User | null> => {
+  if (!phone) return null;
+  const cleanPhone = phone.replace(/[^0-9]/g, '');
+  try {
+    const docRef = doc(db, USERS_COLLECTION, cleanPhone);
+    const docSnap = await getDoc(docRef);
+    
+    if (!docSnap.exists()) return null;
+    return { ...docSnap.data() } as User;
+  } catch (error) {
+    console.error("Error fetching user: ", error);
+    return null;
+  }
+};
+
+export const getUsers = async (search?: string): Promise<User[]> => {
+  try {
+    // Note: ordering by lastVisit will exclude users WHO DO NOT HAVE the field.
+    // For admin search, we should probably order by nickname or just fetch all and filter.
+    const q = query(collection(db, USERS_COLLECTION), limit(500));
+    const querySnapshot = await getDocs(q);
+    let results = querySnapshot.docs.map(docSnap => ({
+      ...docSnap.data()
+    } as User));
+
+    if (search) {
+      const lowerSearch = search.toLowerCase();
+      const cleanSearch = lowerSearch.replace(/[^0-9]/g, '');
+      results = results.filter(u => 
+        (u.nickname || '').toLowerCase().includes(lowerSearch) || 
+        (u.phone || '').replace(/[^0-9]/g, '').includes(cleanSearch)
+      );
+    }
+    return results;
+  } catch (error) {
+    console.error("Error fetching users: ", error);
+    return [];
+  }
+};
+
+export const updateUserSettings = async (phone: string, settings: Partial<User['settings']>) => {
+  if (!phone) return;
+  const cleanPhone = phone.replace(/[^0-9]/g, '');
+  const docRef = doc(db, USERS_COLLECTION, cleanPhone);
+  
+  // Update only the settings field
+  const currentDoc = await getDoc(docRef);
+  const existingData = currentDoc.exists() ? currentDoc.data() : {};
+  const existingSettings = existingData.settings || {};
+
+  return await setDoc(docRef, {
+    settings: {
+      ...existingSettings,
+      ...settings
+    }
+  }, { merge: true });
 };

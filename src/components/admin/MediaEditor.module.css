@@ -1,0 +1,264 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  width: 90%;
+  max-width: 500px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #8b95a1;
+  cursor: pointer;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4e5968;
+}
+
+.input, .textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  font-size: 15px;
+  background: #f9fafb;
+  transition: border-color 0.2s;
+}
+
+.input:focus, .textarea:focus {
+  outline: none;
+  border-color: #3182f6;
+  background: #fff;
+}
+
+.textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.footer {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.cancelBtn {
+  flex: 1;
+  padding: 14px;
+  background: #f2f4f6;
+  color: #4e5968;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.saveBtn {
+  flex: 2;
+  padding: 14px;
+  background: #3182f6;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.saveBtn:disabled {
+  background: #ccd0d5;
+}
+
+/* Progress */
+.progressContainer {
+  width: 100%;
+  height: 24px;
+  background: #f2f4f6;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  margin-top: 10px;
+}
+
+.progressBar {
+  height: 100%;
+  background: #3182f6;
+  transition: width 0.3s;
+}
+
+.progressText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  font-weight: 700;
+  color: #191f28;
+}
+
+/* Media Box & Previews */
+.mediaBox {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: #f9fafb;
+  border: 2px dashed #e5e8eb;
+  border-radius: 12px;
+}
+
+.fileDropZone {
+  width: 100%;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #e5e8eb;
+  transition: all 0.2s;
+}
+
+.fileDropZone:hover {
+  border-color: #3182f6;
+  background: #f0f7ff;
+}
+
+.fileDropZone p {
+  margin: 0;
+  font-size: 14px;
+  color: #4e5968;
+}
+
+.thumbnailPreview {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.thumbnailPreview img,
+.thumbnailPreview video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Custom Dropdown for Class Selection */
+.customSelectWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.customSelectTrigger {
+  width: 100%;
+  padding: 12px 16px;
+  background: #f9fafb;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  font-size: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.customSelectTrigger:hover {
+  border-color: #3182f6;
+}
+
+.customDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  margin-top: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.dropdownItem {
+  padding: 10px 16px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-bottom: 1px solid #f9fafb;
+  transition: background 0.2s;
+}
+
+.dropdownItem:hover {
+  background: #f2f4f6;
+}
+
+.dropdownTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #191f28;
+}
+
+.dropdownInstructor {
+  font-size: 12px;
+  color: #8b95a1;
+}
+
+.itemActive {
+  background: #f0f7ff;
+}
+
+.itemActive .dropdownTitle {
+  color: #3182f6;
+}

@@ -1,7 +1,7 @@
 import { Timestamp } from 'firebase/firestore';
 
 export type ChatRoomType = 'public' | 'notice' | 'private' | 'support';
-export type ChatMessageType = 'text' | 'image' | 'video' | 'youtube';
+export type ChatMessageType = 'text' | 'image' | 'video' | 'youtube' | 'voice' | 'system';
 
 export interface ChatRoom {
   id: string;
@@ -9,7 +9,11 @@ export interface ChatRoom {
   type: ChatRoomType;
   lastMessage?: string;
   lastMessageTime?: Timestamp;
+  lastMessageSenderId?: string;
+  lastMessageReadBy?: string[];
+  unreadCounts?: { [userId: string]: number }; // New: Phone -> count
   participants?: string[]; // Phone numbers (for private/support)
+  customName?: string; // Optional custom name (for 3+ groups)
   createdBy: string;
   createdAt: Timestamp;
 }
@@ -27,4 +31,5 @@ export interface ChatMessage {
   readBy?: string[]; // Phone numbers of users who have read the message
   reactions?: { [userId: string]: string };
   timestamp: Timestamp;
+  isDeleted?: boolean;
 }

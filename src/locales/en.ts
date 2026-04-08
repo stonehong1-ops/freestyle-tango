@@ -3,474 +3,735 @@ export default {
     story: 'TangoStay Story',
     location: 'Location',
     guide: 'Details',
-    contact: 'Contact Us',
+    contact: 'Contact',
+    login: 'Register'
   },
   nav: {
+    home: 'Class',
     milonga: 'Milonga',
-    stay: 'TangoStay',
+    stay: 'Stay',
     class: 'Class',
-    info: 'Guide',
+    info: 'Info',
     mypage: 'MyPage',
+    lucy: 'Milonga',
+    chat: 'Chatting',
+    guide: 'Membership',
+    classGuide: 'Class Info',
+    fullSchedule: 'Calendar',
+    media: 'Media',
+    story: 'Story'
   },
-  milonga: {
-    title: 'Milonga Reservation',
-    reserveBtn: 'Reserve',
-    status: 'Status',
+  reserve: {
+    closed: 'Reservation Closed',
+    title: 'Reservation Request',
+    nameLabel: 'Name',
+    namePlace: 'Enter your name',
+    phoneLabel: 'Phone',
+    phonePlace: 'Enter your phone number',
+    guests: 'Guests',
+    reqLabel: 'Requests',
+    reqPlace: 'Any special requests? (Optional)',
+    submitting: 'Processing...',
+    submitBtn: 'Complete Reservation',
+    directBookingWarning: 'Click the button below to complete. Your reservation will be cancelled if payment is not received within 1 hour.',
+    smsTemplate: '[{stayName} Confirmation]\nName: {name}\nDate: {checkIn} ~ {checkOut}\nGuests: {guests}\nAmount: {amount} KRW\n\n[Payment]\n1. KR: KakaoBank 3333-03-7249602 (Hong Byong Seok)\n2. US: Acc 352665336763211 / Routing: 084009519 (ACH Free)\n3. International: SWIFT/BIC TRWIUS35XXX\n\n[Check-in]\nTime: 4 PM\nPassword: 9999\n\nThank you!',
+    errorFill: 'Please enter both name and phone number.',
+    errorFail: 'An error occurred. Please try again.',
+    save: 'Save',
+    cancel: 'Cancel'
   },
-  class: {
-    title: 'Class Registration',
-    applyBtn: 'Apply',
-    applied: 'Applied',
+  complete: {
+    title: 'Reservation Complete',
+    desc: 'Your request has been submitted. We will send a confirmation message after verifying payment.',
+    homeBtn: 'Back to Home',
+    guestSmsBtn: 'Inquire via SMS'
   },
-  mypage: {
-    title: 'My Page',
-    registrations: 'My Registrations',
-    membership: 'Membership Info',
-  },
-  // Common Sections
-  common: {
-    story: {
-      title: 'TangoStay Story',
-      subtitle: '"Just bring yourself"... Introducing TangoStay\'s [Desert Island Experiment].',
-      p1: 'My single goal in creating this space as a host was the \'Desert Island Experiment\'. A space where you can just walk in with a single suitcase and live perfectly comfortably for over a week without ever stepping outside. I designed this space to completely solve the countless inconveniences I experienced as a guest.',
-      sol1Title: 'Stay Pack: ZERO Discomfort, Welcome Gift Box',
-      sol1Text: 'Stop worrying about using someone else\'s towels or soap. We provide every guest with brand new towels, dishcloths, soap, and toothbrush sets—hotel amenity quality, all brand new. No need to run to the convenience store on your first day.',
-      sol2Title: 'No More Water Worries! Premium Water Purifier',
-      sol2Text: 'Free yourself from carrying heavy water bottles. A state-of-the-art water purifier is installed, providing unlimited clean, cool water anytime.',
-      sol3Title: 'Uncompromising Cleanliness (Professional Laundrygo)',
-      sol3Text: 'All bedding (duvet, cover, pad, pillowcases) and floor rugs are prepared in duplicates and professionally washed and high-temperature sterilized by Laundrygo for every new guest. Experience deep sleep on flawlessly clean bedding.',
-      closing: 'I look forward to welcoming you to my \'Desert Island\', the most comfortable place to truly relax.',
-      hostName: '👋 I\'m Stone, the Argentine Tango Dancer.',
-      hostBio: ''
+  home: {
+    studioName: 'FreestyleTango',
+    info: {
+      subtitle: 'Freestyle Tango Membership Guide',
+      intro: 'Like a fresh rose with mother\'s milk\nLooking like a mix of colors\nWhite, yellow, red roses\n\nSpring where flower buds bloom\nIn the eternal time of autumn leaves\nTo everyone who sweats\nCultivating body and mind\n\nFreestyle will be\nA shelter and a guide.',
+      highlight: '180,000 KRW for all classes!',
+      benefitsTitle: 'Membership Benefits',
+      benefits: [
+        'Monthly Membership: 180k, all classes included / Intl workshop d.c',
+        'New member 6-month discount: 20% d.c 860k',
+        'Open floor access (16h/month)',
+        'Partner class application (for existing partners)',
+        'Benefits: Instructor/Staff discount 100k d.c, free 1:1 lesson for referrals'
+      ],
+      cultureTitle: 'Community Culture',
+      cultureList: [
+        'Be nice to everyone (Happy space, Warm people)',
+        'Gender balance (aiming for 15:15)'
+      ],
+      bankTitle: 'Membership Fee Payment',
+      bankName: 'KakaoBank 3333-14-3159646 (Hong Byong Seok)',
+      copyBtn: 'Copy Account Number',
+      copyHint: 'Please contact us with your name after payment.',
+      contactPhone: 'Phone Inquiry',
+      contactKakao: 'KakaoTalk',
+      contactWhatsapp: 'WhatsApp',
+      openChatBanner: 'Join Freestyle Tango Open Chat',
+      copySuccess: 'Account number copied.',
+      contactTitle: 'Contact',
+      contactSlogan: 'Inquire about classes, facilities, and stays (24/7 inquiries welcome)',
+      photoGallery: 'Photo Gallery',
+      facilityGallery: 'Facility Guide'
     },
-    hostGuide: {
-      title: '🛡️ Room Guidelines & Host Communication',
-      list: [
-        { t: '🔓 Check-in / Out (Flexible)', d: 'Contactless entry. Password and room info sent via message on check-in day.\nStandard: Check-in 15:00 / Check-out 11:00 (Can be adjusted for your convenience!)' },
-        { t: '🏠 Strict Rules', d: 'Absolute NO SMOKING in the entire building. Special cleaning fees apply for violations.\nPlease separate recycling and do dishes before check-out.\nAs a newly built studio, please refrain from loud noises after 22:00.' },
-        { t: '🤩 24/7 Host Communication', d: 'Contact me anytime, even early morning! Don\'t hesitate to message if you\'re uncomfortable.\nIf you are missing any essential items during your stay, let me know. I will purchase and deliver them same-day.' }
-      ]
+    admin: {
+      addClass: 'Add Class',
+      addMilonga: 'Add Milonga',
+      editMilonga: 'Edit Milonga',
+      saveNotice: 'Save Notice',
+      editNotice: 'Edit Notice',
+      noticePlaceholder: 'Enter notice (2-3 lines)',
+      noticeEmpty: 'No monthly notices registered. Click to add one.',
+      saveSuccess: 'Notice saved.',
+      saveFail: 'Save failed'
     },
-    contact: {
-      title: 'Contact Us',
-      desc: 'Please feel free to reach out anytime if you have questions.',
-      call: 'Call',
-      sms: 'SMS',
-      kakao: 'Kakao Chat',
-      whatsapp: 'WhatsApp',
-      fb: 'FB Messenger',
-      callDesc: '010-7209-2468 (Stone)',
-      smsDesc: 'Fast response guaranteed',
-      kakaoDesc: 'ID: stonehong@kakao.com',
-      whatsappDesc: 'For Global Guests',
-      fbDesc: 'Facebook Message'
+    chat: {
+      title: 'Chat',
+      newRoom: '+ New Room',
+      roomPlaceholder: 'Chat Room',
+      enterName: 'Enter room name:',
+      enterType: 'Enter room type (public, notice, private, support):',
+      leaveRoom: 'Leave Room',
+      renameRoom: 'Rename Room',
+      participants: 'Participants',
+      readCount: 'Read',
+      allRead: 'All Read',
+      noActiveChats: 'No active chats.'
     },
-    footer: {
-      term: 'Terms of Service',
-      privacy: 'Privacy Policy',
-      termTitle: '[Terms of Service]',
-      termText: `Article 1 (Purpose)\nThe purpose of these terms is to stipulate the rights, obligations, and responsibilities between the host and the guest regarding the accommodation services provided by TangoStay.\n\nArticle 2 (Service Provision)\n1. TangoStay provides the guest with the specified accommodation and all ancillary facilities (including free consumables).\n2. The host may claim actual damages from the guest for any damage to property within the accommodation.\n\nArticle 3 (Guest Obligations)\n1. Guests are prohibited from smoking or making loud noises (after 22:00) that may disturb others.\n2. Violations may result in forced eviction and a special cleaning fee.`,
-      privacyTitle: '[Privacy Policy]',
-      privacyText: `1. Collected Personal Information\nTangoStay collects the following personal information for smooth reservation and communication.\n- Items collected: Name, Contact number, Reservation schedule\n\n2. Purpose of Collection and Use\n- Guiding passwords for the building and room door locks\n- Payment and reservation confirmation, customer response for stay quality management\n\n3. Retention Period\n- In principle, the information is destroyed immediately after the purpose is achieved (1 month after check-out).`
+    export: {
+      imageBtn: '📸 Save Promo Image (PNG)',
+      error: 'Error generating image.'
+    },
+    exit: {
+      toast: 'Press back again to exit'
+    },
+    stay: {
+      viewMonthly: 'View Monthly Status',
+      monthlyTitle: 'Monthly Reservation Status'
+    },
+    registration: {
+      title: 'Class Registration',
+      classDetail: 'Class Details',
+      fullListTitle: 'Full Registration Status',
+      addClass: 'Add Class',
+      loading: 'Loading...',
+      noClasses: 'No classes registered for {month}.',
+      cartAdded: 'Class added to cart! Proceed to final registration in [MyPage].',
+      deleteConfirm: 'Are you sure you want to delete this class?',
+      deleteSuccess: 'Deleted.',
+      deleteFail: 'Delete failed: {error}',
+      saveSuccess: 'Saved.',
+      saveFail: 'Save failed: {error}',
+      pastMonthWarning: 'Cannot apply for past classes.',
+      selected: '✅ Selected',
+      leader: 'Leader',
+      follower: 'Follower',
+      teacherLabel: 'Instructor:',
+      priceLabel: 'KRW',
+      datesTitle: 'Class Schedule (4 weeks)',
+      noDates: 'No schedule registered.',
+      curriculumTitle: 'Curriculum Details',
+      previewTitle: 'Preview Video',
+      introTitle: 'Class Intro',
+      currentStatus: 'Current Status',
+      waiting: 'Waiting for application',
+      adminTitle: 'Applicant List (Admin)',
+      nickname: 'Nickname',
+      phone: 'Phone',
+      status: 'Status',
+      paid: 'Paid',
+      edit: 'Edit',
+      delete: 'Delete',
+      download: 'Download',
+      addToList: 'Add to List',
+      applied: 'Applied',
+      footerNote: 'You can apply for all classes at once in MyPage later.',
+      dayNames: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+      daysFull: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Other'],
+      monthLabel: 'Month',
+      dayLabel: 'Day',
+      viewFullStatus: 'View Status',
+      viewFullStatusHint: '(Only for applicants)',
+      bittersweet: 'For Milonga',
+      fullStatusTitle: 'Full Status for {month}',
+      fullStatusSummary: 'Leaders {leader} / Followers {follower}',
+      noPermissionMessage: 'Only for applicants.',
+      role: 'Role',
+      classSelection: 'Registration',
+      noData: 'No registration data.'
+    },
+    milonga: {
+      bookingBtn: '🎟️ Book Milonga Table',
+      eventTitle: 'Event Info',
+      eventSubtitle: 'Make memories at Lucy',
+      normalTable: 'Table Booking',
+      normalTableDesc: 'Available for 2+ people.',
+      event2plus1: '2+1 Event',
+      event2plus1Desc: 'One person free for every three people.',
+      event3plus1: '3+1 Event',
+      event3plus1Desc: 'One person free for every four people.',
+      noSchedule: 'No milonga schedule registered.',
+      checkBack: 'Please check back later.',
+      bookingStatus: 'Booking Status',
+      noReservations: 'No bookings yet.',
+      editTitle: 'Edit Booking',
+      editDesc: 'You can modify your booking.',
+      confirmPayBtn: 'Request Payment Check',
+      deleteConfirm: 'Are you sure you want to delete this booking?',
+      deleteSuccess: 'Deleted.',
+      error: 'An error occurred.',
+      options: ['15k KRW per person', 'Event (Free)'],
+      optionPrompt: 'Select an option.',
+      cancel: 'Cancel',
+      submit: 'OK',
+      datePending: 'Schedule Pending',
+      newTitle: 'New Booking',
+      dateLabel: 'Date',
+      optionLabel: 'Option',
+      nicknamePlaceholder: 'Enter nickname',
+      phoneLabel: 'Phone',
+      requestsLabel: 'Requests',
+      requestsPlaceholder: 'Additional requests (Optional)',
+      submitting: 'Processing...',
+      saveEdit: 'Save Changes',
+      saveNew: 'Book',
+      noPoster: 'Poster is being prepared.'
+    },
+    membership: {
+      title: 'Membership Guide',
+      desc: 'Check the benefits of Freestyle Tango membership.',
+      type1: '1 Month Free Pass',
+      type1Price: '180,000 KRW',
+      type2: '3+1 Event',
+      type2Price: '120,000 KRW',
+      type3: '6 Months Membership',
+      type3Price: '860,000 KRW',
+      close: 'Close'
+    },
+    registrationStatus: {
+      editTitle: 'Edit Registration',
+      newTitle: 'Apply for {month} Classes',
+      cancelEdit: 'Cancel Edit',
+      desc: 'Select classes to apply.',
+      selectPrompt: 'Please select a class',
+      typeSelectorTitle: 'Select Type',
+      typeIndividual: 'Individual / 1 Month',
+      typeMembership6: '6 Months Membership',
+      editSubmit: 'Save Changes',
+      newSubmit: 'Apply'
+    },
+    payment: {
+      title: 'Payment Options',
+      desc: 'Select the payment option matching your registration.',
+      placeholder: 'Select an option',
+      options: [
+        'Individual',
+        '1 Month',
+        '6 Months (1st)',
+        '6 Months (2nd)',
+        '6 Months (3rd)',
+        '6 Months (4th)',
+        '6 Months (5th)',
+        '6 Months (6th)'
+      ],
+      optionPrompt: 'Please select a payment option.',
+      cancel: 'Cancel',
+      submit: 'Confirm'
+    },
+    history: {
+      title: 'My History',
+      loading: 'Loading...',
+      empty: 'No history found.',
+      appliedLabel: 'Registered for {month}',
+      statusPaid: 'Paid',
+      statusWaiting: 'Waiting for Payment',
+      appliedDate: 'Applied: {date}',
+      paidMsg: '{type} / {amount} KRW Paid',
+      paidDate: 'Confirmed: {date}',
+      confirmPayBtn: 'Request Payment Check',
+      edit: 'Edit',
+      delete: 'Delete',
+      deleteConfirm: 'Are you sure you want to delete this history?',
+      alreadyRegistered: 'Already registered. Please use edit function.',
+      deleteSuccess: 'Deleted.',
+      confirmSuccess: 'Completed.',
+      error: 'An error occurred.'
+    },
+    success: {
+      welcome: 'Thank you for applying.',
+      completed: 'Please transfer to the account below and click \'Request Payment Check\' in MyPage.',
+      info: 'For other inquiries, contact us via the channels below.',
+      bankLabel: 'Account',
+      bankNumber: 'KakaoBank 3333-14-3159646 (Hong Byong Seok)',
+      copyBtn: 'Copy',
+      copySuccess: 'Copied.',
+      done: 'OK'
     }
   },
-  // Stay-specific Sections
+  mypage: {
+    title: 'MyPage',
+    loginPrompt: 'Login required.',
+    loginBtn: 'Login',
+    logoutBtn: 'Logout',
+    membership: 'Membership Guide',
+    profile: {
+      nickname: 'Nickname',
+      phone: 'Phone',
+      role: 'Role'
+    },
+    tabs: {
+      registration: 'Apr. News/Apply',
+      history: 'Registration History',
+      wallet: 'Wallet & Coupons',
+      profile: 'My Profile'
+    },
+    walletDesc: 'List of your active coupons.',
+    wallet: {
+      title: 'My Wallet & Coupons',
+      noCoupons: 'No coupons found.',
+      useCoupon: 'Use Now',
+      usedCoupon: 'Used',
+      membershipCoupon: {
+        title: '1-Month Membership 5% Discount',
+        desc: '5% discount for 3rd-week class application (10,000 KRW off)',
+        target: 'For Membership Members'
+      },
+      milongaCoupon: {
+        title: 'Milonga Luci 1-Time Free Pass',
+        desc: '1-time free entry coupon for class registrants',
+        target: 'For Class Registrants'
+      },
+      usageConfirm: 'Would you like to use this coupon?\nUsed coupons cannot be restored.',
+      usageSuccess: 'Coupon successfully used.'
+    }
+  },
+  info: {
+    tabs: {
+      location: 'Location',
+      membership: 'Membership',
+      story: 'Story'
+    }
+  },
+  calendar: {
+    Sun: 'Sun',
+    Mon: 'Mon',
+    Tue: 'Tue',
+    Wed: 'Wed',
+    Thu: 'Thu',
+    Fri: 'Fri',
+    Sat: 'Sat',
+    blockedAlert: 'Already booked.',
+    period: 'Admin Block:',
+    invalidRange: 'Invalid range.',
+    viewList: 'View Full Status',
+    available: 'Available',
+    booked: 'Booked',
+    selected: 'Selected',
+    days: 'nights',
+    won: 'KRW',
+    hintSelectOut: 'Select checkout date.',
+    hintSelectDates: 'Select check-in/out dates.',
+    finalPriceTitle: 'Total Price',
+    baseFee: 'Room Fee',
+    guestFee: 'Extra Guest Fee',
+    weekendFee: 'Weekend/Holiday Surcharge',
+    cleaningFee: 'Cleaning Fee',
+    longStayDiscount: 'Long Stay Discount',
+    proceedBtn: 'Apply Now',
+    stay: 'Stay',
+    guestSelectLabel: 'Guests',
+    guestOptions: ['1 person', '2 people', '3 people', '4 people'],
+    checkin: 'Check-in',
+    checkout: 'Check-out',
+    clearBtn: 'Clear',
+    feeGuideTitle: 'Fees'
+  },
+  location: {
+    naver: 'Naver Map',
+    kakao: 'KakaoMap'
+  },
   stays: {
+    viewMonthlyStatus: 'View Monthly Status',
+    monthlyStatusTitle: 'Monthly Reservation Status',
     hapjeong: {
       name: 'Hapjeong',
       hero: {
-        subtitle: '1 min from Hapjeong Stn, Hangang Park within walking distance, Your quiet & cozy stay'
-      },
-      gallery: {
-        more: 'View More Photos',
-        categories: ['All', 'Living', 'Bedroom', 'Kitchen', 'Bath', 'View'],
-        descriptions: [
-          'Living room, Desk (Vanity), Dining table for 2',
-          'Premium studio with high ceilings',
-          'Perfect layout for resting and dining',
-          '2026 Samsung Smart TV M7 / Desk & Vanity',
-          'Free Premium TV & OTT channels (Personal login available)',
-          'Kakao Park Smart Speaker',
-          'IKEA Premium Bedding (Queen Size)',
-          'Bedroom TV',
-          'Recliner Massage Chair (High Performance)',
-          'Ace Single Bed with IKEA Bedding',
-          'Accommodates 3 guests (Living room sofa can be used)',
-          'Water purifier, Cooking utensils, Condiments, Disposables fully equipped',
-          'Samsung Refrigerator & Washing Machine',
-          'Separated Washbasin, Toilet, and Shower room',
-          'Shampoo, Conditioner, Body wash provided',
-          'Bidet available',
-          'Han River View & Cool River Breeze',
-          '1 minute to Hangang Park',
-          'Han River View & City View'
-        ]
-      },
-      calendar: {
-        title: 'Reservation Availability',
-        priceInfo: 'Smart Check-in / Base 2 guests (Max 3)',
-        basePrice: 'Weekday: 90,000 KRW / Weekend: 120,000 KRW',
-        feeGuideLines: [
-          '80,000 KRW per night (1 Guest)',
-          '+10,000 KRW per additional guest (Max 4)',
-          '+10,000 KRW on Weekends & Holidays',
-          '30,000 KRW cleaning fee',
-          '20,000 KRW Discount for 7+ nights stay'
-        ],
+        subtitle: 'Artistic space with Han River view'
       },
       location: {
         title: 'Location',
-        addressLabel: 'Address:',
-        bldgLabel: 'Building:',
+        addressLabel: 'Address',
         address: '13 Yanghwa-ro, Mapo-gu, Seoul',
-        bldg: 'Hapjeong Square Riverview',
-  },
+        bldgLabel: 'Building',
+        bldg: 'Hapjeong Square Riverview'
+      },
       guide: {
-        title: 'Details & Guide',
-        subtitle: '"We have equipped everything so you can start your daily life without any preparations"',
+        title: 'Details',
+        subtitle: 'Artistic rest in the heart of Seoul',
         highlights: {
-          title: '✨ Key Highlights of the Room',
+          title: 'Highlights',
           list: [
-            { t: 'Newly Built Premium with Open Views', d: 'Enjoy exceptional Han River views from the newest and cleanest studio in the Hapjeong/Hongdae area.' },
-            { t: 'Uncompromising Cleanliness', d: 'Bedding and rugs are professionally washed by Laundrygo every time. Indoor steam cleaning, and all towels/dishcloths are 100% replaced with new ones.' },
-            { t: 'Premium Relaxation Furniture', d: 'Two spacious beds (Queen, Super Single), cozy sofa, and a high-performance recliner massage chair.' },
-            { t: 'Rich Entertainment', d: 'Living room features a 2026 Samsung Moving Style Smart TV, plus an additional TV in the bedroom.' }
+            { t: 'Location', d: '1 min walk from Hapjeong Station' },
+            { t: 'View', d: 'Stunning Han River view from high floor' },
+            { t: 'Vibe', d: 'Sensible interior favored by artists' }
           ],
-          quote: '"Enjoy the massage chair while watching the Han River night view~"'
+          quote: 'A special space where tango and daily life become one.'
         },
         transport: {
-          title: '📍 Convenient Location & Transport (Free Parking)',
+          title: 'Directions',
           list: [
-            { t: 'Super Prime Location', d: '1 min walk to Hapjeong Stn. Fast access to Hongdae/Sinchon by foot/subway/bus (10 min walk to Hongdae).' },
-            { t: 'Transportation Hub', d: 'Convergence point for all buses moving across Seoul. (Mangwon Stn, Hongdae Stn all adjacent)' },
-            { t: 'Convenient Parking', d: 'Bring your car and park for free. (Host covers the monthly 30,000 KRW fee)' },
-            { t: 'Driving & Taxi', d: 'Just 1 minute to enter Gangbyeon Expressway heading to Gangnam, Ilsan, Yeouido.' }
+            { t: 'Subway', d: 'Line 2/6 Hapjeong Station Exit 7' },
+            { t: 'Bus', d: '1 min walk from Hapjeong Station stop' }
           ]
         },
         facilities: {
-          title: '🛋️ Amenities & Facilities (Free Consumables)',
-          base: 'Basic Appliances/Furniture',
-          baseDesc: 'Refrigerator, Washing Machine, AC, Smart TVs (2), Giga Wi-Fi, Sink, Induction stove, Queen & Super Single beds',
-          add: 'Additional Facilities',
-          addDesc: 'Secure Door Lock, CCTV/Management Office, Dining Table, Water Purifier, Sofa, Large Desk, Spacious Closet, Shoe Rack',
-          freeTitle: '✨ All Consumables Provided Free!!!',
-          freeDesc: 'Ramen, instant rice, toilet paper, tissues, toothbrush/toothpaste sets, shampoo/conditioner, body wash, hand wash provided.\nFreely use the laundry drying rack, detergent, fabric softener, and garbage/recycling bags!'
+          title: 'Facilities',
+          base: 'Basic',
+          baseDesc: 'Queen bed, AC, high-speed Wi-Fi',
+          add: 'Kitchen/Conv',
+          addDesc: 'Fridge, induction, washer, cookware',
+          freeTitle: 'Freebies',
+          freeDesc: 'Water, towels, shampoo/body wash, hair dryer'
         },
         attractions: {
-          title: '🛍️ Neighborhood Lifestyle & Attractions',
+          title: 'Attractions',
           list: [
-            { t: 'Hapjeong / Hongdae District', d: 'Adjacent to the best restaurants and cafes in Hapjeong and the vibrant streets of Hongdae.' },
-            { t: 'Convenient Supermarkets', d: 'Wang Mart is 1 min away for quick groceries. Homeplus Mega Mart is a 5 min walk for everything else.' },
-            { t: 'Escape to the Han River Anytime', d: '1 minute walk to the Hangang Park entrance. Closely connected to Mangwon Hangang Park.' }
+            { t: 'Shopping', d: 'Mecenatpolis, Delight Square nearby' },
+            { t: 'Art/Culture', d: 'Hapjeong Cafe Street, Mangridan-gil walk' }
           ]
         }
+      },
+      calendar: {
+        title: 'Status',
+        feeGuideTitle: 'Price List',
+        feeGuideLines: [
+          '80,000 KRW per night',
+          '2 guests base / max 4',
+          '10,000 KRW per extra guest',
+          '10,000 KRW weekend surcharge',
+          'Discount: 20k for 7+ nights, 40k for 14+ nights',
+          '30,000 KRW separate cleaning fee'
+        ]
+      },
+      gallery: {
+        more: 'View More',
+        categories: ['All', 'Living', 'Bedroom', 'Kitchen', 'Bath', 'View'],
+        descriptions: [
+          'Hapjeong Living Room',
+          'Cozy Sofa',
+          'Sensible Interior',
+          'Living Lighting',
+          'Sunny Space',
+          'Large Living Room',
+          'Comfortable Bedroom',
+          'Clean Bedding',
+          'Cozy Night',
+          'Bedroom View',
+          'Dressing Table',
+          'Full Kitchen',
+          'Clean Kitchen',
+          'Clean Bathroom',
+          'Bath Amenities',
+          'Refreshing Bath',
+          'Beautiful River View',
+          'Night City View',
+          'Relaxing View'
+        ]
       }
     },
     deokeun: {
-      name: 'Deokeun',
+      name: 'Deokeun(Sangam)',
       hero: {
-        subtitle: 'Cozy new stay in Deokeun district, near Hangang Park, perfect for quiet rest'
+        subtitle: 'Modern facilities and peaceful rest'
       },
-      gallery: {
-        more: 'View More Photos',
-        categories: ['All', 'Living', 'Bedroom', 'Kitchen', 'Bath', 'View'],
-        descriptions: [
-          'Bright and pleasant main living space',
-          'The most comfortable and cozy bedroom',
-          'Clean and spacious entrance structure',
-          'Spacious desk and vanity area',
-          'Always cozy and warm environment',
-          'Android Smart TV with free OTT (Netflix, etc.)',
-          'Spacious closet to keep your clothes wrinkle-free',
-          'Fully equipped with air purifier, vacuum, and steam cleaner',
-          'Neat and well-organized kitchen',
-          'Fully equipped kitchen tools for cooking (1)',
-          'Fully equipped kitchen tools for cooking (2)',
-          'Welcome tea including coffee and green tea provided free',
-          'Free instant rice and ramen for when you feel hungry',
-          'Brand new bath amenities (towels, toothbrushes) provided free',
-          'Hygienic bidet installed and maintained clean',
-          'Separated shower room for a pleasant bath experience',
-          'First aid kit for emergencies (painkillers, digestives, etc.)',
-          'Free access to the fitness center equipped with the latest machines',
-          'Ventilated area for fresh air drying of your clothes'
-        ]
-      },
-      calendar: {
-        title: 'Reservation Availability',
-        priceInfo: 'Smart Check-in / Base 2 guests (Max 3)',
-        basePrice: 'Weekday: 70,000 KRW / Weekend: 80,000 KRW',
-        feeGuideLines: [
-          '60,000 KRW per night (1 Guest)',
-          '+10,000 KRW per additional guest (Max 4)',
-          '+10,000 KRW on Weekends & Holidays',
-          '30,000 KRW cleaning fee',
-          '20,000 KRW Discount for 7+ nights stay'
-        ],
-  },
       location: {
         title: 'Location',
-        addressLabel: 'Address:',
-        bldgLabel: 'Building:',
-        address: '110 Eutteum-ro, Deokyang-gu, Goyang-si, Gyeonggi-do',
-        bldg: 'Hillstate Eco Deokeun',
-  },
+        addressLabel: 'Address',
+        address: '110 Eudeum-ro, Deogyang-gu, Goyang, Gyeonggi',
+        bldgLabel: 'Building',
+        bldg: 'Hillstate Eco Deokeun'
+      },
       guide: {
-        title: 'Details & Guide',
-        subtitle: '🏠 [Just bring yourself!] Free amenities, fitness center, and parking\nWebsite: freestay.notion.site\nWe have equipped everything so you can start your daily life without any preparations.',
+        title: 'Details',
+        subtitle: 'Your own quiet and cozy hideaway',
         highlights: {
-          title: '✨ Key Highlights of the Room',
+          title: 'Highlights',
           list: [
-            { t: 'Cleanliness', d: 'Bedding and rugs professionally washed (Laundrygo), steam cleaned, towels/cloths replaced every time' },
-            { t: 'Kitchen/Appliances', d: 'Coway water purifier, LG air purifier, Samsung combo oven, LG drum washer, SK induction' },
-            { t: 'Storage/Furniture', d: '3-door closet, shoe rack, movable single dining table & desk' }
+            { t: 'New', d: 'Clean space with latest tech' },
+            { t: 'Peace', d: 'Quiet atmosphere away from city' },
+            { t: 'Facilities', d: 'Modern appliances and practical design' }
           ],
-          quote: '| Coffee, bath/laundry supplies, and garbage bags are all provided for free!'
+          quote: 'The perfect place for those seeking true rest.'
         },
         transport: {
-          title: '📍 Convenient Location & Transport',
+          title: 'Directions',
           list: [
-            { t: '🚌 Bus right outside', d: 'Sangam/DMC 5 mins, Hongdae/Hapjeong 15 mins, Gayang 15 mins, Yeouido 30 mins' },
-            { t: '🅿️ Convenient Parking', d: 'Spacious and pleasant parking lot indicative of a newly built building' },
-            { t: '🚗 Driving', d: 'Located along Jayuro, 1 minute access to Gangbyeon Expressway toward Ilsan/Yeouido' }
+            { t: 'Car', d: '5 min from Sangam-dong' },
+            { t: 'Bus', d: '3 min walk from Deokeun stop' }
           ]
         },
         facilities: {
-          title: ' Couch Amenities & Facilities (Free Consumables)',
-          base: 'Basic Appliances/Furniture',
-          baseDesc: 'Refrigerator, Drum Washing Machine, System AC, Smart TV, Giga Wi-Fi, Comfortable bed and mattress',
-          add: 'Additional Facilities',
-          addDesc: 'Secure door lock, CCTV, Water purifier, Air purifier, Cozy lighting',
-          freeTitle: '✨ All Consumables Provided Free!!!',
-          freeDesc: 'Snacks like ramen and instant rice, premium shower kits (shampoo, body wash, toothbrush/toothpaste) all provided for free\nLaundry detergent and official garbage bags are also freely available for your convenience.'
+          title: 'Facilities',
+          base: 'Basic',
+          baseDesc: 'Comfortable bed, AC/Heating, Smart TV',
+          add: 'Kitchen/Conv',
+          addDesc: 'Microwave, toaster, basic dishes',
+          freeTitle: 'Freebies',
+          freeDesc: 'Coffee capsules, water, hygiene kits'
         },
         attractions: {
-          title: '🛍️ Neighborhood Lifestyle & Parks',
+          title: 'Attractions',
           list: [
-            { t: '☕ Restaurants/Cafes', d: 'Dense commercial area. Paris Baguette (same bldg), Starbucks (next door), and 2 famous 9,000 KRW buffet restaurants' },
-            { t: '🛒 Supermarket', d: 'Lotte Super is just a 1-minute walk away' },
-            { t: '🌳 Greenery', d: 'Abundant neighborhood parks, Hangang Park entrance nearby' }
+            { t: 'Nature', d: 'Noeul/Haneul Park nearby' },
+            { t: 'Business', d: 'Sangam DMC district adjacent' }
           ]
-        },
-        neighborhood: {
-          title: '🌳 [Neighborhood Guide] "Is this Seoul or a Forest?" Perfect Guide to Deokeun-dong',
-          list: [
-            { t: '🏃‍♂️ Exceptional Parks & Greenery Just for Walking', d: 'The greatest advantage of Deokeun District is its proximity to the Han River, feeling like the park is your front yard.\n\n- Deokeun Hangang Park & Noeul Park Connection: Perfect for biking or jogging. The sunset over the Han River is the greatest gift of this "Desert Island Experiment."\n- Small Parks in the Complex: The walking trails between the buildings are exceptionally safe and pleasant for a light evening stroll.' },
-            { t: '🛒 "Slipper-commute" Supermarkets & Convenience', d: 'Did you use up all the welcome gift box items after moving in? Don\'t worry. Everything is nearby.\n\n- Large Grocery Mart: A mart where you can buy fresh ingredients at low prices is close by, making it great for cooking.\n- Convenience Stores: Major convenience stores like GS25, CU, and 7-Eleven are clustered around, making it convenient 24/7.\n- Cafes & Bakeries: Emotional cafes that are great for bringing a laptop and working are popping up one after another.' },
-            { t: '🏥 Reliable Living Infrastructure', d: 'You can\'t miss out on health and safety.\n\n- Clinics & Pharmacies: Basic clinics like internal medicine and dentistry, as well as pharmacies, are within walking distance, so you can feel safe in emergencies.\n- Laundry/Alterations: In addition to Laundrygo, if you have laundry that needs urgent care, try the neighborhood laundromat.' }
-          ],
-          quote: '"Deokeun-dong is vibrant during the day and really quiet at night. There won\'t be a better neighborhood for guests who want a noise-free rest."'
-        },
-        story: {
-          title: '📜 From a Thousand-Year Land Embracing the Han River to a Smart City!',
-          desc: 'Hello! Today I\'d like to tell you an interesting story about Deokeun-dong, where our stay is located. You\'ll be surprised if you thought it was just a new studio apartment complex. Without further ado, let\'s explore the fascinating behind-the-scenes story of this neighborhood!',
-          sections: [
-            { t: '1. Meaning of the Name: "A Neighborhood Where Virtue is Hidden"', d: 'The Hanja (Chinese characters) for Deokeun-dong translate to "Hiding (隱) in Great Virtue (德)."\n\n- Land Embracing Hidden Virtue: Since ancient times, this area has been considered a place where virtuous people quietly reside and build up virtue, owing to its cozy topography facing the Han River.\n- An Auspicious Site: It is actually considered an excellent spot based on Feng Shui principles, with the fertile land by the Han River in the front and Daedeoksan Mountain guarding the back.' },
-            { t: '2. Deokeun-dong in History: A Home Since Prehistoric Times', d: 'Deokeun-dong is not a neighborhood that was just created recently. Its history goes all the way back to the Prehistoric Era.\n\n- Land of Relics: During the development of the Deokeun District, numerous relics and dolmens from the Paleolithic and Neolithic eras were discovered. This is proof that our ancestors chose this place as an optimal living site thousands of years ago.\n- A Strategic Defense Point: During the Joseon Dynasty, it was an important passageway to protect Hanyang (Seoul) and held immense historical significance in connection with the nearby Haengjusanseong Fortress.' },
-            { t: '3. A Monumental Change: From a Military Base to "The Next Sangam"', d: 'Just a few years ago, this was a secretive space where public access was restricted because the Korea National Defense University and military facilities were located here.\n\n- The Birth of a New City: With the relocation of military facilities, the "Deokeun Media Valley," a complex combining residential and commercial areas, was developed across roughly 640,000 square meters.\n- The Extension of Sangam DMC: It directly borders Sangam-dong, Mapo-gu, and has already gained a reputation among broadcasting/media industry workers as a "cleaner, newer neighborhood than Sangam."' },
-            { t: '4. Why Deokeun-dong is Attractive Today (3 Reasons)', d: '### ① The Han River like Your "Front Yard"\nDeokeun-dong is one of the residential districts closest to the Han River. You can reach the Hangang Park on foot, making a "Han River Lifestyle" an everyday reality.\n\n### ② Better Accessibility than Inside Seoul\nAlthough administratively in Goyang-si, cross the Gayang Bridge and you are in Gangseo-gu (Magok), and right next to it is Mapo-gu (Sangam). It boasts a smart location where you can reach major business districts within 10–20 minutes.\n\n### ③ The Pleasantness of a Planned City\nEverything is newly built, so the entire street is clean. There are no narrow alleys or old buildings, but instead, wide roads harmoniously matched with modern office buildings, giving off an exotic vibe.' }
-          ],
-          quote: '"If you stay in Deokeun-dong, be sure to visit the Daedeoksan Trail or the Han River connection path around sunset. We hope you feel exactly why this place is called where virtue is hidden."'
-        },
-        transportGuide: {
-          title: '🚌 Transportation Encyclopedia: How to get to 7 key landmarks from Deokeun',
-          list: [
-            { t: '1. DMC (Digital Media City Station)', d: '• Public Transit: 15-20 min via Village Bus (Goyang 022A/B, 054)\n• Taxi: Approx 12 min (~7,000 KRW)\n• Car: Approx 8-10 min towards Susaek-ro' },
-            { t: '2. Sangam (Broadcasting/Business District)', d: '• Public Transit: 20 min via Branch Bus (730, 7711)\n• Taxi: Under 10 min\n• Car: Arrive immediately passing World Cup Park' },
-            { t: '3. Hongdae (Including Hapjeong/Yeonnam)', d: '• Public Transit: 15-20 min via Branch Bus (7711), no transfers\n• Taxi: 12-15 min via Gangbyeon Expressway (~9,000 KRW)\n• Car: Gangbyeon Expressway towards Seoul -> Hapjeong/Mangwon IC' },
-            { t: '4. Magok (Gayang/Gangseo)', d: '• Public Transit: 15 min via Bus crossing Gayang Bridge -> Line 9 Gayang Stn\n• Taxi: Around 10 min crossing Gayang Bridge (~9,500 KRW)\n• Car: 10 min directly entering Magok Business District' },
-            { t: '5. Ilsan (Lake Park/KINTEX)', d: '• Public Transit: 20-30 min direct via Bus 730 towards Jungang-ro\n• Taxi: 15-20 min via Jayu-ro (~15,000 KRW)\n• Car: 1 min to Jayu-ro, 15 min without traffic lights to Lake Park' },
-            { t: '6. Yeouido (IFC Mall/Financial District)', d: '• Public Transit: 30 min via Express Bus (9707) to Yeouido Transfer Center\n• Taxi: 20-25 min via Gangbyeon Expressway (~15,000 KRW)\n• Car: 20 mins straight via Gangbyeon Expressway' },
-            { t: '7. Gangnam (Sinsa/Gangnam Station)', d: '• Public Transit: 45-50 min via Bus -> Line 9 Express (Highly Recommended)\n• Taxi: 35-40 min via Gangbyeon / Olympic Expressway (non-rush hour)\n• Car: 30 min via Gangbyeon to Hannam/Olympic Expressway' }
-          ]
-        },
-        complexNews: {
-          title: '🏢 [Complex News] Premium Life at Hillstate: From Fitness to Laundry!',
-          desc: 'Hello! Today we introduce the community facilities and convenient services that our residents love the most at Hillstate Eco Deokeun. Check out the premium lifestyle where you can manage your health and daily convenience without leaving the complex!',
-          list: [
-            { t: '1. 🏋️‍♂️ Free Fitness Center (07:00 AM ~ 10:00 PM)', d: 'Maintain a healthy lifestyle at our state-of-the-art fitness center.\n- Operating Hours: 07:00 AM ~ 10:00 PM (Closed Mondays)\n- Features: Spacious, separated cardio and weight zones\n- Required: Must register fingerprint at the adjacent management office' },
-            { t: '2. 🧘‍♀️ Well-Public (Yoga & Pilates Studio)', d: 'Visit here if you need professional posture correction and healing. (Paid service)\n- Main Programs: Manual therapy, 1:1 Rehab PT, Yoga/Stretching (Kids, Healing, Traditional)\n- Expert Instructors: Physical therapist director and specialized instructors on-site' },
-            { t: '3. 🧺 24-Hour Self-Service Laundromat', d: 'Easily wash large items or bedding within the complex!\n- Facilities: Extra-large washer (30kg) and dryer (28kg), plus a dedicated shoe washer/dryer\n- Convenient kiosk system with one-stop washing to drying' },
-            { t: '4. 👔 New York Premium Laundry (Alterations & Delivery)', d: 'Leave your delicate garments and dry-cleaning to the professionals.\n- Specializes in suits, boutique dry-cleaning, and various garment alterations\n- Offers pick-up & delivery service right to your unit\n- Inquiries: 02-747-2325' }
-          ],
-          quote: '💡 Tip: Make smart use of the exclusive "my HILLS" app for residents. Don\'t miss out on the premium services exclusive to our complex!'
         }
+      },
+      calendar: {
+        title: 'Status',
+        feeGuideTitle: 'Price List',
+        feeGuideLines: [
+          '60,000 KRW per night',
+          '2 guests base / max 4',
+          '10,000 KRW per extra guest',
+          '10,000 KRW weekend surcharge',
+          'Discount: 20k for 7+ nights, 40k for 14+ nights',
+          '30,000 KRW separate cleaning fee'
+        ]
+      },
+      gallery: {
+        more: 'View More',
+        categories: ['All', 'Living', 'Bedroom', 'Kitchen', 'Bath', 'View'],
+        descriptions: [
+          'Deokeun Main',
+          'Bedroom space',
+          'Entrance',
+          'Desk',
+          'Cozy Interior',
+          'Smart TV',
+          'Closet',
+          'Purifier/Home appliances',
+          'Organized Kitchen',
+          'Cookware',
+          'Dish Set',
+          'Free Tea',
+          'Snack service',
+          'Bath amenities',
+          'Bidet',
+          'Shower room',
+          'First aid kit',
+          'Fitness center',
+          'Drying area'
+        ]
       }
     },
     hongdae: {
       name: 'Hongdae',
       hero: {
-        subtitle: 'Walking distance to Hongik Univ Stn, refined space in the heart of Hongdae'
+        subtitle: 'Rest in the street of youth and art'
       },
-      gallery: {
-        more: 'View More Photos',
-        categories: ['All', 'Living', 'Bedroom', 'Kitchen', 'Bath', 'View'],
-        descriptions: [
-          'Living room, Desk (Vanity), Dining table for 2',
-          'Premium studio with high ceilings',
-          'Perfect layout for resting and dining',
-          '2026 Samsung Smart TV M7 / Desk & Vanity',
-          'Free Premium TV & OTT channels (Personal login available)',
-          'Kakao Park Smart Speaker',
-          'IKEA Premium Bedding (Queen Size)',
-          'Bedroom TV',
-          'Recliner Massage Chair (High Performance)',
-          'Ace Single Bed with IKEA Bedding',
-          'Accommodates 3 guests (Living room sofa can be used)',
-          'Water purifier, Cooking utensils, Condiments, Disposables fully equipped',
-          'Samsung Refrigerator & Washing Machine',
-          'Separated Washbasin, Toilet, and Shower room',
-          'Shampoo, Conditioner, Body wash provided',
-          'Bidet available',
-          'Dynamic views of Hongdae city center',
-          'Best spot for foodies',
-          'Vibrant city view'
-        ]
-      },
-      calendar: {
-        title: 'Reservation Availability',
-        priceInfo: 'Smart Check-in / Base 2 guests (Max 3)',
-        basePrice: 'Weekday: 90,000 KRW / Weekend: 120,000 KRW',
-        feeGuideLines: [
-          '80,000 KRW per night (1 Guest)',
-          '+10,000 KRW per additional guest (Max 4)',
-          '+10,000 KRW on Weekends & Holidays',
-          '30,000 KRW cleaning fee',
-          '20,000 KRW Discount for 7+ nights stay'
-        ],
-  },
       location: {
         title: 'Location',
-        addressLabel: 'Address:',
-        bldgLabel: 'Building:',
-        address: 'Seogyo-dong, Mapo-gu, Seoul (Details soon)',
-        bldg: 'Stay Hongdae',
-  },
+        addressLabel: 'Address',
+        address: 'Seogyo-dong, Mapo-gu, Seoul',
+        bldgLabel: 'Building',
+        bldg: 'Stay Hongdae'
+      },
       guide: {
-        title: 'Details & Guide',
-        subtitle: '"We have equipped everything so you can start your daily life without any preparations"',
+        title: 'Details',
+        subtitle: 'Harmony of energy and comfort',
         highlights: {
-          title: '✨ Key Highlights of the Room',
+          title: 'Highlights',
           list: [
-            { t: 'Heart of Hongdae', d: 'Closest possible location to enjoy Hongdae\'s trendy culture.' },
-            { t: 'Uncompromising Cleanliness', d: 'Bedding and rugs are professionally washed by Laundrygo every time. Indoor steam cleaning, and all towels/dishcloths are 100% replaced with new ones.' },
-            { t: 'Premium Relaxation Furniture', d: 'Two spacious beds (Queen, Super Single), cozy sofa, and a high-performance recliner massage chair.' },
-            { t: 'Rich Entertainment', d: 'Living room features a 2026 Samsung Moving Style Smart TV, plus an additional TV in the bedroom.' }
+            { t: 'Center', d: 'Optimal location between Hongdae and Hapjeong' },
+            { t: 'Trend', d: 'Interior filled with MZ sensibility' },
+            { t: 'Prep', d: 'Currently preparing to open.' }
           ],
-          quote: '"Premium rest after enjoying the vibes of Hongdae~"'
+          quote: 'We promise the most comfortable night in the hippest street.'
         },
         transport: {
-          title: '📍 Convenient Location & Transport',
+          title: 'Directions',
           list: [
-            { t: 'Hongik Univ Stn Area', d: 'Very convenient access to Line 2, Airport Railroad, and Gyeongui-Jungang Line.' },
-            { t: 'Plentiful Bus Routes', d: 'Numerous buses going across Seoul and to Incheon Airport.' },
-            { t: 'Perfect for Walking', d: 'Best location to explore Hongdae, Hapjeong, and Yeonnam-dong all on foot.' }
+            { t: 'Subway', d: '7 min walk from Hongdae Station Line 2' }
           ]
         },
         facilities: {
-          title: ' Couch Amenities & Facilities (Free Consumables)',
-          base: 'Basic Appliances/Furniture',
-          baseDesc: 'Refrigerator, Washing Machine, AC, Smart TVs (2), Giga Wi-Fi, Sink, Induction stove, Queen & Super Single beds',
-          add: 'Additional Facilities',
-          addDesc: 'Secure Door Lock, CCTV/Management Office, Dining Table, Water Purifier, Sofa, Large Desk, Spacious Closet, Shoe Rack',
-          freeTitle: '✨ All Consumables Provided Free!!!',
-          freeDesc: 'Ramen, instant rice, toilet paper, tissues, toothbrush/toothpaste sets, shampoo/conditioner, body wash, hand wash provided.\nFreely use the laundry drying rack, detergent, fabric softener, and garbage/recycling bags!'
+          title: 'Facilities',
+          base: 'Basic',
+          baseDesc: 'Premium bedding, Beam projector',
+          add: 'Kitchen/Conv',
+          addDesc: 'Under preparation.',
+          freeTitle: 'Freebies',
+          freeDesc: 'Water, towels'
         },
         attractions: {
-          title: '🛍️ Neighborhood Lifestyle & Attractions',
+          title: 'Attractions',
           list: [
-            { t: 'Hongdae Walking Street', d: 'Main street of Hongdae filled with busking and various shops.' },
-            { t: 'Yeonnam-dong Gyeongui Line Forest Park', d: 'Enjoy "Yentral Park", a hot spot for walks and picnics.' },
-            { t: 'Endless Restaurants & Cafes', d: 'Famous local and international restaurants and hidden cafes are dense within hundreds of meters.' }
+            { t: 'Hot Place', d: 'Hongdae Street, Yeonnam-dong nearby' }
           ]
         }
+      },
+      calendar: {
+        title: 'Status',
+        feeGuideTitle: 'Price List',
+        feeGuideLines: [
+          '80,000 KRW per night',
+          'Opening special coming soon'
+        ]
+      },
+      gallery: {
+        more: 'View More',
+        categories: ['All', 'Living', 'Bedroom', 'Kitchen', 'Bath', 'View'],
+        descriptions: [
+          'Gallery coming soon',
+          'Cozy space prep',
+          'Sensible Interior'
+        ]
       }
     }
   },
-  // Common items (fallback)
-  calendar: {
-    checkin: 'Check-in',
-    checkout: 'Check-out',
-    reserveBtn: 'Reserve Now',
-    Sun: 'Sun', Mon: 'Mon', Tue: 'Tue', Wed: 'Wed', Thu: 'Thu', Fri: 'Fri', Sat: 'Sat',
-    booked: 'Booked',
-    available: 'Available',
-    selected: 'Selected',
-    totalPrice: 'Total Price',
-    surcharge: 'Includes Weekend/Holiday Surcharge',
-    clearBtn: 'Clear Selection',
-    guestsCount: 'Guests',
-    days: 'Nights',
-    won: 'KRW',
-    blockedAlert: '[Fully Booked]\nGuest:',
-    period: 'Period:',
-    invalidRange: 'Your selected range includes already booked dates. Please try again.',
-    hintSelectOut: 'Please select a check-out date!',
-    feeGuideTitle: 'Pricing Guide',
-    hintSelectDates: 'Select dates on the calendar to see the exact total price.',
-    guestSelectLabel: 'Guests',
-    guestOptions: ['1 Guest (Base)', '2 Guests (+10k/night)', '3 Guests (+20k/night)', '4 Guests (Max, +30k/night)'],
-    finalPriceTitle: 'Total Final Price',
-    baseFee: 'Base Nightly Rate',
-    guestFee: 'Extra Guest Fee',
-    weekendFee: 'Weekend/Holiday Surcharge',
-    cleaningFee: 'Cleaning Fee',
-    longStayDiscount: 'Long Stay Discount',
-    proceedBtn: 'Proceed to Book',
-    stay: 'Stay',
-    selectedDate: 'Selected Dates',
-    viewList: 'View as List',
-    viewCalendar: 'View as Calendar'
+  common: {
+    contact: {
+      title: 'Contact',
+      desc: 'Feel free to contact us anytime.',
+      call: 'Phone',
+      callDesc: 'Direct Call',
+      sms: 'SMS',
+      smsDesc: 'Inquire via SMS',
+      kakao: 'KakaoTalk',
+      kakaoDesc: 'KakaoTalk Channel',
+      whatsapp: 'WhatsApp',
+      whatsappDesc: 'WhatsApp Inquiry',
+      fb: 'Messenger',
+      fbDesc: 'Facebook Message'
+    },
+    hostGuide: {
+      title: 'Host Intro',
+      list: [
+        { t: 'Host', d: 'Stone Hong (Hong Byong Seok)' },
+        { t: 'Intro', d: 'Tango Instructor / Stay Host. Supporting your tango journey in an artistic space.' },
+        { t: 'Inquiry', d: 'Contact us via KakaoTalk or WhatsApp for stay and lesson inquiries.' }
+      ]
+    },
+    story: {
+      title: 'TangoStay Story',
+      subtitle: 'Art and Rest in Seoul',
+      p1: 'Freestyle Tango leading the culture where dance and life harmonize. Providing optimal rest for tangueros is our goal.',
+      sol1Title: 'Accessibility',
+      sol1Text: 'Located near major milongas like Hapjeong for easy travel.',
+      sol2Title: 'For Artists',
+      sol2Text: 'Beyond simple stay, providing an artistic interior for inspiration.',
+      sol3Title: 'Community',
+      sol3Text: 'A platform where tangueros worldwide communicate and make memories.',
+      closing: 'Start your special Seoul journey at TangoStay.',
+      hostName: 'Stone Hong',
+      hostBio: 'Tango Instructor / Stay Host'
+    },
+    footer: {
+      term: 'Terms',
+      privacy: 'Privacy',
+      termTitle: 'Terms of Service',
+      privacyTitle: 'Privacy Policy',
+      termText: 'Article 1 (Purpose)...',
+      privacyText: 'TangoStay values your personal information...'
+    },
   },
-  location: {
-    naver: 'Open in Naver Map',
-    kakao: 'Open in Kakao Map'
+  startTime: 'Start Time',
+  endTime: 'End Time',
+  media: {
+    title: 'Media',
+    type: {
+      youtube: 'YouTube',
+      demonstration: 'Demo',
+      general: 'General'
+    },
+    filterAll: 'All',
+    addBtn: 'Register',
+    like: 'Like',
+    comment: 'Comment',
+    views: 'Views',
+    noAccess: 'Demonstration video for class participants only.',
+    placeholder: {
+      title: 'Enter title',
+      url: 'YouTube ID or Video URL',
+      desc: 'Enter description',
+      class: 'Select Class (Optional)',
+      comment: 'Leave a comment...'
+    },
+    uploading: 'Uploading...',
+    deleteConfirm: 'Delete this?',
+    saveSuccess: 'Saved.',
+    deleteSuccess: 'Deleted.'
   },
-  contact: {
-    title: 'Contact Us',
-    desc: 'Please feel free to reach out anytime if you have questions.',
-    call: 'Call',
-    sms: 'SMS',
-    kakao: 'Kakao Chat',
-    whatsapp: 'WhatsApp',
-    fb: 'FB Messenger',
-    callDesc: '010-7209-2468 (Stone)',
-    smsDesc: 'Fast response guaranteed',
-    kakaoDesc: 'ID: stonehong@kakao.com',
-    whatsappDesc: 'For Global Guests',
-    fbDesc: 'Facebook Message'
-  },
-  reserve: {
-    title: 'Reservation Details',
-    nights: 'Nights',
-    reserveDate: 'Dates:',
-    totalAmount: 'Total Amount:',
-    nameLabel: 'Guest Name',
-    namePlace: 'Enter your full name',
-    phoneLabel: 'Contact',
-    phonePlace: '010-0000-0000',
-    guestLabel: 'Number of Guests',
-    guests: 'Guests',
-    reqLabel: 'Requests',
-    reqPlace: 'Any special requests or questions?',
-    submitBtn: 'Submit Reservation',
-    submitting: 'Processing...',
-    errorFill: 'Please fill in name, contact, and guest count.',
-    errorFail: 'An error occurred while processing.',
-
-    save: 'Save',
-    cancel: 'Cancel',
-    close: 'Close',
-    editBtn: 'Edit',
-    deleteBtn: 'Delete',
-  },
-  complete: {
-    title: 'Reservation Complete! 🎉',
-    desc: 'Payment and check-in instructions will be sent to your provided contact number shortly.',
-    guestSmsBtn: 'Get reservation info (SMS)',
-    hostSmsBtn: 'Notify host (SMS)',
-    guideBtn: 'Preview Usage Guide',
-    homeBtn: 'Return to Home',
-    sms: '[{stayName} Reservation]\nGuest: {name}\nDates: {checkIn} ~ {checkOut}\nGuests: {guests}\nAmount: {total} KRW\n\n[Check-in Info]\nTime: 4:00 PM\nPassword: 9999\n\nThank you!'
+  story: {
+    campaign: {
+      title: 'Core Campaign',
+      slogan: 'Happy Space, Warm People',
+      sloganKo: 'Happy Space, Warm People'
+    },
+    hero: {
+      title: 'The Playground We Dream of,\nA Sanctuary for All',
+      subtitle: 'A Freestyle Tango community where we grow together with respect'
+    },
+    ethics: {
+      title: 'Community Core Values',
+      respectTitle: 'Attitude First (Respect)',
+      respectDesc: 'The premise that we must respect each other is too clear. Otherwise, club activities may be restricted.',
+      teachingTitle: 'No Teaching',
+      teachingDesc: 'One-sided teaching among students can hinder the progress of both yourself and others. We welcome exchange of opinions, but please resolve technical issues through the instructors.',
+      teachingDetail: 'It is important to accurately understand the teacher\'s intentions. Regardless of experience, please refrain from one-sided teaching.'
+    },
+    projects: {
+      title: 'Strategic Projects',
+      azit: {
+        title: "Project 'Azit'",
+        desc: 'Our own sanctuary where we can comfortably talk and enjoy food and drinks before and after classes.'
+      },
+      camp: {
+        title: "Project 'Camp'",
+        desc: 'A pension space that can be a sanctuary for us outside the city on weekends and holidays.'
+      },
+      nuevo: {
+        title: "Project Professional Performance Team 'Nuevo Company'",
+        desc: 'Operation of a professional performance team and activation of yoga rooms and cultural centers for wellness.'
+      },
+      orchestra: {
+        title: "Project 'House Ochestra'",
+        desc: 'Freestyle\'s own house orchestra for salon recitals and live milongas.'
+      }
+    },
+    roadmap: {
+      title: 'Sustainable Future',
+      cooperative: {
+        title: 'Cooperative Transition',
+        desc: 'A system where members share ownership of the club and jointly operate and make decisions.'
+      },
+      donation: {
+        title: 'Establishing a Donation Culture',
+        desc: 'A culture that supports new members and helps the club grow through scholarships and volunteering.'
+      },
+      instructor: {
+        title: 'Internal Instructor Training',
+        desc: 'A system to nurture the next generation of leaders from within our community.'
+      }
+    },
+    guidelines: {
+      title: 'General Guide',
+      cleaning: 'Wipe up spills immediately.',
+      shoes: 'Only dedicated shoes or bare feet are allowed inside.',
+      toilet: 'Only toilet paper in the toilet (No hand towels, wet wipes).',
+      trash: 'Sort trash and dispose of it in bins when leaving.',
+      power: 'Use the main switch next to the door when entering/leaving.',
+      facilities: {
+        wifi: 'WiFi: freestyle1234',
+        pc: 'PC PW: 7788',
+        lockers: 'Items cannot be stored outside personal lockers.'
+      }
+    }
   }
 };

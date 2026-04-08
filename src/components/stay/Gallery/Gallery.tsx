@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useModalHistory } from '@/hooks/useModalHistory';
 import styles from './Gallery.module.css';
 
 const baseCategories = ['전체', '거실', '침실', '키친', '화장실', '뷰'];
@@ -69,94 +70,94 @@ const galleryDataMap: Record<string, any[]> = {
 export default function Gallery({ stayId = 'hapjeong' }: { stayId?: string }) {
   const { t } = useLanguage();
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [currentMainIdx, setCurrentMainIdx] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
+  // Swipe logic
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (isLeftSwipe) {
+      nextMain();
+    } else if (isRightSwipe) {
+      prevMain();
+    }
+  };
+
+  const nextMain = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setCurrentMainIdx(prev => (prev + 1) % imageData.length);
+  };
+
+  const prevMain = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setCurrentMainIdx(prev => (prev - 1 + imageData.length) % imageData.length);
+  };
+
   // @ts-ignore - t.stays dynamic indexing
-  const stayGallery = t.stays[stayId]?.gallery || t.stays.hapjeong.gallery;
+  const stayGallery = t.stays[stayId]?.gallery || t.stays.hapjeong.gallery || { categories: baseCategories, descriptions: [], more: 'See More' };
 
   const currentImages = galleryDataMap[stayId] || galleryDataMap['hapjeong'];
 
   const imageData = currentImages.map((img, idx) => ({
     ...img,
-    category: stayGallery.categories[img.categoryId],
-    desc: stayGallery.descriptions[idx]
+    category: stayGallery?.categories?.[img.categoryId] || baseCategories[img.categoryId] || 'Stay',
+    desc: stayGallery?.descriptions?.[idx] || ''
   }));
 
-  const minSwipeDistance = 50;
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
-
-    if (isLeftSwipe && lightboxIndex !== null) {
-      setLightboxIndex((lightboxIndex + 1) % imageData.length);
-    }
-    if (isRightSwipe && lightboxIndex !== null) {
-      setLightboxIndex((lightboxIndex - 1 + imageData.length) % imageData.length);
-    }
-  };
+  useModalHistory(lightboxIndex !== null, () => setLightboxIndex(null), 'gallery');
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (lightboxIndex === null) return;
       if (e.key === 'Escape') {
         setLightboxIndex(null);
-        if (window.location.hash === '#gallery') {
-          window.history.replaceState(null, '', window.location.pathname + window.location.search);
-        }
       }
-      if (e.key === 'ArrowRight') setLightboxIndex(prev => prev !== null ? (prev + 1) % imageData.length : null);
+      if (e.key === 'ArrowRight') setLightboxIndex(prev => prev !== null ? (prev + 1) : null);
       if (e.key === 'ArrowLeft') setLightboxIndex(prev => prev !== null ? (prev - 1 + imageData.length) % imageData.length : null);
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [lightboxIndex]);
+  }, [lightboxIndex, imageData.length]);
 
   const openLightbox = (idx: number) => {
     setLightboxIndex(idx);
-    window.history.pushState({ lightbox: true }, '', '#gallery');
   };
 
   const closeLightbox = () => {
     setLightboxIndex(null);
-    if (window.location.hash === '#gallery') {
-      window.history.replaceState(null, '', window.location.pathname + window.location.search);
-    }
   };
-
-  useEffect(() => {
-    const handlePopState = () => {
-      if (window.location.hash !== '#gallery') {
-        setLightboxIndex(null);
-      }
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
 
   const nextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (lightboxIndex !== null) {
-      setLightboxIndex((lightboxIndex + 1) % imageData.length);
+      const nextIdx = (lightboxIndex + 1) % imageData.length;
+      setLightboxIndex(nextIdx);
+      setCurrentMainIdx(nextIdx); // Sync main index
     }
   };
 
   const prevImage = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (lightboxIndex !== null) {
-      setLightboxIndex((lightboxIndex - 1 + imageData.length) % imageData.length);
+      const prevIdx = (lightboxIndex - 1 + imageData.length) % imageData.length;
+      setLightboxIndex(prevIdx);
+      setCurrentMainIdx(prevIdx); // Sync main index
     }
   };
 
@@ -165,24 +166,53 @@ export default function Gallery({ stayId = 'hapjeong' }: { stayId?: string }) {
       {/* 1. Main Hero Image */}
       <div 
         className={styles.mainImageWrapper} 
-        onClick={() => openLightbox(0)}
+        onClick={() => openLightbox(currentMainIdx)}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
       >
         <Image 
-          src={imageData[0].src} 
+          src={imageData[currentMainIdx].src} 
           alt="TangoStay Hero" 
           fill
           className={styles.mainImage}
           priority
           sizes="(max-width: 1024px) 100vw, 1024px"
         />
-        <button className={styles.seeMoreBtn}>
-          {stayGallery.more} ({imageData.length})
-        </button>
+
+        <button className={styles.mainPrev} onClick={prevMain}>&#10094;</button>
+        <button className={styles.mainNext} onClick={nextMain}>&#10095;</button>
+
+        <div className={styles.imageCounter}>
+          {currentMainIdx + 1} / {imageData.length}
+        </div>
+
+        <div className={styles.captionOverlay}>
+          <p className={styles.captionText}>{imageData[currentMainIdx].desc}</p>
+        </div>
       </div>
 
       {/* 2. Lightbox Modal */}
       {lightboxIndex !== null && (
-        <div className={styles.lightbox} onClick={closeLightbox}>
+        <div 
+          className={styles.lightbox} 
+          onClick={closeLightbox}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={() => {
+            if (!touchStart || !touchEnd) return;
+            const distance = touchStart - touchEnd;
+            if (distance > minSwipeDistance) {
+              const nextIdx = (lightboxIndex + 1) % imageData.length;
+              setLightboxIndex(nextIdx);
+              setCurrentMainIdx(nextIdx);
+            } else if (distance < -minSwipeDistance) {
+              const prevIdx = (lightboxIndex - 1 + imageData.length) % imageData.length;
+              setLightboxIndex(prevIdx);
+              setCurrentMainIdx(prevIdx);
+            }
+          }}
+        >
           <button className={styles.lightboxClose} onClick={closeLightbox}>&times;</button>
           
           <button className={styles.lightboxPrev} onClick={prevImage}>&#10094;</button>
@@ -190,9 +220,6 @@ export default function Gallery({ stayId = 'hapjeong' }: { stayId?: string }) {
           <div 
             className={styles.lightboxImageContainer} 
             onClick={(e) => e.stopPropagation()}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
           >
             <Image 
               src={imageData[lightboxIndex].src} 

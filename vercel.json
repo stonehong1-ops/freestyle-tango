@@ -2,5 +2,15 @@
   "framework": "nextjs",
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
+  ],
+  "crons": [
+    {
+      "path": "/api/notifications/cron?type=morning",
+      "schedule": "0 1 * * *"
+    },
+    {
+      "path": "/api/notifications/cron?type=afternoon",
+      "schedule": "0 5 * * *"
+    }
   ]
 }

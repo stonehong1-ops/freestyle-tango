@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import styles from './ClassEditor.module.css';
-import { storage } from '@/lib/firebase';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { uploadFile } from '@/lib/storage';
 import { TangoClass, CURRENT_REGISTRATION_MONTH } from '@/lib/db';
 
 interface ClassEditorProps {
@@ -57,9 +57,12 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
       : ['', '', '', '']
   );
   
+  const { currentUser } = useAuth();
   const [isImageUploading, setIsImageUploading] = useState(false);
+  const [imageUploadProgress, setImageUploadProgress] = useState(0);
   const [isVideoUploading, setIsVideoUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
 
@@ -69,105 +72,98 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
   };
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Strip everything except numbers
+    // Remove "원" and any non-numeric characters before formatting
     const rawValue = e.target.value.replace(/[^0-9]/g, '');
     if (!rawValue) {
       setFormData(prev => ({ ...prev, price: '' }));
       return;
     }
-    
-    // 포맷팅된 결과에 '원'이 중복되지 않도록 처리
+    // Re-format to KRW with comma and single "원" suffix
     const formatted = parseInt(rawValue, 10).toLocaleString('ko-KR') + '원';
     setFormData(prev => ({ ...prev, price: formatted }));
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
+    if (!currentUser) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
     setIsImageUploading(true);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 800;
-        let scale = 1;
-        if (img.width > MAX_WIDTH) {
-          scale = MAX_WIDTH / img.width;
-        }
-        canvas.width = img.width * scale;
-        canvas.height = img.height * scale;
-        
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-          setFormData(prev => ({ ...prev, imageUrl: dataUrl }));
-          setIsImageUploading(false);
-        } else {
-          alert("이미지 컨텍스트를 생성하지 못했습니다.");
-          setIsImageUploading(false);
-        }
-      };
-      img.onerror = () => {
-        alert("이미지 처리에 실패했습니다.");
-        setIsImageUploading(false);
-      };
-      img.src = reader.result as string;
-    };
-    reader.onerror = () => {
-      alert("이미지 로드에 실패했습니다.");
+    setImageUploadProgress(0);
+
+    try {
+      const { compressImage } = await import('@/lib/image-utils');
+      // Compress to max 1600px for class images
+      const optimizedBlob = await compressImage(file, { maxWidth: 1600, maxHeight: 1600, quality: 0.8 });
+
+      const path = `classes/${currentUser.uid}/${Date.now()}_${file.name}`;
+      const url = await uploadFile(optimizedBlob, path, {
+        onProgress: (progress) => setImageUploadProgress(progress)
+      });
+      setFormData(prev => ({ ...prev, imageUrl: url }));
+      alert("이미지가 성공적으로 업로드되었습니다!");
+    } catch (error: any) {
+      console.error("Image upload failed", error);
+      alert(error.message || "이미지 업로드 중 오류가 발생했습니다.");
+    } finally {
       setIsImageUploading(false);
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
-  const handleVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (!currentUser) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
     if (file.size > 50 * 1024 * 1024) {
-      alert("동영상 파일이 너무 큽니다. (최대 50MB)");
+      alert('동영상 파일이 너무 큽니다. (최대 50MB)');
       return;
     }
 
     setIsVideoUploading(true);
     setUploadProgress(0);
 
-    const storageRef = ref(storage, `videos/${Date.now()}_${file.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
     const timeoutId = setTimeout(() => {
-      if (uploadProgress === 0 && isVideoUploading) {
+      // access the state indirectly via the current snapshot value if possible, 
+      // but since we are in an async function, we'll check the local state variable
+      // (Note: uploadProgress might be stale here if we don't handle it carefully, but it's a UI alert)
+      if (isVideoUploading) {
         alert("업로드가 시작되지 않습니다 (0%).\n\n확인 필요:\n1. Firebase Storage 규칙에서 'allow read, write: if true' 설정이 되어있나요?\n2. Vercel 환경변수(Storage Bucket)가 정확한지 확인해주세요.");
       }
     }, 15000);
 
-    uploadTask.on('state_changed', 
-      (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setUploadProgress(Math.round(progress));
-      }, 
-      (error) => {
-        clearTimeout(timeoutId);
-        console.error("Upload failed", error);
-        alert(`동영상 업로드 중 오류가 발생했습니다: ${error.message}`);
-        setIsVideoUploading(false);
-      }, 
-      () => {
-        clearTimeout(timeoutId);
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setFormData(prev => ({ ...prev, videoUrl: downloadURL }));
-          setIsVideoUploading(false);
-          alert("동영상이 성공적으로 업로드되었습니다!");
-        }).catch((err: unknown) => {
-          console.error("URL retrieval failed", err);
-          alert("동영상 경로를 가져오는데 실패했습니다.");
-          setIsVideoUploading(false);
-        });
+    try {
+      // 1. Double check auth - if not authed, try to sign in anonymously
+      let uploadUID = currentUser?.uid;
+      if (!uploadUID) {
+        const { signInAnonymously } = await import('firebase/auth');
+        const { auth } = await import('@/lib/firebase');
+        const userCredential = await signInAnonymously(auth);
+        uploadUID = userCredential.user.uid;
+        console.log("Signed in anonymously for video upload:", uploadUID);
       }
-    );
+
+      const path = `videos/${uploadUID}/${Date.now()}_${file.name}`;
+      const url = await uploadFile(file, path, {
+        onProgress: (progress) => setUploadProgress(progress)
+      });
+      setFormData(prev => ({ ...prev, videoUrl: url }));
+      alert("동영상이 성공적으로 업로드되었습니다!");
+    } catch (error: any) {
+      console.error("Video upload failed", error);
+      alert(error.message || "동영상 업로드 중 오류가 발생했습니다.");
+    } finally {
+      clearTimeout(timeoutId);
+      setIsVideoUploading(false);
+    }
   };
 
   const handleDateChange = (index: number, value: string) => {
@@ -233,13 +229,13 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
       
       {/* 0. Target Month Selection */}
       <div className={styles.inputGroup}>
-        <label style={{ color: '#3182f6', fontWeight: 800 }}>대상 월 (해당 월의 수업 목록에 노출됩니다)</label>
+        <label style={{ color: '#3182f6', fontWeight: 600 }}>대상 월 (해당 월의 수업 목록에 노출됩니다)</label>
         <select 
           className={styles.input} 
           name="targetMonth" 
           value={formData.targetMonth} 
           onChange={handleChange}
-          style={{ border: '2px solid #3182f6' }}
+          style={{ border: '1px solid #e5e8eb' }}
         >
           {Array.from({ length: 12 }, (_, i) => {
             const d = new Date(2026, i, 1);
@@ -382,7 +378,7 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
               }
             }} 
           />
-          <span style={{ fontWeight: 600, color: '#4e5968' }}>~</span>
+          <span style={{ fontWeight: 400, color: '#8b95a1' }}>~</span>
           <input 
             type="time" 
             className={styles.input} 

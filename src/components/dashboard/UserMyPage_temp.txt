@@ -1,0 +1,703 @@
+﻿'use client';
+
+import React, { useState, useEffect } from 'react';
+import { TangoClass, Registration, getUserCouponUsage, useUserCoupon, UserCouponUsage, FullStayReservation } from '@/lib/db';
+import { SafeStorage } from '@/lib/storage';
+import { UserCoupon, Coupon, getUserCoupons, getActiveCoupons, issueCoupon, useCoupon } from '@/lib/coupon';
+import RegistrationStatus from './RegistrationStatus';
+import AdminChecklist from '../admin/AdminChecklist';
+import MemberManagement from '../admin/MemberManagement';
+import StayTemplateEditor from '../admin/StayTemplateEditor';
+import styles from './UserMyPage.module.css';
+import { useLanguage } from '@/contexts/LanguageContext';
+import FullscreenModal from '../common/FullscreenModal';
+import IdentityForm from '../registration/IdentityForm';
+import { useModalHistory } from '@/hooks/useModalHistory';
+import { messaging, db } from '@/lib/firebase';
+import { getToken } from 'firebase/messaging';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+
+interface Props {
+  classes: TangoClass[];
+  registrations: Registration[];
+  reservations: FullStayReservation[];
+  selectedMonth: string;
+  availableMonths: string[];
+  isAdmin: boolean;
+  onMonthChange: (month: string) => void;
+  onHome: () => void;
+  requireIdentity?: (action: () => void) => void;
+  onOpenCouponEditor?: () => void;
+}
+
+interface NotificationSettings {
+  pushEnabled: boolean;
+  openChat: boolean;
+  privateChat: boolean;
+  token?: string;
+}
+
+export default function UserMyPage({ 
+  classes, 
+  registrations: initialRegistrations,
+  reservations: initialReservations,
+  selectedMonth, 
+  availableMonths, 
+  isAdmin,
+  onMonthChange, 
+  onHome, 
+  requireIdentity,
+  onOpenCouponEditor
+}: Props) {
+  const { t, language } = useLanguage();
+  const [activeSubTab, setActiveSubTab] = useState<'registration' | 'wallet' | 'profile' | 'admin'>('registration');
+  const [identity, setIdentity] = useState<{nickname: string, phone: string, role?: string, photoURL?: string} | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [userRegs, setUserRegs] = useState<Registration[]>(initialRegistrations);
+  const [reservations, setReservations] = useState<any[]>(initialReservations);
+  const [couponUsage, setCouponUsage] = useState<UserCouponUsage[]>([]);
+  const [loadingCoupons, setLoadingCoupons] = useState(false);
+  const [realUserCoupons, setRealUserCoupons] = useState<UserCoupon[]>([]);
+  const [availableCoupons, setAvailableCoupons] = useState<Coupon[]>([]);
+  const [showCouponStore, setShowCouponStore] = useState(false);
+  const [showMemberManagement, setShowMemberManagement] = useState(false);
+  const [showStayChecklist, setShowStayChecklist] = useState(false);
+  const [showStaySMS, setShowStaySMS] = useState(false);
+  
+  // Notification State
+  const [notifySettings, setNotifySettings] = useState<NotificationSettings | null>(null);
+  const [hasToken, setHasToken] = useState(false);
+
+  useModalHistory(showEditModal, () => setShowEditModal(false), 'editProfile');
+  useModalHistory(showMemberManagement, () => setShowMemberManagement(false), 'memberManagement');
+  useModalHistory(showStayChecklist, () => setShowStayChecklist(false), 'stayChecklist');
+  useModalHistory(showStaySMS, () => setShowStaySMS(false), 'staySMS');
+
+  useEffect(() => {
+    const stored = localStorage.getItem('ft_user');
+    if (stored) {
+      const user = JSON.parse(stored);
+      setIdentity(user);
+      const cleanPhone = user.phone.replace(/[^0-9]/g, '');
+      fetchUserData(cleanPhone);
+      fetchNotificationSettings(cleanPhone);
+    }
+  }, [selectedMonth]); 
+
+  const fetchNotificationSettings = async (phone: string) => {
+    try {
+      const docRef = doc(db, 'users', phone);
+      const snap = await getDoc(docRef);
+      if (snap.exists()) {
+        const data = snap.data();
+        const settings = data.settings as NotificationSettings;
+        if (settings) {
+          setNotifySettings(settings);
+          setHasToken(!!settings.token);
+        } else {
+          setNotifySettings({
+            pushEnabled: false,
+            openChat: true,
+            privateChat: true
+          });
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching notification settings:", err);
+    }
+  };
+
+  const handleToggleNotify = async (key: keyof NotificationSettings, value: boolean) => {
+    if (!identity) return;
+    const phone = identity.phone.replace(/[^0-9]/g, '');
+    const newSettings = { ...notifySettings!, [key]: value };
+    setNotifySettings(newSettings);
+
+    try {
+      await updateDoc(doc(db, 'users', phone), {
+        settings: newSettings
+      });
+    } catch (err) {
+      console.error("Error saving settings:", err);
+    }
+  };
+
+  const requestNotificationPermission = async () => {
+    if (!identity || !messaging) return;
+    
+    // Check if notifications are supported
+    if (!('Notification' in window)) {
+      alert(language === 'ko' ? '이 브라우저는 알림 기능을 지원하지 않습니다.' : 'This browser does not support notifications.');
+      return;
+    }
+
+    try {
+      // Step 1: Request permission
+      let permission = Notification.permission;
+      if (permission === 'default') {
+        permission = await Notification.requestPermission();
+      }
+      
+      if (permission === 'denied') {
+        alert(language === 'ko' 
+          ? '알림 권한이 차단되었습니다. 브라우저 주소창의 자물쇠 아이콘을 눌러 알림 허용으로 변경해주세요.' 
+          : 'Notification permission denied. Please enable notifications in your browser settings.');
+        return;
+      }
+
+      if (permission === 'granted') {
+        const m = await messaging;
+        if (!m) {
+          throw new Error('Messaging initialization failed.');
+        }
+        
+        const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
+        if (!vapidKey) {
+          console.error('VAPID Key is missing from environment variables.');
+          throw new Error('Application configuration error (VAPID Key missing).');
+        }
+
+        // Step 2: Get FCM token
+        const token = await getToken(m, { vapidKey });
+        
+        if (token) {
+          const phone = identity.phone.replace(/[^0-9]/g, '');
+          const newSettings = {
+            ...notifySettings!,
+            token: token,
+            pushEnabled: true
+          };
+          
+          // Step 3: Update user document
+          await updateDoc(doc(db, 'users', phone), {
+            settings: newSettings
+          });
+          
+          setHasToken(true);
+          setNotifySettings(newSettings);
+          alert(language === 'ko' ? '알림 설정이 완료되었습니다! 이제 푸시 메세지를 받으실 수 있습니다.' : 'Push notifications enabled successfully!');
+        } else {
+          throw new Error('Failed to generate registration token.');
+        }
+      }
+    } catch (err) {
+      console.error("FCM Token Error:", err);
+      const msg = language === 'ko' 
+        ? '알림 설정 중 오류가 발생했습니다. (잠시 후 다시 시도하거나 브라우저 설정을 확인해주세요.)' 
+        : 'Failed to enable notifications. Please try again or check browser settings.';
+      alert(msg);
+    }
+  };
+
+  const fetchUserData = async (phone: string) => {
+    if (!phone) return;
+    setLoadingCoupons(true);
+    try {
+      const { getAllRegistrationsByPhone } = await import('@/lib/db');
+      const [regs, usage] = await Promise.all([
+        getAllRegistrationsByPhone(phone),
+        getUserCouponUsage(phone)
+      ]);
+      setUserRegs(regs);
+      setCouponUsage(usage);
+    } catch (err) {
+      console.error("Error fetching user data for coupons:", err);
+    } finally {
+      setLoadingCoupons(false);
+    }
+  };
+
+  const fetchCouponsData = async () => {
+    if (!identity) return;
+    setLoadingCoupons(true);
+    try {
+      const phone = identity.phone.replace(/[^0-9]/g, '');
+      const [issued, available] = await Promise.all([
+        getUserCoupons(phone),
+        getActiveCoupons()
+      ]);
+      setRealUserCoupons(issued);
+      setAvailableCoupons(available.filter(c => !issued.some(ic => ic.couponId === c.id)));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingCoupons(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeSubTab === 'wallet') {
+      fetchCouponsData();
+    }
+  }, [activeSubTab, identity]);
+
+  const monthName = selectedMonth ? selectedMonth.split('-')[1] : '04';
+
+  const handleLogout = () => {
+    if (window.confirm(language === 'ko' ? '로그아웃 하시겠습니까?' : 'Are you sure you want to logout?')) {
+      localStorage.removeItem('ft_user');
+      setIdentity(null);
+      onHome();
+    }
+  };
+
+  const handleEditInfo = () => {
+    setShowEditModal(true);
+  };
+
+  const handleEditComplete = () => {
+    const stored = localStorage.getItem('ft_user');
+    if (stored) {
+      setIdentity(JSON.parse(stored));
+    }
+    setShowEditModal(false);
+  };
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.subTabs}>
+        <button 
+          className={`${styles.subTabBtn} ${activeSubTab === 'registration' ? styles.active : ''}`}
+          onClick={() => setActiveSubTab('registration')}
+        >
+          {t.mypage.tabs.history}
+        </button>
+        <button 
+          className={`${styles.subTabBtn} ${activeSubTab === 'wallet' ? styles.active : ''}`}
+          onClick={() => setActiveSubTab('wallet')}
+        >
+          {t.mypage.tabs.wallet}
+        </button>
+        <button 
+          className={`${styles.subTabBtn} ${activeSubTab === 'profile' ? styles.active : ''}`}
+          onClick={() => setActiveSubTab('profile')}
+        >
+          {t.mypage.tabs.profile}
+        </button>
+        {isAdmin && (
+          <button 
+            className={`${styles.subTabBtn} ${activeSubTab === 'admin' ? styles.active : ''}`}
+            onClick={() => setActiveSubTab('admin')}
+          >
+            {language === 'ko' ? '어드민' : 'Admin'}
+          </button>
+        )}
+      </div>
+
+      {activeSubTab === 'registration' && (
+        <div className={styles.selectorRow}>
+          <button 
+            className="nav-btn-standard" 
+            onClick={() => {
+              const idx = availableMonths?.indexOf(selectedMonth) ?? -1;
+              if (idx > 0) onMonthChange?.(availableMonths[idx - 1]);
+            }}
+            disabled={!availableMonths || availableMonths.indexOf(selectedMonth) <= 0}
+          >
+            <span className="nav-btn-icon">←</span>
+            <span style={{ marginLeft: '4px' }}>{language === 'ko' ? '이전' : 'Prev'}</span>
+          </button>
+
+          <div className={styles.monthTitle}>
+            {selectedMonth?.split('-')?.[0] || ''}년 {parseInt(selectedMonth?.split('-')?.[1] || '0')}월
+          </div>
+
+          <button 
+            className="nav-btn-standard" 
+            onClick={() => {
+              const idx = availableMonths?.indexOf(selectedMonth) ?? -1;
+              if (idx !== -1 && idx < (availableMonths?.length ?? 0) - 1) onMonthChange?.(availableMonths[idx + 1]);
+            }}
+            disabled={!availableMonths || availableMonths.indexOf(selectedMonth) >= (availableMonths?.length ?? 0) - 1}
+          >
+            <span style={{ marginRight: '4px' }}>{language === 'ko' ? '다음' : 'Next'}</span>
+            <span className="nav-btn-icon">→</span>
+          </button>
+        </div>
+      )}
+
+      <div className={styles.content}>
+        {activeSubTab === 'registration' && (
+          <section className={styles.section}>
+            <RegistrationStatus 
+              classes={classes} 
+              selectedMonth={selectedMonth} 
+              onClose={onHome} 
+              requireIdentity={requireIdentity}
+              hideForm={true}
+            />
+          </section>
+        )}
+
+        {activeSubTab === 'wallet' && (
+          <section className={styles.section}>
+            <div className={styles.walletHeader}>
+              <h3 className={styles.walletTitle}>{t.mypage.tabs.wallet}</h3>
+              <p className={styles.walletDesc}>{t.mypage.walletDesc || (language === 'ko' ? '보유하신 쿠폰 목록�                  const allCoupons = [
+                   desc: language === 'ko' ? '프리스타일 탱고 수업 신청자 대상 무료 쿠폰' : 'Free entry for class registrants',
+                    type: 'FREE',
+                    isUsed: false,
+                    isLocked: false,
+                    isExpired: false,
+                    isReal: false,
+                    color: 'red'
+                  });
+
+                  const allCoupons = [
+                    ...realUserCoupons.map(uc => ({
+                      id: uc.id,
+                      title: uc.couponData.title,
+                      desc: `${uc.couponData.location}${uc.expiresAt ? ` (${language === 'ko' ? '만료일' : 'Expiry'}: ${new Date(uc.expiresAt.toMillis()).toLocaleDateString()})` : ''}`,
+                      type: uc.couponData.type,
+                      isUsed: uc.status === 'USED',
+                      isLocked: false,
+                      isExpired: uc.status === 'EXPIRED',
+                      color: uc.couponData.type === 'FREE' ? 'purple' : 'green',
+                      isReal: true
+                    }))
+                  ];
+
+                  return (
+                    <>
+                      <div className={styles.walletActions}>
+                        <button 
+                          className={styles.couponStoreBtn}
+                          onClick={() => setShowCouponStore(true)}
+                        >
+                          🎟️ {language === 'ko' ? '신규 쿠폰 받기' : 'Get New Coupons'}
+                        </button>
+                      </div>
+
+                      {allCoupons.map(coupon => (
+                        <div key={coupon.id} className={`${styles.couponCard} ${coupon.isUsed ? styles.used : ''} ${coupon.isLocked ? styles.locked : ''} ${coupon.isExpired ? styles.expired : ''} ${styles[coupon.color]}`}>
+                          <div className={styles.couponMain}>
+                            <div className={styles.couponLeft}>
+                              <div className={styles.couponType}>{coupon.type}</div>
+                            </div>
+                            <div className={styles.couponBody}>
+                              <h4 className={styles.couponTitle}>{coupon.title}</h4>
+                              <p className={styles.couponDesc}>{coupon.desc}</p>
+                              <div className={styles.couponExpiry}>
+                                {coupon.isExpired ? (language === 'ko' ? '기한경과' : 'Expired') : (language === 'ko' ? '사용가능' : 'Available')}
+                              </div>
+                            </div>
+                          </div>
+                          <div className={styles.couponAction}>
+                            <button 
+                              className={styles.couponBtn}
+                              disabled={coupon.isUsed || coupon.isLocked || coupon.isExpired}
+                              onClick={async () => {
+                                if (coupon.isReal) {
+                                  if (window.confirm(language === 'ko' ? '행사장에서 직원이 확인 후 버튼을 눌러야 합니다. 사용하시겠습니까?' : 'Staff at the event must confirm this. Use now?')) {
+                                    await useCoupon(coupon.id!);
+                                    fetchCouponsData();
+                                    alert(language === 'ko' ? '사용 완료되었습니다.' : 'Used successfully.');
+                                  }
+                                } else {
+                                  // Legacy logic
+                                  alert(language === 'ko' ? '이 쿠폰은 추후 자동 반영됩니다.' : 'This coupon will be auto-applied.');
+                                }
+                              }}
+                            >
+                              {coupon.isUsed 
+                                ? (language === 'ko' ? '사용완료' : 'Used') 
+                                : coupon.isExpired
+                                  ? (language === 'ko' ? '기한경과' : 'Expired')
+                                  : coupon.isLocked 
+                                    ? (language === 'ko' ? '사용불가' : 'Locked')
+                                    : (language === 'ko' ? '사용하기' : 'Use Now')}
+                            </button>
+                          </div>
+                          <div className={styles.notchTop}></div>
+                          <div className={styles.notchBottom}></div>
+                        </div>
+                      ))}
+
+                      {showCouponStore && (
+                        <div className={styles.modalOverlay} onClick={() => setShowCouponStore(false)}>
+                          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+                            <div className={styles.modalHeader}>
+                              <h3>{language === 'ko' ? '발급 가능한 쿠폰' : 'Available Coupons'}</h3>
+                              <button onClick={() => setShowCouponStore(false)}>X</button>
+                            </div>
+                            <div className={styles.storeList}>
+                              {availableCoupons.length === 0 ? (
+                                <p className={styles.emptyStore}>{language === 'ko' ? '현재 발급 가능한 쿠폰이 없습니다.' : 'No coupons available.'}</p>
+                              ) : (
+                                availableCoupons.map(c => (
+                                  <div key={c.id} className={styles.storeItem}>
+                                    <div className={styles.storeInfo}>
+                                      <div className={styles.storeTitle}>{c.title}</div>
+                                      <div className={styles.storeMeta}>{c.location} • {c.duration === 0 ? (language === 'ko' ? '상시' : 'Always') : `${c.duration}${language === 'ko' ? '개월' : ' Months'}`}</div>
+                                      <div className={styles.storeStats}>
+                                        {language === 'ko' ? '선착순' : 'Limit'}: <strong>{c.totalQuantity - c.issuedCount}</strong> {language === 'ko' ? '장 남음' : 'Left'}
+                                      </div>
+                                    </div>
+                                    <button 
+                                      className={styles.issueBtn}
+                                      disabled={c.issuedCount >= c.totalQuantity}
+                                      onClick={async () => {
+                                        const res = await issueCoupon(c.id!, identity!.phone.replace(/[^0-9]/g, ''), identity!.nickname);
+                                        if (res.success) {
+                                          alert(language === 'ko' ? '쿠폰이 발급되었습니다! 지갑을 확인해주세요.' : 'Coupon issued! Check your wallet.');
+                                          fetchCouponsData();
+                                        } else {
+                                          alert(res.message === 'SOLD_OUT' ? (language === 'ko' ? '마감되었습니다.' : 'Sold out') : 'Error');
+                                        }
+                                      }}
+                                    >
+                                      {c.issuedCount >= c.totalQuantity ? (language === 'ko' ? '마감' : 'Full') : (language === 'ko' ? '받기' : 'Get')}
+                                    </button>
+                                  </div>
+                                ))
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+            )}
+          </section>
+        )}
+
+        {activeSubTab === 'profile' && identity && (
+          <section className={styles.section}>
+            <div className={styles.profileHeader}>
+              <div className={styles.avatarWrapper}>
+                <div 
+                  className={styles.avatarCircle}
+                  style={{ 
+                    background: identity.photoURL ? `url(${identity.photoURL}) center/cover no-repeat` : '#f2f4f6',
+                  } as React.CSSProperties}
+                >
+                  {!identity.photoURL && (
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#adb5bd" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                  )}
+                </div>
+              </div>
+              <div className={styles.userNameGroup}>
+                <h2 className={styles.userNickname}>{identity.nickname}</h2>
+                <span className={styles.userRoleBadge}>
+                  {identity.role === 'leader' ? (language === 'ko' ? '리더' : 'Leader') : (language === 'ko' ? '팔로어' : 'Follower')}
+                </span>
+              </div>
+            </div>
+
+            <div className={styles.infoCardList}>
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>{language === 'ko' ? '전화번호' : 'Phone Number'}</span>
+                <span className={styles.infoValue}>{identity.phone}</span>
+              </div>
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>{language === 'ko' ? '가입 일자' : 'Joined Date'}</span>
+                <span className={styles.infoValue}>2026.04.01</span>
+              </div>
+            </div>
+
+            {/* Notification Settings */}
+            <div className={styles.notifySection}>
+              <span className={styles.notifyTitle}>{language === 'ko' ? '알림 설정' : 'Notification Settings'}</span>
+              
+              <div className={styles.notifyItem}>
+                <span className={styles.notifyLabel}>{language === 'ko' ? '푸시 알림 허용' : 'Allow Push Notifications'}</span>
+                <label className={styles.toggleSwitch}>
+                  <input 
+                    type="checkbox" 
+                    checked={notifySettings?.pushEnabled ?? false}
+                    onChange={(e) => handleToggleNotify('pushEnabled', e.target.checked)}
+                  />
+                  <span className={styles.toggleSlider}></span>
+                </label>
+              </div>
+
+              {(notifySettings?.pushEnabled) && (
+                <>
+                  <div className={styles.notifyItem}>
+                    <span className={styles.notifyLabel}>{language === 'ko' ? '수다방 알림' : 'Open Chat'}</span>
+                    <label className={styles.toggleSwitch}>
+                      <input 
+                        type="checkbox" 
+                        checked={notifySettings?.openChat ?? true}
+                        onChange={(e) => handleToggleNotify('openChat', e.target.checked)}
+                      />
+                      <span className={styles.toggleSlider}></span>
+                    </label>
+                  </div>
+                  <div className={styles.notifyItem}>
+                    <span className={styles.notifyLabel}>{language === 'ko' ? '개별 채팅 알림' : 'Private Chat'}</span>
+                    <label className={styles.toggleSwitch}>
+                      <input 
+                        type="checkbox" 
+                        checked={notifySettings?.privateChat ?? true}
+                        onChange={(e) => handleToggleNotify('privateChat', e.target.checked)}
+                      />
+                      <span className={styles.toggleSlider}></span>
+                    </label>
+                  </div>
+                </>
+              )}
+
+              {notifySettings?.pushEnabled && !hasToken && (
+                <button 
+                  className={styles.permissionBtn}
+                  onClick={requestNotificationPermission}
+                >
+                  {language === 'ko' ? '알림 권한 요청' : 'Request Permission'}
+                </button>
+              )}
+            </div>
+
+            <div className={styles.actionButtons}>
+              <button className={styles.editBtn} onClick={handleEditInfo}>
+                {language === 'ko' ? '기본정보 수정' : 'Edit Profile'}
+              </button>
+              <button className={styles.logoutBtn} onClick={handleLogout}>
+                {language === 'ko' ? '로그아웃' : 'Log out'}
+              </button>
+            </div>
+          </section>
+        )}
+
+        {activeSubTab === 'admin' && isAdmin && (
+          <section className={styles.adminSection}>
+            <div className={styles.adminMenuHeader}>
+              <h3 className={styles.adminMenuTitle}>{language === 'ko' ? '관리자 도구' : 'Admin Tools'}</h3>
+              <p className={styles.adminMenuDesc}>{language === 'ko' ? '서비스 운영을 위한 관리 메뉴입니다.' : 'Management menu for service operations.'}</p>
+            </div>
+            
+            <div className={styles.adminMenuList}>
+              {/* Member Management */}
+              <button className={styles.adminMenuItem} onClick={() => setShowMemberManagement(true)}>
+                <div className={styles.adminMenuIcon}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                </div>
+                <div className={styles.adminMenuContent}>
+                  <span className={styles.adminMenuLabel}>{language === 'ko' ? '회원 목록 관리' : 'Member Management'}</span>
+                  <span className={styles.adminMenuSubLabel}>{language === 'ko' ? '회원 가입/활동 정보 및 신청 이력 관리' : 'Manage user activity and history'}</span>
+                </div>
+                <div className={styles.adminMenuArrow}>›</div>
+              </button>
+
+              {/* Stay Checklist */}
+              <button className={styles.adminMenuItem} onClick={() => setShowStayChecklist(true)}>
+                <div className={styles.adminMenuIcon}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                  </svg>
+                </div>
+                <div className={styles.adminMenuContent}>
+                  <span className={styles.adminMenuLabel}>{language === 'ko' ? '스테이 체크리스트' : 'Stay Checklist'}</span>
+                  <span className={styles.adminMenuSubLabel}>{language === 'ko' ? '스테이 예약 현황 및 체크인/아웃 관리' : 'Manage stay reservations and status'}</span>
+                </div>
+                <div className={styles.adminMenuArrow}>›</div>
+              </button>
+
+              {/* Stay SMS Settings */}
+              <button className={styles.adminMenuItem} onClick={() => setShowStaySMS(true)}>
+                <div className={styles.adminMenuIcon}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </div>
+                <div className={styles.adminMenuContent}>
+                  <span className={styles.adminMenuLabel}>{language === 'ko' ? '스테이 문자설정' : 'Stay SMS Settings'}</span>
+                  <span className={styles.adminMenuSubLabel}>{language === 'ko' ? '입실/퇴실 단계별 자동 문자 양식 관리' : 'Manage automated SMS templates'}</span>
+                </div>
+                <div className={styles.adminMenuArrow}>›</div>
+              </button>
+
+              {/* Coupon Management */}
+              <button className={styles.adminMenuItem} onClick={onOpenCouponEditor}>
+                <div className={styles.adminMenuIcon}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M15 5H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10l5-7-5-7z"></path>
+                    <circle cx="9" cy="12" r="1.5"></circle>
+                  </svg>
+                </div>
+                <div className={styles.adminMenuContent}>
+                  <span className={styles.adminMenuLabel}>{language === 'ko' ? '쿠폰 발행 및 관리' : 'Coupon Management'}</span>
+                  <span className={styles.adminMenuSubLabel}>{language === 'ko' ? '신규 쿠폰 발행 및 선착순 현황 관리' : 'Issue new coupons and manage limits'}</span>
+                </div>
+                <div className={styles.adminMenuArrow}>›</div>
+              </button>
+
+              {/* Placeholders for future menus */}
+              <div style={{ padding: '2rem 1.5rem', textAlign: 'center', opacity: 0.3 }}>
+                <span style={{ fontSize: '0.8rem' }}>• • •</span>
+              </div>
+            </div>
+          </section>
+        )}
+      </div>
+
+      {/* Stay Checklist Modal */}
+      <FullscreenModal
+        isOpen={showStayChecklist}
+        onClose={() => setShowStayChecklist(false)}
+        title={language === 'ko' ? '스테이 체크리스트' : 'Stay Checklist'}
+      >
+        <AdminChecklist 
+          classes={classes}
+          registrations={initialRegistrations}
+          reservations={initialReservations}
+          onEditRegistration={(reg) => {
+            alert(language === 'ko' ? `${reg.nickname}님 상세 정보 편집 페이지로 이동합니다.` : `Navigating to detail for ${reg.nickname}`);
+          }}
+          onEditReservation={(res) => {
+            alert(language === 'ko' ? `${res.name}님 예약 상세 정보 편집 페이지로 이동합니다.` : `Navigating to detail for ${res.name}`);
+          }}
+        />
+      </FullscreenModal>
+
+      {/* Stay SMS Settings Modal */}
+      <FullscreenModal
+        isOpen={showStaySMS}
+        onClose={() => setShowStaySMS(false)}
+        title={language === 'ko' ? '스테이 문자설정' : 'Stay SMS Settings'}
+      >
+        <StayTemplateEditor 
+          onClose={() => setShowStaySMS(false)}
+          language={language}
+        />
+      </FullscreenModal>
+
+      {/* Member Management Modal */}
+      <FullscreenModal
+        isOpen={showMemberManagement}
+        onClose={() => setShowMemberManagement(false)}
+        title={language === 'ko' ? '회원 목록 관리' : 'Member Management'}
+      >
+        <MemberManagement 
+          registrations={initialRegistrations} 
+          onClose={() => setShowMemberManagement(false)} 
+        />
+      </FullscreenModal>
+
+      <FullscreenModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        title={language === 'ko' ? '내 정보 수정' : 'Edit My Info'}
+        isBottomSheet={true}
+      >
+        <IdentityForm 
+          onClose={() => setShowEditModal(false)}
+          onComplete={handleEditComplete}
+          isEdit={true}
+        />
+      </FullscreenModal>
+    </div>
+  );
+}
+

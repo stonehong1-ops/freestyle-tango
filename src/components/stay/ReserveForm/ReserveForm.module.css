@@ -36,7 +36,7 @@
 
 .routeDesc {
   font-size: 1rem;
-  color: var(--primary);
+  color: var(--accent);
   font-weight: 600;
   margin: 0;
 }
@@ -66,11 +66,23 @@
   font-size: 1rem;
 }
 
+.accountList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
 .account {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--primary);
-  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--foreground);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.account strong {
+  color: var(--accent);
 }
 
 .warning {
@@ -111,7 +123,7 @@
 }
 
 .countrySelect {
-  width: 90px;
+  width: 110px;
   flex-shrink: 0;
 }
 
@@ -126,8 +138,25 @@
   color: var(--foreground);
 }
 
+.phoneInputContainer input {
+  flex: 1;
+  width: 0;
+  min-width: 0;
+}
+
+.directWarning {
+  color: #ef4444;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 1rem 0 0;
+  line-height: 1.5;
+  text-align: center;
+}
+
 .submitBtn {
-  background-color: var(--primary);
+  display: block;
+  width: 100%;
+  background-color: var(--accent);
   color: white;
   border: none;
   padding: 1rem;
@@ -135,7 +164,7 @@
   font-size: 1.1rem;
   font-weight: 700;
   cursor: pointer;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
 }
 
 .submitBtn:disabled {
@@ -189,7 +218,7 @@
 }
 
 .homeBtn {
-  background-color: var(--primary);
+  background-color: var(--accent);
   color: white;
   padding: 0.75rem;
   border-radius: var(--radius);

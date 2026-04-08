@@ -1,0 +1,132 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 8px 0 24px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #8b95a1;
+  margin-bottom: 8px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4e5968;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid #e5e8eb;
+  background: #f9fafb;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  border-color: #333;
+}
+
+.mediaBox {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  border: 2px dashed #e5e8eb;
+  background: #f9fafb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+}
+
+.mediaBox:hover {
+  background: #f2f4f6;
+  border-color: #d1d6db;
+}
+
+.mediaBox p {
+  font-size: 14px;
+  color: #8b95a1;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.progressContainer {
+  margin-top: 16px;
+}
+
+.progressBar {
+  height: 6px;
+  background: #f2f4f6;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  background: #333;
+  transition: width 0.3s ease;
+}
+
+.progressText {
+  font-size: 12px;
+  color: #8b95a1;
+  text-align: center;
+  display: block;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 16px;
+  margin-top: 12px;
+  border-radius: 12px;
+  border: none;
+  background: #1a1a1a;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.idFields {
+  display: flex;
+  gap: 12px;
+}
+
+.idFields > div {
+  flex: 1;
+}

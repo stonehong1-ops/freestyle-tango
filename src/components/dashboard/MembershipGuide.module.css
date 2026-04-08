@@ -133,57 +133,9 @@
   background: var(--bg-base);
 }
 
-.hostHeader {
-  display: flex;
-  align-items: center;
-  gap: var(--space-5);
-  margin-bottom: var(--space-8);
-}
-
-.hostPhoto {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-light);
-}
-
-.hostInfo h3 {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.hostInfo p {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  margin-top: var(--space-1);
-}
-
-.contactGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-2);
-}
-
-.contactBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-3);
-  background: var(--bg-base);
-  border: 1px solid var(--border-medium);
-  border-radius: var(--radius-sm);
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-decoration: none;
-  transition: all 0.2s;
-}
-
-.contactBtn:active {
-  background: var(--bg-secondary);
+.hostProfileCard {
+  margin: 1rem 0 2rem;
+  width: 100%;
 }
 
 .openChatBox {

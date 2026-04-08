@@ -4,6 +4,8 @@ const nextConfig: NextConfig = {
   /* config options here */
   async rewrites() {
     return [
+      { source: '/c', destination: '/' },
+      { source: '/s', destination: '/' },
       { source: '/stay', destination: '/' },
       { source: '/membership', destination: '/' },
       { source: '/status', destination: '/' },

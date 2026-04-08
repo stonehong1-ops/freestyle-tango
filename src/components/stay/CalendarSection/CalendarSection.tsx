@@ -1,20 +1,46 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getStayReservedDates, BlockedDateInfo, getStayReservationList, FullStayReservation, cancelStayReservation, updateStayReservation } from '@/lib/db';
+import { onSnapshot, collection, query, where, QuerySnapshot, DocumentData } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { BlockedDateInfo, FullStayReservation, cancelStayReservation, updateStayReservation } from '@/lib/db';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useModalHistory } from '@/hooks/useModalHistory';
 import styles from './CalendarSection.module.css';
+
+const maskName = (name: string) => {
+  if (!name) return "***";
+  if (name.length <= 2) return name.substring(0, 1) + "*";
+  return name.substring(0, 1) + "*" + name.substring(2);
+};
+
+const maskPhone = (phone: string) => {
+  if (!phone) return "****";
+  // Clean dots, spaces, hyphens but keep plus for intl
+  const cleaned = phone.replace(/[^\d+]/g, '');
+  if (cleaned.length < 8) return phone.substring(0, 3) + "****";
+  
+  // Standard Mask: Keep last 4 digits and first 4-5 digits
+  // e.g. +8201032987727 -> +8201****7727
+  const last4 = phone.slice(-4);
+  const prefix = phone.slice(0, -8); // Mask middle 4 digits of the rest
+  return prefix + "****" + last4;
+};
 
 export default function CalendarSection({ 
   stayId = 'hapjeong',
   onReserve ,
   showInlineGrid = true,
-  hideCalendar = false
+  hideCalendar = false,
+  forceListView = false,
+  hideHeader = false
 }: { 
   stayId?: string;
   onReserve?: (data: { checkIn: string, checkOut: string, guests: number, pricing: any }) => void;
   showInlineGrid?: boolean;
   hideCalendar?: boolean;
+  forceListView?: boolean;
+  hideHeader?: boolean;
 }) {
   const { t, language } = useLanguage();
   
@@ -27,17 +53,8 @@ export default function CalendarSection({
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState<FullStayReservation | null>(null);
 
-  useEffect(() => {
-    const handlePopState = () => {
-      if (selectedResForDetail) {
-        setSelectedResForDetail(null);
-      } else if (isListOpen) {
-        setIsListOpen(false);
-      }
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, [selectedResForDetail, isListOpen]);
+  useModalHistory(isListOpen, () => setIsListOpen(false), 'stayList');
+  useModalHistory(!!selectedResForDetail, () => setSelectedResForDetail(null), 'stayDetail');
   
   // Dates
   const [currentMonth, setCurrentMonth] = useState(() => {
@@ -50,14 +67,52 @@ export default function CalendarSection({
   const [reservations, setReservations] = useState<FullStayReservation[]>([]);
   const [guests, setGuests] = useState(1);
 
-  const refreshData = async () => {
-    const [dates, list] = await Promise.all([getStayReservedDates(stayId), getStayReservationList(stayId)]);
-    setBlockedDates(dates);
-    setReservations(list);
-  };
-
   useEffect(() => {
-    refreshData();
+    console.log(`Setting up real-time listener for ${stayId} reservations...`);
+    const q = query(
+      collection(db, 'reservations'),
+      where('status', '!=', 'cancelled')
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot: QuerySnapshot<DocumentData>) => {
+      const allRes: FullStayReservation[] = [];
+      const allBlocked: BlockedDateInfo[] = [];
+
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        let docStayId = data.stayId || 'hapjeong';
+        if (docStayId === 'stayhapjeoung') docStayId = 'hapjeong';
+        if (docStayId === 'staydeokeun' || docStayId === 'deokeun' || docStayId === '덕은' || docStayId === 'deogeun') docStayId = 'deokeun';
+        if (docStayId !== stayId) return;
+
+        const res = { ...data, id: docSnap.id, stayId: docStayId } as FullStayReservation;
+        allRes.push(res);
+
+        // Generate blocked dates
+        const start = new Date(res.checkIn);
+        const end = new Date(res.checkOut);
+        if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+          const current = new Date(start);
+          while (current < end) {
+            allBlocked.push({
+              date: current.toISOString().split('T')[0],
+              maskedName: maskName(res.name || ""),
+              checkIn: res.checkIn,
+              checkOut: res.checkOut
+            });
+            current.setDate(current.getDate() + 1);
+          }
+        }
+      });
+
+      console.log(`Received ${allRes.length} reservations for ${stayId}`);
+      setReservations(allRes.sort((a: any, b: any) => (a.checkIn || "").localeCompare(b.checkIn || "")));
+      setBlockedDates(allBlocked);
+    }, (error) => {
+      console.error("Reservation listener error:", error);
+    });
+
+    return () => unsubscribe();
   }, [stayId]);
 
   const handleCancel = async (id: string) => {
@@ -77,7 +132,6 @@ export default function CalendarSection({
         if (result.success) {
           alert(language === 'ko' ? '취소되었습니다.' : 'Cancelled successfully.');
           setSelectedResForDetail(null);
-          refreshData();
         } else {
           alert(language === 'ko' ? '삭제 실패: ' + result.error : 'Failed to delete: ' + result.error);
         }
@@ -110,7 +164,6 @@ export default function CalendarSection({
         );
         if (fullRes) {
           setSelectedResForDetail(fullRes);
-          window.history.pushState({ modal: 'stayDetail' }, '', '');
         }
         return;
       }
@@ -415,7 +468,6 @@ export default function CalendarSection({
         alert(language === 'ko' ? '수정되었습니다.' : 'Updated successfully.');
         setSelectedResForDetail(editData);
         setIsEditing(false);
-        refreshData();
       }
     };
 
@@ -450,7 +502,7 @@ export default function CalendarSection({
                   onChange={e => setEditData(prev => prev ? ({...prev, phone: e.target.value}) : null)}
                 />
               ) : (
-                <span className={styles.detailValue}>{res.phone}</span>
+                <span className={styles.detailValue}>{maskPhone(res.phone)}</span>
               )}
             </div>
             <div className={styles.detailRow}>
@@ -587,15 +639,20 @@ export default function CalendarSection({
     <div className={styles.container} id="reserve">
       {!hideCalendar && (
         <>
-          <header className={styles.header}>
-            <h2 className={styles.title}>{stayCal.title}</h2>
-            <p className={styles.desc}>{t.common.contact.desc}</p>
-          </header>
+          {!hideHeader && (
+            <header className={styles.header}>
+              <h2 className={styles.title}>{stayCal.title}</h2>
+              <p className={styles.desc}>{t.common.contact.desc}</p>
+            </header>
+          )}
 
           <div className={styles.content}>
             <div className={styles.calendarSection}>
               <div className={styles.calHeader}>
-                <button onClick={prevMonth} type="button" className={styles.calNav}>&lt;</button>
+                <button onClick={prevMonth} type="button" className="nav-btn-standard">
+                  <span className="nav-btn-icon">←</span>
+                  <span style={{ marginLeft: '4px' }}>{language === 'ko' ? '이전' : 'Prev'}</span>
+                </button>
                 <h3 className={styles.calTitle}>
                   {currentMonth.toLocaleString(
                     language === 'ko' ? 'ko' : 
@@ -606,7 +663,10 @@ export default function CalendarSection({
                     { year: 'numeric', month: 'long' }
                   )}
                 </h3>
-                <button onClick={nextMonth} type="button" className={styles.calNav}>&gt;</button>
+                <button onClick={nextMonth} type="button" className="nav-btn-standard">
+                  <span style={{ marginRight: '4px' }}>{language === 'ko' ? '다음' : 'Next'}</span>
+                  <span className="nav-btn-icon">→</span>
+                </button>
               </div>
               
               <div className={styles.weekdays}>
@@ -619,7 +679,9 @@ export default function CalendarSection({
                 {days.map((dStr, idx) => {
                   if (!dStr) return <div key={`empty-${idx}`} className={styles.emptyDay} />;
                   
-                  const isBlocked = blockedDates.some(b => b.date === dStr);
+                  const bookedInfo = blockedDates.find(b => b.date === dStr);
+                  const isBlocked = !!bookedInfo;
+                  const isStartOfBooking = isBlocked && bookedInfo?.checkIn === dStr;
                   const isPast = dStr < todayStr;
                   const isToday = dStr === todayStr;
                   const isCheckIn = checkIn === dStr;
@@ -630,6 +692,7 @@ export default function CalendarSection({
                   if (isPast) classNames += ` ${styles.past}`;
                   if (isToday) classNames += ` ${styles.today}`;
                   if (isBlocked) classNames += ` ${styles.booked}`;
+                  if (isStartOfBooking) classNames += ` ${styles.bookedStart}`;
                   if (isCheckIn || isCheckOut) classNames += ` ${styles.selected}`;
                   if (isInRange) classNames += ` ${styles.inRange}`;
 
@@ -667,13 +730,12 @@ export default function CalendarSection({
                 <div className={styles.baseInfoList}>
                   <h3>{stayCal.feeGuideTitle}</h3>
                   <ul>
-                    <li><strong>{stayCal.feeGuideLines[0]}</strong></li>
-                    <li>{stayCal.feeGuideLines[1]}</li>
-                    <li>{stayCal.feeGuideLines[2]}</li>
-                    <li>{stayCal.feeGuideLines[3]}</li>
-                    <li><strong>{stayCal.feeGuideLines[4]}</strong></li>
+                    {stayCal.feeGuideLines.map((line: string, i: number) => (
+                      <li key={i}>
+                        {i === 0 ? <strong>{line}</strong> : line}
+                      </li>
+                    ))}
                   </ul>
-                  <p className={styles.infoHint}>{t.calendar.hintSelectDates}</p>
                 </div>
               ) : (
                 <>
@@ -763,12 +825,8 @@ export default function CalendarSection({
         </>
       )}
 
-      {showInlineGrid && (
+      {(showInlineGrid || forceListView) && (
         <section className={styles.inlineListSection}>
-          <div className={styles.inlineListHeader}>
-            <h2 className={styles.inlineListTitle}>{language === 'ko' ? '예약 현황' : 'Reservation Status'}</h2>
-            <p className={styles.inlineListDesc}>{language === 'ko' ? '월별 전체 예약 일정을 확인하실 수 있습니다.' : 'Check all monthly schedules at a glance.'}</p>
-          </div>
           
           <div className={styles.inlineMonthGrid}>
             {(() => {
@@ -845,8 +903,7 @@ export default function CalendarSection({
                             `}
                             onClick={() => {
                               if (isBooked && item.fullRes) {
-                                setSelectedResForDetail(item.fullRes);
-                                window.history.pushState({ modal: 'stayDetail' }, '', '');
+                                setSelectedResForDetail(item.fullRes || null);
                               }
                             }}
                             title={(isBooked && item.fullRes) ? `${item.name} (${item.fullRes.checkIn} ~ ${item.fullRes.checkOut})` : `${item.day}일 예약가능`}

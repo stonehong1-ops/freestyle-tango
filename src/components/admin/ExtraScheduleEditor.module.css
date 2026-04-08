@@ -1,0 +1,97 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  max-width: 500px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333d4b;
+}
+
+.field input,
+.field textarea {
+  padding: 12px;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.field input:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: #3182f6;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.cancelBtn,
+.saveBtn {
+  flex: 1;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cancelBtn {
+  background: #f2f4f6;
+  color: #4e5968;
+}
+
+.saveBtn {
+  background: #3182f6;
+  color: #fff;
+}
+
+.timeInputs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+
+.timeSubField {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.timeSubField label {
+  font-size: 11px;
+  color: #8b95a1;
+  font-weight: 500;
+}
+
+.timeSubField input {
+  padding: 8px 10px;
+  font-size: 14px;
+}
+

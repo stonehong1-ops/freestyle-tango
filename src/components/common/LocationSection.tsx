@@ -7,13 +7,13 @@ export default function LocationSection() {
   const address = "서울 마포구 합정동 386-37";
   const bldg = "어반오아시스빌딩 B2";
   
-  const naverUrl = `https://map.naver.com/p/search/${encodeURIComponent(address)}`;
-  const kakaoUrl = `https://map.kakao.com/link/search/${encodeURIComponent(address)}`;
-  const googleEmbedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(address)}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
+  const naverUrl = `https://map.naver.com/p/search/${encodeURIComponent(address + " " + bldg)}`;
+  const kakaoUrl = `https://map.kakao.com/link/search/${encodeURIComponent(address + " " + bldg)}`;
+  const googleEmbedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(address + " " + bldg)}&hl=ko&z=17&ie=UTF8&iwloc=&output=embed`;
 
   return (
     <div className={styles.container}>
-      <h3 className={styles.title}>📍 찾아오시는 길</h3>
+
       
       <div className={styles.addressBox}>
         <strong>주소:</strong> {address}<br/>

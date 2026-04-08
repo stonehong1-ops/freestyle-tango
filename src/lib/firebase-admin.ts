@@ -1,0 +1,19 @@
+import * as admin from 'firebase-admin';
+
+if (!admin.apps.length) {
+  try {
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || '{}');
+    
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+      databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`
+    });
+    console.log('Firebase Admin initialized successfully');
+  } catch (error) {
+    console.error('Firebase Admin initialization error:', error);
+  }
+}
+
+export const adminMessaging = admin.messaging();
+export const adminFirestore = admin.firestore();
+export const adminAuth = admin.auth();

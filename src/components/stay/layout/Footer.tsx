@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import CompactHostProfile from '@/components/common/CompactHostProfile';
 import { useLanguage } from '@/contexts/LanguageContext';
 import styles from './Footer.module.css';
 
@@ -17,46 +18,9 @@ export default function Footer() {
     <>
       <footer className={styles.footer}>
         <div className={styles.container}>
-          {/* Host Profile Section (Simplified) */}
-          <section className={styles.hostSection}>
-            <div className={styles.hostAvatar}>
-              <Image 
-                src="/images/stonehong.jpg" 
-                alt="Host Stone" 
-                width={60} 
-                height={60} 
-                className={styles.avatarImage}
-              />
-            </div>
-            <div className={styles.hostInfo}>
-              <h3 className={styles.hostName}>{story.hostName}</h3>
-              <p className={styles.hostBio}>{story.hostBio.split('\n')[0]}</p>
-            </div>
-          </section>
-
-          {/* Contact Grid Section */}
-          <section className={styles.contactGrid}>
-            <a href="tel:010-7209-2468" target="_blank" rel="noopener noreferrer" className={styles.contactCard}>
-              <span className={styles.icon}>📞</span>
-              <span className={styles.label}>{contact.call}</span>
-            </a>
-            <a href="sms:010-7209-2468" target="_blank" rel="noopener noreferrer" className={styles.contactCard}>
-              <span className={styles.icon}>💬</span>
-              <span className={styles.label}>{contact.sms}</span>
-            </a>
-            <a href="https://open.kakao.com/o/sNq0Irmi" target="_blank" rel="noopener noreferrer" className={styles.contactCard}>
-              <span className={styles.icon}>💛</span>
-              <span className={styles.label}>{contact.kakao}</span>
-            </a>
-            <a href="https://wa.me/821072092468" target="_blank" rel="noopener noreferrer" className={styles.contactCard}>
-              <span className={styles.icon}>🟩</span>
-              <span className={styles.label}>{contact.whatsapp}</span>
-            </a>
-            <a href="https://m.me/StoneHong1" target="_blank" rel="noopener noreferrer" className={styles.contactCard}>
-              <span className={styles.icon}>📘</span>
-              <span className={styles.label}>{contact.fb}</span>
-            </a>
-          </section>
+          <div className={styles.hostProfileWrapper}>
+            <CompactHostProfile showBio={false} />
+          </div>
 
           <hr className={styles.footerDivider} />
 

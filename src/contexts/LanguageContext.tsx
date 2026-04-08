@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { translations, Language, Translations } from '../locales';
+import { SafeStorage } from '@/lib/storage';
 
 interface LanguageContextType {
   language: Language;
@@ -16,8 +17,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Only access localStorage on the client side
-    const saved = localStorage.getItem('tangostay_lang') as Language;
+    // Only access storage on the client side
+    const saved = SafeStorage.get('tangostay_lang') as Language;
     if (saved && translations[saved]) {
       setLanguage(saved);
     }
@@ -26,7 +27,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const handleSetLanguage = (lang: Language) => {
     setLanguage(lang);
-    localStorage.setItem('tangostay_lang', lang);
+    SafeStorage.set('tangostay_lang', lang);
   };
 
   // Provide an initial render with the default language, 
@@ -39,8 +40,31 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     );
   }
 
+  const createProxy = (target: any, fallback: any): any => {
+    return new Proxy(target, {
+      get: (obj, prop) => {
+        if (prop === '$$typeof' || prop === 'prototype' || prop === 'then') return obj[prop];
+        
+        const val = obj[prop];
+        const fbVal = fallback?.[prop];
+        
+        if (val === undefined || val === null) {
+          return fbVal;
+        }
+        
+        if (typeof val === 'object' && val !== null && fbVal && typeof fbVal === 'object') {
+          return createProxy(val, fbVal);
+        }
+        
+        return val;
+      }
+    });
+  };
+
+  const t = language === 'ko' ? translations['ko'] : createProxy(translations[language] || {}, translations['ko']);
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t: translations[language] }}>
+    <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t }}>
       {children}
     </LanguageContext.Provider>
   );

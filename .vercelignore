@@ -1,0 +1,8 @@
+public/images/staysangam/
+.next/
+*.zip
+*.log
+scripts/archive/
+node_modules/
+.gitignore
+.git/

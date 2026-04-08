@@ -1,0 +1,303 @@
+.editorContainer {
+  padding: 1.5rem;
+  background: white;
+  min-height: 100%;
+}
+
+.editorHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f1f3f5;
+}
+
+.editorHeader h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1f27;
+  margin: 0;
+}
+
+.addBtn {
+  background: #3182f6;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.addBtn:hover {
+  background: #1b64da;
+  transform: translateY(-1px);
+}
+
+/* Modal Styling */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modalContent {
+  background: white;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  border-radius: 20px;
+  padding: 2rem;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  animation: modalAppear 0.3s ease-out;
+}
+
+@keyframes modalAppear {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.modalHeader h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1f27;
+  margin: 0;
+}
+
+.listBtn {
+  background: #3182f6;
+  color: white;
+  border: 4px solid #1a1f27; /* 이미지 3의 독특한 보더 스타일 반영 */
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.formGroup label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #4e5968;
+}
+
+.formGroup input, 
+.formGroup select {
+  padding: 0.85rem 1rem;
+  border: 1px solid #e5e8eb;
+  border-radius: 12px;
+  font-size: 1rem;
+  outline: none;
+  background: #f9fafb;
+  transition: all 0.2s;
+}
+
+.formGroup input:focus {
+  border-color: #3182f6;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(49, 130, 246, 0.1);
+}
+
+.formHelp {
+  font-size: 0.8rem;
+  color: #6b7684;
+  line-height: 1.4;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.submitBtn {
+  flex: 3;
+  background: #3182f6;
+  color: white;
+  border: none;
+  padding: 1.1rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submitBtn:hover {
+  background: #1b64da;
+}
+
+.cancelBtn {
+  flex: 1;
+  background: #f2f4f6;
+  color: #4e5968;
+  border: none;
+  padding: 1.1rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  background: #e5e8eb;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.couponItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border: 1px solid #f1f3f5;
+  border-radius: 16px;
+  background: #f9fafb;
+  transition: transform 0.2s;
+}
+
+.couponItem:hover {
+  transform: translateX(4px);
+  border-color: #e5e8eb;
+}
+
+.couponTitle {
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #1a1f27;
+  margin-bottom: 0.4rem;
+}
+
+.couponMeta {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #8b95a1;
+  margin-bottom: 0.6rem;
+}
+
+.couponStats {
+  font-size: 0.9rem;
+  color: #4e5968;
+}
+
+.deleteBtn {
+  background: #fff0f0;
+  color: #ff4d4f;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.deleteBtn:hover {
+  background: #ffd6d6;
+  transform: scale(1.1);
+}
+
+.soldOutTag {
+  margin-left: 0.5rem;
+  background: #ff4d4f;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.empty {
+  text-align: center;
+  color: #adb5bd;
+  padding: 5rem 1rem;
+  font-size: 1.1rem;
+}
+
+.recipientsList {
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px dashed #e5e8eb;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.recipientRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.recipientName {
+  color: #4e5968;
+  font-weight: 600;
+}
+
+.issuedTime {
+  color: #8b95a1;
+  font-family: monospace;
+}
+
+.syncButton {
+  margin-left: 0.8rem;
+  padding: 2px 8px;
+  background: white;
+  border: 1px solid #e5e8eb;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #4e5968;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.syncButton:hover {
+  background: #f9fafb;
+  border-color: #3182f6;
+  color: #3182f6;
+}

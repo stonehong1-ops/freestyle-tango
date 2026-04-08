@@ -42,3 +42,8 @@ next-env.d.ts
 
 .vercel
 .env*.local
+
+backups/
+*.zip
+*.bak
+

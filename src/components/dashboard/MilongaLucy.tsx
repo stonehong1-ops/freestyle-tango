@@ -1,21 +1,41 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from './MilongaLucy.module.css';
-import { addMilongaReservation, getMilongaReservations, MilongaReservation, MilongaInfo, getMilongaInfo } from '@/lib/db';
+import { toJpeg } from 'html-to-image';
+import { addMilongaReservation, getMilongaReservations, MilongaReservation, MilongaInfo, getMilongaInfo, updateMilongaReservation, deleteMilongaReservation, deleteMilongaInfo } from '@/lib/db';
 import FullscreenModal from '@/components/common/FullscreenModal';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useModalHistory } from '@/hooks/useModalHistory';
+import Skeleton from '@/components/common/Skeleton';
+import MediaList from './MediaList';
+import MediaDetail from './MediaDetail';
+import { MediaItem, getMedia } from '@/lib/db';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function MilongaLucy({ 
   selectedDate, 
+  activeDates = [],
+  onSelectDate,
   onHome,
   isAdmin,
-  onEdit
+  onEdit,
+  currentUser,
+  requireIdentity,
+  onSubTabChange
 }: { 
   selectedDate: string;
+  activeDates?: string[];
+  onSelectDate?: (date: string) => void;
   onHome?: () => void;
   isAdmin?: boolean;
   onEdit?: () => void;
+  currentUser?: any;
+  requireIdentity?: (action: () => void) => void;
+  onSubTabChange?: (tab: 'poster' | 'reserve' | 'live') => void;
 }) {
+  const { t, language } = useLanguage();
+  // currentUser is now provided via props from page.tsx to ensure consistency
   const [reservations, setReservations] = useState<MilongaReservation[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [nickname, setNickname] = useState('');
@@ -24,40 +44,71 @@ export default function MilongaLucy({
   const [requests, setRequests] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [milongaInfo, setMilongaInfo] = useState<MilongaInfo | null>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
   const [myPhone, setMyPhone] = useState('');
+  const [showPosterFullscreen, setShowPosterFullscreen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [unmaskedId, setUnmaskedId] = useState<string | null>(null);
+  const [lastTap, setLastTap] = useState({ id: '', time: 0 });
+  const posterCardRef = useRef<HTMLDivElement>(null);
+  const [activeTab, setActiveTabState] = useState<'poster' | 'reserve' | 'live'>('poster');
+  
+  const setActiveTab = (tab: 'poster' | 'reserve' | 'live') => {
+    setActiveTabState(tab);
+    if (onSubTabChange) onSubTabChange(tab);
+  };
+  const [milongaMedia, setMilongaMedia] = useState<MediaItem[]>([]);
+  const [lucyCountLast7Days, setLucyCountLast7Days] = useState(0);
+  const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
+  const [mediaLoading, setMediaLoading] = useState(false);
 
   useEffect(() => {
     const savedPhone = localStorage.getItem('ft_milonga_phone');
     if (savedPhone) setMyPhone(savedPhone);
-  }, []);
+    
+    // Auto-fill from currentUser if available
+    if (currentUser) {
+      setNickname(currentUser.nickname || '');
+      setPhone(currentUser.phone || '');
+    }
+  }, [currentUser]);
 
   useEffect(() => {
     if (selectedDate) {
       fetchReservations();
+      fetchMedia();
     } else {
       setReservations([]);
+      setMilongaMedia([]);
     }
     fetchMilongaInfo();
+    fetchLucyLiveCount();
 
     const handleUpdate = () => fetchMilongaInfo();
     window.addEventListener('ft_milonga_updated', handleUpdate);
     
-    const handlePopState = () => {
-      if (showForm) {
-        setShowForm(false);
-      }
+    const handleMediaUpdated = () => {
+      fetchMedia();
+      fetchLucyLiveCount();
     };
-    window.addEventListener('popstate', handlePopState);
-
+    window.addEventListener('ft_milonga_media_updated', handleMediaUpdated);
+    
     return () => {
       window.removeEventListener('ft_milonga_updated', handleUpdate);
-      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('ft_milonga_media_updated', handleMediaUpdated);
     };
-  }, [selectedDate, showForm]);
+  }, [selectedDate, activeTab]);
+
+  const handleCloseForm = React.useCallback(() => setShowForm(false), []);
+  const handleClosePoster = React.useCallback(() => setShowPosterFullscreen(false), []);
+  const handleCloseMedia = React.useCallback(() => setSelectedMedia(null), []);
+
+  useModalHistory(showForm, handleCloseForm, 'milongaForm');
+  useModalHistory(showPosterFullscreen, handleClosePoster, 'posterFullscreen');
+  useModalHistory(!!selectedMedia, handleCloseMedia, 'lucyMediaDetail');
 
   const fetchMilongaInfo = async () => {
-    const info = await getMilongaInfo();
+    if (!selectedDate) return;
+    const info = await getMilongaInfo(selectedDate);
     setMilongaInfo(info);
   };
 
@@ -66,12 +117,43 @@ export default function MilongaLucy({
     setReservations(data);
   };
 
+  const fetchMedia = async () => {
+    setMediaLoading(true);
+    let data: MediaItem[] = [];
+    
+    if (activeTab === 'live') {
+      // Fetch all media and filter for Lucy Live (those with relatedMilongaDate)
+      const allMedia = await getMedia();
+      data = allMedia.filter(m => !!m.relatedMilongaDate);
+    } else {
+      if (!selectedDate) {
+        setMilongaMedia([]);
+        setMediaLoading(false);
+        return;
+      }
+      data = await getMedia(undefined, undefined, selectedDate);
+    }
+    setMilongaMedia(data);
+    setMediaLoading(false);
+  };
+
+  const fetchLucyLiveCount = async () => {
+    const allMedia = await getMedia();
+    const lucyMedia = allMedia.filter(m => !!m.relatedMilongaDate);
+    
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    
+    const recentCount = lucyMedia.filter(m => new Date(m.createdAt) > oneWeekAgo).length;
+    setLucyCountLast7Days(recentCount);
+  };
+
   const formatDateLabel = (dateStr: string) => {
-    if (!dateStr) return '일정 준비중';
+    if (!dateStr) return t.home.milonga.datePending;
     const [y, m, d] = dateStr.split('-');
     const date = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
-    const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
-    return `${parseInt(m)}/${parseInt(d)} ${dayNames[date.getDay()]}요일`;
+    const dayNames = t.home.registration.dayNames;
+    return `${parseInt(m)}/${parseInt(d)} (${dayNames[date.getDay()]})`;
   };
 
   const handleBooking = async () => {
@@ -97,7 +179,7 @@ export default function MilongaLucy({
       };
 
       if (editingId) {
-        await import('@/lib/db').then(m => m.updateMilongaReservation(editingId, reservationData));
+        await updateMilongaReservation(editingId, reservationData);
         alert('예약이 수정되었습니다!');
       } else {
         await addMilongaReservation(reservationData);
@@ -106,8 +188,8 @@ export default function MilongaLucy({
 
       localStorage.setItem('ft_milonga_phone', cleanPhone);
       setMyPhone(cleanPhone);
-      setShowForm(false);
       resetForm();
+      setShowForm(false);
       fetchReservations();
     } catch (e) {
       alert('처리 실패: ' + e);
@@ -117,9 +199,14 @@ export default function MilongaLucy({
   };
 
   const resetForm = () => {
-    setNickname('');
-    const savedPhone = localStorage.getItem('ft_milonga_phone') || '';
-    setPhone(savedPhone);
+    if (currentUser) {
+      setNickname(currentUser.nickname || '');
+      setPhone(currentUser.phone || '');
+    } else {
+      setNickname('');
+      const savedPhone = localStorage.getItem('ft_milonga_phone') || '';
+      setPhone(savedPhone);
+    }
     setRequests('');
     setSelectedOption('테이블 예약');
     setEditingId(null);
@@ -128,17 +215,16 @@ export default function MilongaLucy({
   const handleEdit = (res: MilongaReservation) => {
     setNickname(res.nickname);
     setPhone(res.phone);
-    setSelectedOption(res.option);
+    setSelectedOption(res.option as any);
     setRequests(res.requests || '');
     setEditingId(res.id);
     setShowForm(true);
-    window.history.pushState({ modal: 'milongaForm' }, '', '');
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm('정말 삭제하시겠습니까?')) return;
     try {
-      await import('@/lib/db').then(m => m.deleteMilongaReservation(id));
+      await deleteMilongaReservation(id);
       alert('삭제되었습니다.');
       fetchReservations();
     } catch (e) {
@@ -146,17 +232,79 @@ export default function MilongaLucy({
     }
   };
 
+  const handleNameClick = (id: string) => {
+    const now = Date.now();
+    if (lastTap.id === id && now - lastTap.time < 300) {
+      setUnmaskedId(id);
+      setTimeout(() => setUnmaskedId(null), 1000);
+    }
+    setLastTap({ id, time: now });
+  };
+
   const maskNickname = (name: string) => {
     if (name.length <= 1) return '*';
     if (name.length === 2) return name[0] + '*';
     return name[0] + '*'.repeat(name.length - 2) + name[name.length - 1];
+  };
+  const handleDownloadPoster = async () => {
+    if (!milongaInfo || !posterCardRef.current) return;
+    
+    try {
+      const dataUrl = await toJpeg(posterCardRef.current, {
+        quality: 0.95,
+        backgroundColor: '#1a1a1a',
+        cacheBust: true,
+        pixelRatio: 2,
+      });
+      
+      const link = document.createElement('a');
+      const dateTag = selectedDate ? selectedDate.substring(5) : 'poster';
+      link.download = `milonga_lucy_${dateTag}.jpg`;
+      link.href = dataUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (e) {
+      console.error('Download failed:', e);
+      alert('포스터 저장에 실패했습니다: ' + e);
+    }
+  };
+
+  const handleDeleteMilonga = async () => {
+    if (!milongaInfo?.id) return;
+    if (!confirm(t.home.registration.deleteConfirm || '정말로 이 밀롱가 정보를 삭제하시겠습니까?')) return;
+    
+    try {
+      await deleteMilongaInfo(milongaInfo.id);
+      alert(t.home.registration.deleteSuccess || '삭제되었습니다.');
+      setShowPosterFullscreen(false);
+      if (onHome) onHome();
+      // Trigger update event for other components
+      window.dispatchEvent(new CustomEvent('ft_milonga_updated'));
+    } catch (e) {
+      alert('삭제 실패: ' + e);
+    }
+  };
+
+  const handlePrevDate = () => {
+    const idx = activeDates.indexOf(selectedDate);
+    if (idx < activeDates.length - 1 && onSelectDate) {
+      onSelectDate(activeDates[idx + 1]);
+    }
+  };
+
+  const handleNextDate = () => {
+    const idx = activeDates.indexOf(selectedDate);
+    if (idx > 0 && onSelectDate) {
+      onSelectDate(activeDates[idx - 1]);
+    }
   };
 
   if (!selectedDate && !isAdmin) {
     return (
       <div className={styles.container}>
         <div className={styles.emptyMsg}>
-          현재 등록된 밀롱가 일정이 없습니다.<br/>잠시 후 다시 확인해주세요.
+          {t.home.milonga.noSchedule}<br/>{t.home.milonga.checkBack}
         </div>
       </div>
     );
@@ -164,101 +312,236 @@ export default function MilongaLucy({
 
   return (
     <div className={styles.container}>
-      {/* Hero Visual Section */}
-      <section className={styles.heroSection}>
-        <div className={styles.heroImageWrapper}>
-          {milongaInfo?.posterUrl && (
-            <img src={milongaInfo.posterUrl} alt="Milonga Lucy" className={styles.heroImage} />
-          )}
-          
-          {isAdmin && onEdit && (
-            <div className={styles.editOverlay}>
-              <button className={styles.editBtn} onClick={onEdit}>
-                수정
-              </button>
-            </div>
-          )}
-        </div>
-        
-        {milongaInfo?.message && (
-          <div className={styles.messageArea}>
-            <p className={styles.milongaMessage}>
-              &quot;{milongaInfo.message}&quot;
-            </p>
-          </div>
-        )}
-      </section>
+      {/* Premium Tab Navigation (Moved to top) */}
+      <div className={styles.tabNav}>
+        <button 
+          className={`${styles.tabBtn} ${activeTab === 'poster' ? styles.activeTabBtn : ''}`}
+          onClick={() => setActiveTab('poster')}
+        >
+          {language === 'ko' ? '포스터' : 'Poster'}
+        </button>
+        <button 
+          className={`${styles.tabBtn} ${activeTab === 'reserve' ? styles.activeTabBtn : ''}`}
+          onClick={() => setActiveTab('reserve')}
+        >
+          {language === 'ko' ? '테이블 예약' : 'Table Booking'}
+          {reservations.length > 0 && <span className={styles.badge}>{reservations.length}</span>}
+        </button>
+        <button 
+          className={`${styles.tabBtn} ${activeTab === 'live' ? styles.activeTabBtn : ''}`}
+          onClick={() => setActiveTab('live')}
+        >
+          {language === 'ko' ? '루씨 Live' : 'Lucy Live'}
+          {lucyCountLast7Days > 0 && <span className={styles.badge}>{lucyCountLast7Days}</span>}
+        </button>
+      </div>
 
-      {/* Main Action Section - Prominent Booking Button */}
-      {selectedDate && (
-        <section className={styles.actionSection}>
-          <button className={styles.bookingBtn} onClick={() => { resetForm(); setShowForm(true); window.history.pushState({ modal: 'milongaForm' }, '', ''); }}>
-            🎟️ 밀롱가 테이블 예약하기
+      {/* Navigation Controls (Moved below Tabs, Hidden in 'live' tab) */}
+      {activeTab !== 'live' && activeDates.length > 1 && (
+        <div className={styles.navControls}>
+          <button 
+            className="nav-btn-standard" 
+            onClick={handlePrevDate}
+            disabled={activeDates.indexOf(selectedDate) === activeDates.length - 1}
+          >
+            <span className="nav-btn-icon">←</span>
+            <span style={{ marginLeft: '4px' }}>{language === 'ko' ? '이전' : 'Prev'}</span>
           </button>
+          
+          <div className={styles.navDateLabel}>{selectedDate?.split('-')?.slice(1)?.join('/') || ''}</div>
+          
+          <button 
+            className="nav-btn-standard" 
+            onClick={handleNextDate}
+            disabled={activeDates.indexOf(selectedDate) === 0}
+          >
+            <span style={{ marginRight: '4px' }}>{language === 'ko' ? '다음' : 'Next'}</span>
+            <span className="nav-btn-icon">→</span>
+          </button>
+        </div>
+      )}
+
+      {activeTab === 'poster' && (
+        <section className={styles.heroSection}>
+          {/* Poster & Message 통합 카드 (캡처 대상) */}
+          <div ref={posterCardRef} className={styles.posterCard}>
+            <div className={styles.heroImageWrapper}>
+              {!milongaInfo ? (
+                <Skeleton height={300} borderRadius={16} />
+              ) : milongaInfo.posterUrl ? (
+                <div 
+                  className={styles.heroImageContainer}
+                  onClick={() => setShowPosterFullscreen(true)}
+                >
+                  <img 
+                    src={milongaInfo.posterUrl} 
+                    alt="Milonga Lucy" 
+                    className={styles.heroImage} 
+                    crossOrigin="anonymous"
+                  />
+                </div>
+              ) : (
+                <div className={styles.emptyPoster}>{t.home.milonga.noPoster || '준비중'}</div>
+              )}
+            </div>
+            
+            {milongaInfo?.message && (
+              <div className={styles.messageArea}>
+                <p className={styles.milongaMessage}>
+                  &quot;{milongaInfo.message}&quot;
+                </p>
+                <div className={styles.creditLine}>Freestyle Tango</div>
+              </div>
+            )}
+          </div>
+
+          {/* Event Section */}
+          <section className={styles.eventSection}>
+            <div className={styles.sectionHeader}>
+                <h3 className={styles.eventTitle}>{t.home.milonga.eventTitle}</h3>
+                <p className={styles.sectionSubtitle}>{t.home.milonga.eventSubtitle}</p>
+            </div>
+
+            <div className={styles.eventGrid}>
+              <div className={styles.eventCard}>
+                <div className={styles.eventBadge}>Basic</div>
+                <h3 className={styles.eventCardTitle}>{t.home.milonga.normalTable}</h3>
+                <p className={styles.eventCardDesc}>{t.home.milonga.normalTableDesc}</p>
+              </div>
+              <div className={styles.eventCard}>
+                <div className={styles.eventBadge}>Event</div>
+                <h3 className={styles.eventCardTitle}>{t.home.milonga.event2plus1}</h3>
+                <p className={styles.eventCardDesc}>{t.home.milonga.event2plus1Desc}</p>
+              </div>
+              <div className={styles.eventCard}>
+                <div className={styles.eventBadge}>VIP</div>
+                <h3 className={styles.eventCardTitle}>{t.home.milonga.event3plus1}</h3>
+                <p className={styles.eventCardDesc}>{t.home.milonga.event3plus1Desc}</p>
+              </div>
+            </div>
+          </section>
         </section>
       )}
 
-      {/* Event Section */}
-      <section className={styles.eventSection}>
-        <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>이벤트 안내</h2>
-            <p className={styles.sectionSubtitle}>루씨에서 즐거운 추억을 만드세요</p>
-        </div>
+      {activeTab === 'reserve' && (
+        <>
+          {/* Main Action Section - Prominent Booking Button */}
+          {selectedDate && (
+            <section className={styles.actionSection}>
+              {isAdmin || new Date(selectedDate) >= new Date(new Date(new Date().getTime() - (6 * 60 * 60 * 1000)).setHours(0, 0, 0, 0)) ? (
+                <button className={styles.bookingBtn} onClick={() => { resetForm(); setShowForm(true); }}>
+                  {t.home.milonga.bookingBtn}
+                </button>
+              ) : (
+                <div className={styles.bookingClosed}>{t.reserve.closed || 'Reservation Closed'}</div>
+              )}
+            </section>
+          )}
 
-        <div className={styles.eventGrid}>
-          <div className={styles.eventCard}>
-            <div className={styles.eventBadge}>기본</div>
-            <h3 className={styles.eventCardTitle}>테이블 예약</h3>
-            <p className={styles.eventCardDesc}>2인 이상 테이블 신청 가능합니다.</p>
-          </div>
-          <div className={styles.eventCard}>
-            <div className={styles.eventBadge}>이벤트</div>
-            <h3 className={styles.eventCardTitle}>2+1 Event</h3>
-            <p className={styles.eventCardDesc}>세 분이 오시면 한 분은 무료입니다.</p>
-          </div>
-          <div className={styles.eventCard}>
-            <div className={styles.eventBadge}>VIP</div>
-            <h3 className={styles.eventCardTitle}>3+1 Event</h3>
-            <p className={styles.eventCardDesc}>네 분이 오시면 한 분은 무료입니다.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Reservation List Section */}
-      {selectedDate && (
-        <section className={styles.listSection}>
-          <div className={styles.sectionHeaderBetween}>
-            <h2 className={styles.sectionTitle}>예약 현황</h2>
-            <div className={styles.selectedDateBadge}>
-              {formatDateLabel(selectedDate)}
-            </div>
-          </div>
-          
-          <div className={styles.resList}>
-            {reservations.length === 0 ? (
-              <div className={styles.emptyMsg}>아직 예약이 없습니다.</div>
-            ) : (
-              reservations.map((res, i) => {
-                const isMyRes = res.phone === myPhone || isAdmin || myPhone === '01072092468';
-                return (
-                  <div key={res.id} className={styles.resWrapper}>
-                    <div className={res.option === '3+1 이벤트' ? styles.resItemVip : styles.resItem}>
-                      <span className={styles.resIdx}>{i + 1}</span>
-                      <span className={styles.resName}>{maskNickname(res.nickname)}</span>
-                      <span className={styles.resOption}>{res.option}</span>
-                      {isMyRes && (
-                        <div className={styles.resActions}>
-                          <button className={styles.resActionBtn} onClick={() => handleEdit(res)}>수정</button>
-                          <button className={`${styles.resActionBtn} ${styles.deleteBtn}`} onClick={() => handleDelete(res.id)}>삭제</button>
+          {/* Reservation List Section */}
+          {selectedDate && (
+            <section className={styles.listSection}>
+              <div className={styles.sectionHeaderBetween}>
+                <h2 className={styles.sectionTitle}>{t.home.milonga.bookingStatus}</h2>
+                <div className={styles.selectedDateBadge}>
+                  {formatDateLabel(selectedDate)}
+                </div>
+              </div>
+              
+              <div className={styles.resList}>
+                {reservations.length === 0 ? (
+                  <div className={styles.emptyMsg}>{t.home.milonga.noReservations}</div>
+                ) : (
+                  reservations.map((res, i) => {
+                    const isMyRes = res.phone === myPhone || isAdmin || ['01072092468', '01012345678'].includes(myPhone);
+                    return (
+                      <div key={res.id} className={styles.resWrapper}>
+                        <div className={res.option === '3+1 이벤트' ? styles.resItemVip : styles.resItem}>
+                          <span className={styles.resIdx}>{i + 1}</span>
+                          <span 
+                            className={styles.resName}
+                            onClick={() => handleNameClick(res.id)}
+                            style={{ cursor: 'pointer', userSelect: 'none' }}
+                          >
+                            {unmaskedId === res.id ? res.nickname : maskNickname(res.nickname)}
+                          </span>
+                          <span className={styles.resOption}>{res.option}</span>
+                          {isMyRes && (
+                            <div className={styles.resActions}>
+                              <button className={styles.resActionBtn} onClick={() => handleEdit(res)}>{t.home.registration.edit}</button>
+                              <button className={`${styles.resActionBtn} ${styles.deleteBtn}`} onClick={() => handleDelete(res.id)}>{t.home.registration.delete}</button>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                    {res.requests && <div className={styles.resReq}>💬 {res.requests}</div>}
-                  </div>
-                );
-              })
-            )}
-          </div>
+                        {res.requests && <div className={styles.resReq}>💬 {res.requests}</div>}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </section>
+          )}
+        </>
+      )}
+
+      {activeTab === 'live' && (
+        <section className={styles.liveContainer}>
+          {(() => {
+            // Group media by relatedMilongaDate
+            const groups: Record<string, MediaItem[]> = {};
+            milongaMedia.forEach(item => {
+              const date = item.relatedMilongaDate || 'Other';
+              if (!groups[date]) groups[date] = [];
+              groups[date].push(item);
+            });
+
+            // Sort dates descending
+            const sortedDates = Object.keys(groups).sort((a, b) => b.localeCompare(a));
+
+            if (mediaLoading) {
+              return (
+                <div style={{ padding: '20px' }}>
+                  <Skeleton height={200} count={3} />
+                </div>
+              );
+            }
+
+            if (milongaMedia.length === 0) {
+              return (
+                <div className={styles.noAccess}>
+                  <div style={{ opacity: 0.3, fontSize: '40px', marginBottom: '12px' }}>🎬</div>
+                  <p>{t.home.registration?.noData || 'No data'}</p>
+                </div>
+              );
+            }
+
+            return sortedDates.map(date => (
+              <div key={date} className={styles.dateGroup}>
+                <div className={styles.dateDivider}>
+                  <span>{formatDateLabel(date)}</span>
+                  <div className={styles.dividerLine} />
+                </div>
+                <MediaList 
+                  media={groups[date]}
+                  t={t}
+                  loading={false}
+                  onSelect={setSelectedMedia}
+                />
+              </div>
+            ));
+          })()}
+
+          {selectedMedia && (
+            <MediaDetail 
+              item={selectedMedia}
+              onClose={() => setSelectedMedia(null)}
+              t={t}
+              user={currentUser}
+              isAdmin={!!isAdmin}
+              onUpdate={fetchMedia}
+              customTitle={language === 'ko' ? '루씨 Live' : 'Lucy Live'}
+            />
+          )}
         </section>
       )}
 
@@ -266,12 +549,12 @@ export default function MilongaLucy({
       <FullscreenModal
         isOpen={showForm}
         onClose={() => setShowForm(false)}
-        title={editingId ? "예약 수정하기" : "테이블 및 이벤트 예약"}
+        title={editingId ? t.home.milonga.editTitle : t.home.milonga.newTitle}
         isBottomSheet={true}
       >
         <div className={styles.formContent}>
           <div className={styles.formField}>
-            <label>예약 일자</label>
+            <label>{t.home.milonga.dateLabel}</label>
             <input 
               type="text" 
               value={formatDateLabel(selectedDate)} 
@@ -282,7 +565,7 @@ export default function MilongaLucy({
           </div>
 
           <div className={styles.formField}>
-            <label>예약 옵션 선택</label>
+            <label>{t.home.milonga.optionLabel}</label>
             <div className={styles.optionGroup}>
               {(['테이블 예약', '2+1 이벤트', '3+1 이벤트'] as const).map(opt => (
                 <button
@@ -290,17 +573,19 @@ export default function MilongaLucy({
                   className={`${styles.optionBtn} ${selectedOption === opt ? styles.activeOption : ''}`}
                   onClick={() => setSelectedOption(opt)}
                 >
-                  {opt}
+                  {opt === '테이블 예약' ? t.home.milonga.normalTable : 
+                   opt === '2+1 이벤트' ? t.home.milonga.event2plus1 : 
+                   t.home.milonga.event3plus1}
                 </button>
               ))}
             </div>
           </div>
 
           <div className={styles.formField}>
-            <label>닉네임</label>
+            <label>{t.home.registration.nickname}</label>
             <input 
               type="text" 
-              placeholder="닉네임을 입력하세요" 
+              placeholder={t.home.milonga.nicknamePlaceholder} 
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               className={styles.input}
@@ -308,7 +593,7 @@ export default function MilongaLucy({
           </div>
 
           <div className={styles.formField}>
-            <label>핸드폰 번호 (예약 확인용)</label>
+            <label>{t.home.milonga.phoneLabel}</label>
             <input 
               type="tel" 
               placeholder="010-0000-0000" 
@@ -319,9 +604,9 @@ export default function MilongaLucy({
           </div>
 
           <div className={styles.formField}>
-            <label>기타 요청사항 (선택)</label>
+            <label>{t.home.milonga.requestsLabel}</label>
             <textarea 
-              placeholder="요청사항을 입력하세요 (예: 와인 요청)" 
+              placeholder={t.home.milonga.requestsPlaceholder} 
               value={requests}
               onChange={(e) => setRequests(e.target.value)}
               className={styles.textarea}
@@ -329,13 +614,83 @@ export default function MilongaLucy({
             />
           </div>
 
+          <div className={styles.priceDisplay}>
+            <span className={styles.priceLabel}>{language === 'ko' ? '최종 결제 금액' : 'Total Amount'}</span>
+            <span className={styles.priceValue}>
+              {selectedOption === '테이블 예약' ? '10,000' : 
+               selectedOption === '2+1 이벤트' ? '20,000' : '30,000'}원
+            </span>
+          </div>
+
           <button 
             className={styles.submitBtn} 
             onClick={handleBooking}
             disabled={isSubmitting}
           >
-            {isSubmitting ? '처리 중...' : editingId ? '수정 완료하기' : '예약 완료하기'}
+            {isSubmitting ? t.home.milonga.submitting : editingId ? t.home.milonga.saveEdit : t.home.milonga.saveNew}
           </button>
+        </div>
+      </FullscreenModal>
+
+      {/* Poster Fullscreen Viewer */}
+      <FullscreenModal
+        isOpen={showPosterFullscreen}
+        onClose={() => setShowPosterFullscreen(false)}
+        hideHeader={true}
+        noPadding={true}
+      >
+        <div className={styles.fullscreenPosterContainer}>
+          <button className={styles.modalCloseBtn} onClick={() => setShowPosterFullscreen(false)}>
+            ✕
+          </button>
+          {milongaInfo?.posterUrl && (
+            <>
+              <div className={styles.detailCardWrapper}>
+                <img src={milongaInfo.posterUrl} alt="Poster Full" className={styles.fullscreenPoster} />
+                {milongaInfo?.message && (
+                  <div className={styles.messageArea}>
+                    <p className={styles.milongaMessage} style={{ fontSize: '1rem' }}>
+                      &quot;{milongaInfo.message}&quot;
+                    </p>
+                    <div className={styles.creditLine}>Freestyle Tango</div>
+                  </div>
+                )}
+              </div>
+              <div className={styles.fullscreenActions}>
+                {isAdmin && onEdit && (
+                  <>
+                    <button className={`${styles.circleDownloadBtn} ${styles.deleteActionBtn}`} onClick={handleDeleteMilonga}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        <line x1="10" y1="11" x2="10" y2="17" />
+                        <line x1="14" y1="11" x2="14" y2="17" />
+                      </svg>
+                      <span>{t.home.registration.delete}</span>
+                    </button>
+                    <button className={styles.circleDownloadBtn} onClick={() => {
+                      setShowPosterFullscreen(false);
+                      onEdit();
+                    }}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                      </svg>
+                      <span>{t.home.registration.edit}</span>
+                    </button>
+                  </>
+                )}
+                <button className={styles.circleDownloadBtn} onClick={handleDownloadPoster}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  <span>{(t.home.registration as any).download || 'Download'}</span>
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </FullscreenModal>
     </div>

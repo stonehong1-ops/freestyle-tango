@@ -10,7 +10,6 @@ export default function ContactSection() {
     <div className={styles.container} id="contact">
       <header className={styles.header}>
         <h2 className={styles.title}>{t.common.contact.title}</h2>
-        <p className={styles.desc}>{t.common.contact.desc}</p>
       </header>
 
       <div className={styles.contactGrid}>

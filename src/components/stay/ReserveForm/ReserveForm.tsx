@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { submitStayReservation } from '@/lib/db';
 import styles from './ReserveForm.module.css';
@@ -56,6 +56,9 @@ export default function ReserveForm({
     const result = await submitStayReservation(formData);
     
     if (result.success) {
+      // No longer auto-triggering SMS to avoid "pop-up" confusion.
+      // SMS is now handled via a localized button on the CompleteView.
+
       onComplete({
         ...formData,
         totalAmount
@@ -82,8 +85,11 @@ export default function ReserveForm({
         <div className={styles.formSection}>
           <div className={styles.paymentGuide}>
             <h3>💳 {t.calendar.feeGuideTitle} (Deposit)</h3>
-            <p className={styles.account}>KakaoBank 3333-03-7249602 (Hong Byeong-seok)</p>
-            <p className={styles.warning}><strong>{t.complete.desc}</strong></p>
+            <div className={styles.accountList}>
+              <p className={styles.account}><strong>1. KR (한국계좌):</strong> KakaoBank 3333-03-7249602 (홍병석)</p>
+              <p className={styles.account}><strong>2. US (미국 Wise):</strong> Acc 352665336763211 / Routing 084009519 (ACH Free)</p>
+              <p className={styles.account}><strong>3. International:</strong> SWIFT/BIC TRWIUS35XXX (Byong Seok Hong)</p>
+            </div>
           </div>
 
           <form className={styles.form} onSubmit={handleSubmit}>
@@ -144,6 +150,12 @@ export default function ReserveForm({
                 rows={3} 
                 placeholder={t.reserve.reqPlace} 
               />
+            </div>
+
+            <div className={styles.directWarning}>
+              {t.reserve.directBookingWarning.split('\n').map((line: string, i: number) => (
+                <React.Fragment key={i}>{line}<br/></React.Fragment>
+              ))}
             </div>
 
             <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>

@@ -60,3 +60,24 @@
   background: var(--accent);
   border-radius: 0 0 2px 2px;
 }
+
+.badge {
+  position: absolute;
+  top: 6px;
+  right: calc(50% - 15px);
+  background-color: #ff4d4f;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  border: 1.5px solid var(--bg-base);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+

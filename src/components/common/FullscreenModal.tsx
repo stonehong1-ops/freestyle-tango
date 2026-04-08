@@ -6,10 +6,13 @@ import styles from './FullscreenModal.module.css';
 interface FullscreenModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
+  title?: string;
   children: React.ReactNode;
   isBottomSheet?: boolean;
   heightMode?: 'full' | 'half';
+  hideHeader?: boolean;
+  headerRight?: React.ReactNode;
+  noPadding?: boolean;
 }
 
 export default function FullscreenModal({
@@ -18,9 +21,14 @@ export default function FullscreenModal({
   title,
   children,
   isBottomSheet = false,
-  heightMode = 'full'
+  heightMode = 'full',
+  hideHeader = false,
+  headerRight,
+  noPadding = false
 }: FullscreenModalProps) {
   if (!isOpen) return null;
+
+  const showHeader = !hideHeader && (title || !isBottomSheet);
 
   return (
     <div 
@@ -31,12 +39,17 @@ export default function FullscreenModal({
     >
       <div className={`${isBottomSheet ? styles.sheet : styles.fullContent} ${isBottomSheet && heightMode === 'half' ? styles.half : ''}`}>
         {isBottomSheet && <div className={styles.handle} />}
-        <header className={isBottomSheet ? styles.sheetHeader : styles.header}>
-          <button className={styles.closeBtn} onClick={onClose}>✕</button>
-          <h2 className={styles.title}>{title}</h2>
-          <div style={{ width: '40px' }} /> {/* Spacer to center title */}
-        </header>
-        <div className={styles.content}>
+        {showHeader && (
+          <header className={isBottomSheet ? styles.sheetHeader : styles.header}>
+            <button className={styles.closeBtn} onClick={onClose}>✕</button>
+            {title && <h2 className={styles.title}>{title}</h2>}
+            <div className={styles.headerRightArea}>
+              {headerRight}
+              {!headerRight && <div style={{ width: '40px' }} />} 
+            </div>
+          </header>
+        )}
+        <div className={`${styles.content} ${noPadding ? styles.noPadding : ''}`}>
           {children}
         </div>
       </div>

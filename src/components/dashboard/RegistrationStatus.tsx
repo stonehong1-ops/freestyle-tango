@@ -1,15 +1,22 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { TangoClass, Registration } from '@/lib/db';
 import styles from './RegistrationStatus.module.css';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useModalHistory } from '@/hooks/useModalHistory';
 
 interface Props {
   classes: TangoClass[];
   selectedMonth: string; // From Home page
   onClose: () => void;
   requireIdentity?: (action: () => void) => void;
+  hideForm?: boolean;
+  hideHistory?: boolean;
 }
 
-export default function RegistrationStatus({ classes, selectedMonth, onClose, requireIdentity }: Props) {
+export default function RegistrationStatus({ classes, selectedMonth, onClose, requireIdentity, hideForm, hideHistory }: Props) {
+  const { t, language } = useLanguage();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isSuccess, setIsSuccess] = useState(false);
   const [dbRegs, setDbRegs] = useState<Registration[]>([]);
@@ -18,8 +25,11 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
   const [paymentSheet, setPaymentSheet] = useState<{ isOpen: boolean, regId: string, type: string } | null>(null);
   const [selectedOption, setSelectedOption] = useState<string>('');
   const [editingRegId, setEditingRegId] = useState<string | null>(null);
-  // Remove manual name/phone state as it's handled by IdentityForm
+  const [selectedType, setSelectedType] = useState<string>('');
 
+  useModalHistory(!!paymentSheet?.isOpen, () => setPaymentSheet(null), 'paymentSheet');
+  useModalHistory(isSuccess, () => { setIsSuccess(false); setEditingRegId(null); }, 'regSuccess');
+  useModalHistory(!!editingRegId, () => { setEditingRegId(null); setSelectedIds(new Set()); setSelectedType(''); }, 'editReg');
 
   useEffect(() => {
     const loadData = async () => {
@@ -45,7 +55,7 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
       }
       setIsLoading(false);
     };
-    
+
     loadData();
   }, []);
 
@@ -54,34 +64,44 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
     const action = async () => {
       const savedUser = localStorage.getItem('ft_user');
       if (!savedUser) return;
-      
+
       const { nickname, phone, role: rawRole } = JSON.parse(savedUser);
       const role = (rawRole || '').replace(/"/g, '');
 
-      const typeDisplay = 
-        regType === 'month1' ? '1개월 신청' : '개별신청';
+      let typeDisplay = selectedType || (selectedIds.size === 1 ? '개별수강' : '1개월멤버쉽');
+      const isAutoPaid = ['6개월멤버쉽(2차)', '6개월멤버쉽(3차)', '6개월멤버쉽(4차)', '6개월멤버쉽(5차)', '6개월멤버쉽(6차)'].includes(typeDisplay);
 
       try {
         const { addRegistration, updateRegistration } = await import('@/lib/db');
-        
+
         if (editingRegId) {
           await updateRegistration(editingRegId, {
             classIds: Array.from(selectedIds),
             type: typeDisplay as '개별신청' | '1개월 신청' | '6개월 멤버쉽',
             date: new Date().toISOString()
           });
-          alert("신청 내역이 수정되었습니다.");
+          alert(t.home.history.confirmSuccess);
           setEditingRegId(null);
         } else {
+          // Double registration guard: Disallow new registration if they already have one for the month
+          const currentRegs = await (await import('@/lib/db')).getAllRegistrationsByPhone(phone.replace(/[^0-9]/g, ''));
+          const existing = currentRegs.find(r => r.month === selectedMonth);
+          if (existing) {
+            alert(t.home.history.alreadyRegistered || '이미 등록된 내역이 있습니다. 수정 기능을 이용해주세요.');
+            return;
+          }
+
           await addRegistration({
             date: new Date().toISOString(),
             nickname,
             phone: phone.replace(/[^0-9]/g, ''),
             role,
             classIds: Array.from(selectedIds),
-            type: typeDisplay as '개별신청' | '1개월 신청',
-            month: selectedMonth, 
-            status: 'waiting'
+            type: typeDisplay,
+            month: selectedMonth,
+            status: isAutoPaid ? 'paid' : 'waiting',
+            amount: 0,
+            ...(isAutoPaid ? { paidAt: new Date().toISOString() } : {})
           });
           setIsSuccess(true);
         }
@@ -90,12 +110,13 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
         setSelectedIds(new Set());
         window.dispatchEvent(new Event('ft_user_updated'));
         window.dispatchEvent(new Event('ft_registrations_updated'));
-        
+
         const regs = await (await import('@/lib/db')).getAllRegistrationsByPhone(phone.replace(/[^0-9]/g, ''));
         setDbRegs(regs);
+        setSelectedType(''); // Reset type for next use
       } catch (error) {
         console.error("Registration Error:", error);
-        alert("신청 중 오류가 발생했습니다.");
+        alert(t.home.history.error);
       }
     };
 
@@ -103,39 +124,45 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
     else action();
   };
 
-  useEffect(() => {
-    const handlePopState = () => {
-      if (paymentSheet?.isOpen) {
-        setPaymentSheet(null);
-      }
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, [paymentSheet]);
+  // Removed redundant second handlePopState listener
 
   const handlePaymentConfirm = (id: string, type: string) => {
     setPaymentSheet({ isOpen: true, regId: id, type });
-    setSelectedOption('');
-    window.history.pushState({ modal: 'paymentSheet' }, '', '');
+    setSelectedOption(type); // Pre-populate with current type
   };
 
   const submitPayment = async () => {
     if (!selectedOption || !paymentSheet) {
-      alert('옵션을 선택해주세요.');
+      alert(t.home.payment.optionPrompt);
       return;
     }
 
-    // Determine amount based on option text
+    // Determine amount based on option text or index
+    // Note: This logic is still tied to Korean strings in the DB for amount calculation,
+    // but the UI will show localized options from the array.
+    // To be safe, we map the localized options back to values.
+    const options = t.home.payment.options;
+    const index = options.indexOf(selectedOption);
+
+    // Find the registration to get class count
+    const reg = dbRegs.find(r => r.id === paymentSheet.regId);
+    const classCount = reg?.classIds.length || 0;
+
     let amount = 0;
-    if (selectedOption.includes('18만원')) amount = 180000;
-    else if (selectedOption.includes('12만원')) amount = 120000;
-    else if (selectedOption.includes('86만원')) amount = 860000;
-    else amount = 180000; // Membership sequels
-    
+    if (index === 0) { // 개별수강
+      amount = 120000;
+    } else if (index === 1) { // 1개월멤버쉽
+      amount = 171000; // 5% Discount 
+    } else if (index === 2) { // 6개월멤버쉽(1차)
+      amount = 860000;
+    } else { // 6개월멤버쉽(2차~6차)
+      amount = 0;
+    }
+
     try {
       const { updatePaymentStatus } = await import('@/lib/db');
       await updatePaymentStatus(paymentSheet.regId, amount, selectedOption);
-      alert('입금 확인 요청이 완료되었습니다.');
+      alert(t.home.history.confirmSuccess);
       setPaymentSheet(null);
       // Refresh
       const savedUser = localStorage.getItem('ft_user');
@@ -147,18 +174,8 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
       }
     } catch (e) {
       console.error(e);
-      alert('오류가 발생했습니다.');
+      alert(t.home.history.error);
     }
-  };
-
-  const calculateMembershipMonth = (currentReg: Registration) => {
-    if (currentReg.type !== '6개월 멤버쉽') return null;
-    const pastMemberRegs = dbRegs
-      .filter(r => r.type === '6개월 멤버쉽')
-      .sort((a, b) => a.date.localeCompare(b.date));
-    
-    const index = pastMemberRegs.findIndex(r => r.id === currentReg.id);
-    return index !== -1 ? index + 1 : 1;
   };
 
   const toggleSelection = (id: string) => {
@@ -173,23 +190,28 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
   };
 
   const handleDeleteRegistration = async (id: string) => {
-    if (!confirm('정말 신청 내역을 삭제하시겠습니까?')) return;
+    if (!confirm(t.home.history.deleteConfirm)) return;
     try {
       const { deleteRegistration } = await import('@/lib/db');
       await deleteRegistration(id);
       setDbRegs(prev => prev.filter(r => r.id !== id));
-      alert('삭제되었습니다.');
+      alert(t.home.history.deleteSuccess);
       window.dispatchEvent(new Event('ft_registrations_updated'));
       window.dispatchEvent(new Event('ft_user_updated'));
     } catch (e) {
-      alert('오류가 발생했습니다.');
+      alert(t.home.history.error);
     }
   };
 
   const handleEditRegistration = (reg: Registration) => {
     setEditingRegId(reg.id);
     setSelectedIds(new Set(reg.classIds));
-    document.getElementById('selection-section')?.scrollIntoView({ behavior: 'smooth' });
+    setSelectedType(reg.type); // Store current type when editing
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    setTimeout(() => {
+      document.getElementById('selection-section')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
   };
 
   // Filter classes for the current selection month
@@ -214,156 +236,182 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
     return (
       <div className={styles.successContainer}>
         <div className={styles.successIcon}>✨</div>
-        <h2 className={styles.successTitle}>환영합니다.</h2>
+        <h2 className={styles.successTitle}>{t.home.success.welcome}</h2>
         <p className={styles.successMessage}>
-          신청은 완료되었습니다.<br/>
-          위 계좌로 입금하시기 바랍니다.
+          {t.home.success.completed.split('\n').map((line: string, i: number) => (
+            <React.Fragment key={i}>{line}<br /></React.Fragment>
+          ))}
         </p>
         <p className={styles.successMessageInfo}>
-          입금시 닉네임을 알 수 있거나,<br/>
-          입금자명을 스톤에게 보내주셔야<br/>
-          정확히 확인할 수 있습니다.
+          {t.home.success.info.split('\n').map((line: string, i: number) => (
+            <React.Fragment key={i}>{line}<br /></React.Fragment>
+          ))}
         </p>
         <div className={styles.bankBox}>
-          <span className={styles.bankLabel}>계좌번호</span>
-          <span className={styles.bankNumber}>카카오뱅크 3333-14-3159646 홍병석</span>
+          <span className={styles.bankLabel}>{t.home.success.bankLabel}</span>
+          <span className={styles.bankNumber}>{t.home.success.bankNumber}</span>
           <button className={styles.copyBtnSmall} onClick={handleCopySuccess}>
-            복사하기
+            {t.home.success.copyBtn}
           </button>
         </div>
         <button className={styles.closeBtn} onClick={() => {
-          // Open payment sheet for the latest registration if possible
-          // For now, just close and let them use the history list
           setIsSuccess(false);
-          onClose();
-        }}>완료</button>
+          setEditingRegId(null);
+          onClose(); // Explicitly call onClose to remove the modal
+        }}>{t.home.success.done}</button>
 
         {showToast && (
           <div className={styles.copyToast}>
-            계좌번호가 복사되었습니다
+            {t.home.success.copySuccess}
           </div>
         )}
       </div>
     );
   }
 
-  const daysOrdered = ['월요일','화요일','수요일','목요일','금요일','토요일','일요일','기타'];
+  const daysOrdered = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일', '기타'];
   const existingRegForMonth = dbRegs.find(r => r.month === selectedMonth);
 
   return (
     <div className={styles.container}>
       {/* 1. History Section */}
-      <div className={styles.historySection}>
-        <h3 className={styles.sectionTitle}>📅 나의 신청 내역</h3>
-        {isLoading ? (
-          <div className={styles.loadingSmall}>데이터를 불러오는 중...</div>
-        ) : dbRegs.length === 0 ? (
-          <div className={styles.emptyHistory}>아직 신청 내역이 없습니다.</div>
-        ) : (
-          <div className={styles.historyList}>
-            {dbRegs.map(reg => {
-              const monthName = reg.month ? reg.month.split('-')[1] : '4';
-              const dayMap: Record<string, number> = {
-                '월요일': 0, '화요일': 1, '수요일': 2, '목요일': 3, '금요일': 4, '토요일': 5, '일요일': 6, '기타': 7
-              };
-              const dayShort: Record<string, string> = {
-                '월요일': '월', '화요일': '화', '수요일': '수', '목요일': '목', '금요일': '금', '토요일': '토', '일요일': '일', '기타': '기타'
-              };
+      {!hideHistory && (
+        <div className={styles.historySection}>
+          <h3 className={styles.sectionTitle}>{t.home.history.title}</h3>
+          {isLoading ? (
+            <div className={styles.loadingSmall}>{t.home.history.loading}</div>
+          ) : dbRegs.length === 0 ? (
+            <div className={styles.emptyHistory}>{t.home.history.empty}</div>
+          ) : (
+            <div className={styles.historyList}>
+              {dbRegs.map(reg => {
+                const monthName = reg.month ? reg.month.split('-')[1] : '4';
+                const dayMap: Record<string, number> = {
+                  '월요일': 0, '화요일': 1, '수요일': 2, '목요일': 3, '금요일': 4, '토요일': 5, '일요일': 6, '기타': 7
+                };
+                const dayShort: Record<string, string> = {
+                  '월요일': '월', '화요일': '화', '수요일': '수', '목요일': '목', '금요일': '금', '토요일': '토', '일요일': '일', '기타': '기타'
+                };
 
-              const regClasses = classes
-                .filter(c => reg.classIds.includes(c.id))
-                .sort((a, b) => {
-                  const dayA = a.time.match(/([월화수목금토일]요일)/)?.[1] || '기타';
-                  const dayB = b.time.match(/([월화수목금토일]요일)/)?.[1] || '기타';
-                  return dayMap[dayA] - dayMap[dayB];
-                });
+                const regClasses = classes
+                  .filter(c => reg.classIds.includes(c.id))
+                  .sort((a, b) => {
+                    const dayA = a.time.match(/([월화수목금토일]요일)/)?.[1] || '기타';
+                    const dayB = b.time.match(/([월화수목금토일]요일)/)?.[1] || '기타';
+                    return dayMap[dayA] - dayMap[dayB];
+                  });
 
-              return (
-                <div key={reg.id} className={styles.historyCard}>
-                  <div className={styles.cardHeader}>
-                    <div className={styles.cardTitle}>
-                      <span className={styles.monthTag}>{monthName}월</span>
-                      수업 신청 완료
-                    </div>
-                    <div className={`${styles.statusBadge} ${reg.status === 'paid' ? styles.statusPaid : styles.statusWaiting}`}>
-                      {reg.status === 'paid' ? '입금 확인됨' : '입금 대기중'}
-                    </div>
-                  </div>
-                  
-                  <div className={styles.regInfo}>
-                    신청일: {new Date(reg.date).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                  </div>
-
-                  <div className={styles.regClasses}>
-                    {regClasses.map(c => {
-                      const dayName = c.time.match(/([월화수목금토일]요일)/)?.[1] || '기타';
-                      return (
-                        <div key={c.id} className={styles.regClassInner}>
-                          • {dayShort[dayName]} : {c.title}
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <div className={styles.cardActions}>
-                    {reg.status === 'paid' ? (
-                      <div className={styles.paidArea}>
-                        <div className={styles.paidMessage}>
-                          {reg.type} {reg.amount?.toLocaleString()}원을 입금함
-                        </div>
-                        <div className={styles.paidDate}>확인일: {new Date(reg.paidAt!).toLocaleString()}</div>
+                return (
+                  <div key={reg.id} className={styles.historyCard}>
+                    <div className={styles.cardHeader}>
+                      <div className={styles.cardTitle}>
+                        <span className={styles.monthTag}>{monthName}{language === 'ko' ? '월' : ''}</span>
+                        {language === 'ko' ? `신청현황 (${reg.classIds.length}과목)` : `Applied Classes (${reg.classIds.length})`}
                       </div>
-                    ) : (
+                      <div className={`${styles.statusBadge} ${reg.status === 'paid' ? styles.statusPaid : styles.statusWaiting}`}>
+                        {reg.status === 'paid' ? t.home.history.statusPaid : t.home.history.statusWaiting}
+                      </div>
+                    </div>
+
+                    <div className={styles.regInfo}>
+                      {t.home.history.appliedDate.replace('{date}', new Date(reg.date).toLocaleString(language, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }))}
+                    </div>
+
+                    <div className={styles.regClasses}>
+                      {regClasses.map(c => {
+                        const dayName = c.time.match(/([월화수목금토일]요일)/)?.[1] || '기타';
+                        return (
+                          <div key={c.id} className={styles.regClassInner}>
+                            • {dayShort[dayName]} : {c.title}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <div className={styles.cardActions}>
+                      {reg.status === 'paid' && (
+                        <div className={styles.paidArea}>
+                          <div className={styles.paidMessage}>
+                            {t.home.history.paidMsg
+                              .replace('{type}', reg.type)
+                              .replace('{amount}', reg.amount?.toLocaleString() || '0')}
+                          </div>
+                          <div className={styles.paidDate}>
+                            {t.home.history.paidDate.replace('{date}', new Date(reg.paidAt!).toLocaleString(language))}
+                          </div>
+                        </div>
+                      )}
+
                       <div className={styles.unpaidActions}>
                         <div className={styles.unpaidHeader}>
-                          <button 
-                            className={styles.confirmPayBtn}
-                            onClick={() => handlePaymentConfirm(reg.id, reg.type)}
-                          >
-                            입금완료 버튼 클릭
-                          </button>
+                          {reg.status !== 'paid' && (
+                            <button
+                              className={styles.confirmPayBtn}
+                              onClick={() => handlePaymentConfirm(reg.id, reg.type)}
+                            >
+                              {t.home.history.confirmPayBtn}
+                            </button>
+                          )}
                           <div className={styles.editDeleteGroup}>
-                            <button 
+                            <button
                               className={styles.editBtn}
                               onClick={() => handleEditRegistration(reg)}
                             >
-                              수정
+                              {t.home.history.edit}
                             </button>
-                            <button 
+                            <button
                               className={styles.deleteBtn}
                               onClick={() => handleDeleteRegistration(reg.id)}
                             >
-                              삭제
+                              {t.home.history.delete}
                             </button>
                           </div>
                         </div>
                       </div>
-                    )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className={styles.divider} />
 
       {/* 2. Current Selection Section */}
-      {(editingRegId || !existingRegForMonth) ? (
+      {(!hideForm && !isLoading && (editingRegId || !existingRegForMonth)) ? (
         <>
           <div id="selection-section" className={styles.selectionSection}>
             <h3 className={styles.sectionTitle}>
-              {editingRegId ? '🔄 신청 내역 수정하기' : `✍️ ${selectedMonth.split('-')[1]}월 신규 신청하기`}
+              {editingRegId
+                ? t.home.registrationStatus.editTitle
+                : t.home.registrationStatus.newTitle.replace('{month}', selectedMonth.split('-')[1])}
             </h3>
             {editingRegId && (
               <button className={styles.cancelEditBtn} onClick={() => {
                 setEditingRegId(null);
                 setSelectedIds(new Set());
-              }}>수정 취소</button>
+                setSelectedType('');
+              }}>{t.home.registrationStatus.cancelEdit}</button>
             )}
-            <p className={styles.sectionDesc}>원하는 수업을 체크하고 하단 버튼을 눌러주세요.</p>
-            
+            <p className={styles.sectionDesc}>{t.home.registrationStatus.desc}</p>
+
+            <div className={styles.typeSelectorArea}>
+              <h4 className={styles.dayTitle}>{t.home.registrationStatus.typeSelectorTitle}</h4>
+              <select
+                className={styles.paymentSelect}
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value)}
+                style={{ marginTop: '5px', marginBottom: '20px' }}
+              >
+                <option value="">{t.home.payment.placeholder}</option>
+                {t.home.payment.options.map((opt: string, i: number) => (
+                  <option key={i} value={opt}>{opt}</option>
+                ))}
+              </select>
+            </div>
+
             <div className={styles.listContainer}>
               {daysOrdered.map(day => {
                 if (!grouped[day] || grouped[day].length === 0) return null;
@@ -373,15 +421,18 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
                     <div className={styles.classList}>
                       {grouped[day].map(cls => (
                         <label key={cls.id} className={styles.classItem}>
-                          <input 
-                            type="checkbox" 
+                          <input
+                            type="checkbox"
                             className={styles.checkbox}
                             checked={selectedIds.has(cls.id)}
                             onChange={() => toggleSelection(cls.id)}
                           />
                           <div className={styles.classInfo}>
-                            <div className={styles.classTitle}>{cls.title}</div>
-                            <div className={styles.classMeta}>{cls.time} | 강사: {cls.teacher1}</div>
+                            <div className={styles.classTitle}>
+                              {cls.title}
+                              <span className={styles.classInstructor}> ({cls.teacher1}{cls.teacher2 ? ` & ${cls.teacher2}` : ''})</span>
+                            </div>
+                            <div className={styles.classMeta}>{cls.time}</div>
                           </div>
                         </label>
                       ))}
@@ -392,16 +443,34 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
             </div>
           </div>
 
+          <div className={styles.priceDisplay}>
+            <span className={styles.priceLabel}>{language === 'ko' ? '예상 결제 금액' : 'Estimated Amount'}</span>
+            <span className={styles.priceValue}>
+              {(() => {
+                if (selectedIds.size === 0 || selectedType === '') return '0원';
+                const idx = t.home.payment.options.indexOf(selectedType);
+                if (idx === 0) return '120,000원';
+                if (idx === 1) return '171,000원';
+                if (idx === 2) return '860,000원';
+                return '0원';
+              })()}
+            </span>
+          </div>
+
           <div className={styles.footer}>
-            <button 
-              className={selectedIds.size > 0 ? styles.actionBtnPrimary : styles.actionBtnDisabled} 
+            <button
+              className={(selectedIds.size > 0 && selectedType !== '') ? styles.actionBtnPrimary : styles.actionBtnDisabled}
               onClick={() => {
-                if (selectedIds.size === 0) return;
+                if (selectedIds.size === 0 || selectedType === '') return;
                 handleRegister(selectedIds.size >= 2 ? 'month1' : 'single');
               }}
-              disabled={selectedIds.size === 0}
+              disabled={selectedIds.size === 0 || selectedType === ''}
             >
-              {selectedIds.size === 0 ? '신청할 수업을 선택하세요' : (editingRegId ? '신청 내역 수정 완료' : '수업 신청하기')}
+              {selectedIds.size === 0
+                ? t.home.registrationStatus.selectPrompt
+                : selectedType === ''
+                  ? (t.home.payment.placeholder || '신청 유형을 선택해주세요')
+                  : (editingRegId ? t.home.registrationStatus.editSubmit : t.home.registrationStatus.newSubmit)}
             </button>
           </div>
         </>
@@ -412,29 +481,39 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
         <div className={styles.sheetOverlay}>
           <div className={styles.bottomSheet}>
             <div className={styles.sheetHeader}>
-              <h4 className={styles.sheetTitle}>입금 확인 정보 선택</h4>
-              <p className={styles.sheetDesc}>입금하신 항목을 선택해주세요.</p>
+              <h4 className={styles.sheetTitle}>{t.home.payment.title}</h4>
+              <p className={styles.sheetDesc}>{t.home.payment.desc}</p>
             </div>
-            
-            <select 
+
+            <select
               className={styles.paymentSelect}
               value={selectedOption}
               onChange={(e) => setSelectedOption(e.target.value)}
             >
-              <option value="">선택해주세요</option>
-              <option value="1개월수강 18만원 입금하였습니다.">1개월수강 18만원 입금하였습니다.</option>
-              <option value="단일수업 신청 12만원 입금하였습니다.">단일수업 신청 12만원 입금하였습니다.</option>
-              <option value="6개월 멤버쉽 86만원을 입금하였습니다">6개월 멤버쉽 86만원을 입금하였습니다</option>
-              <option value="기존 6개월 멤버쉽 2개월차입니다">기존 6개월 멤버쉽 2개월차입니다</option>
-              <option value="기존 6개월 멤버쉽 3개월차입니다">기존 6개월 멤버쉽 3개월차입니다</option>
-              <option value="기존 6개월 멤버쉽 4개월차입니다">기존 6개월 멤버쉽 4개월차입니다</option>
-              <option value="기존 6개월 멤버쉽 5개월차입니다">기존 6개월 멤버쉽 5개월차입니다</option>
-              <option value="기존 6개월 멤버쉽 마지막 월입니다">기존 6개월 멤버쉽 마지막 월입니다</option>
+              <option value="">{t.home.payment.placeholder}</option>
+              {t.home.payment.options.map((opt: string, i: number) => (
+                <option key={i} value={opt}>{opt}</option>
+              ))}
             </select>
 
+            {selectedOption && (
+              <div className={styles.amountDisplay}>
+                <span className={styles.amountLabel}>{language === 'ko' ? '결제 금액' : 'Amount'}</span>
+                <span className={styles.amountValue}>
+                  {(() => {
+                    const idx = t.home.payment.options.indexOf(selectedOption);
+                    if (idx === 0) return '120,000원';
+                    if (idx === 1) return '171,000원 (5% 할인 적용)';
+                    if (idx === 2) return '860,000원';
+                    return '0원';
+                  })()}
+                </span>
+              </div>
+            )}
+
             <div className={styles.sheetFooter}>
-              <button className={styles.cancelBtn} onClick={() => setPaymentSheet(null)}>취소</button>
-              <button className={styles.submitBtn} onClick={submitPayment}>입금확인</button>
+              <button className={styles.cancelBtn} onClick={() => setPaymentSheet(null)}>{t.home.payment.cancel}</button>
+              <button className={styles.submitBtn} onClick={submitPayment}>{t.home.payment.submit}</button>
             </div>
           </div>
         </div>

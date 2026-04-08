@@ -1,0 +1,60 @@
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isValidImage(sizeMB) {
+      return request.resource.size < sizeMB * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+    
+    function isValidVideo(sizeMB) {
+      return request.resource.size < sizeMB * 1024 * 1024
+        && (request.resource.contentType.matches('video/.*') || request.resource.contentType.matches('application/x-mpegURL'));
+    }
+
+    // Milonga posters and photos (Limited to 20MB images)
+    match /milongas/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAuthenticated() && isValidImage(20);
+    }
+    
+    // Class images and videos (Limited to 100MB for short clips or high-res images)
+    match /classes/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAuthenticated() && (isValidImage(50) || isValidVideo(100));
+    }
+
+    // Milonga Lucy Live - Member uploads (Up to 500MB)
+    match /milonga_live/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAuthenticated() && (isValidImage(50) || isValidVideo(500));
+    }
+
+    // User-uploaded videos (3-minute support up to 500MB)
+    match /videos/{uid}/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAuthenticated() && request.auth.uid == uid && isValidVideo(500);
+    }
+
+    // Chat photos and videos
+    match /chat/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAuthenticated() && (isValidImage(50) || isValidVideo(100));
+    }
+    
+    // User profile photos
+    match /users/{phone}/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAuthenticated() && isValidImage(5);
+    }
+
+    // General assets or other future needs
+    match /{allPaths=**} {
+      allow read: if true;
+      allow write: if false; // Default deny for other paths
+    }
+  }
+}

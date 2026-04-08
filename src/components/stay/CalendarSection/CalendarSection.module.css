@@ -134,6 +134,12 @@
   opacity: 1;
 }
 
+.dayBtn.bookedStart {
+  background-color: #ff4b82 !important;
+  color: #ffffff !important;
+  text-decoration: none !important;
+}
+
 .dayBtn.past {
   color: #e5e8eb;
   cursor: not-allowed;
@@ -299,9 +305,9 @@
 }
 /* Inline/Monthly List Section */
 .inlineListSection {
-  margin-top: 3rem;
-  padding-top: 2rem;
-  border-top: 1px solid #f2f4f6;
+  /* margin-top: 3rem; */
+  /* padding-top: 2rem; */
+  /* border-top: 1px solid #f2f4f6; */
 }
 
 .inlineListHeader {
@@ -417,45 +423,14 @@
   gap: 4px;
 }
 
-.miniDay {
-  aspect-ratio: 1 / 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.85rem;
-  font-weight: 500;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.miniDayAvailable {
-  background-color: #f9fafb;
-  color: #adb5bd;
-}
-
-.miniDayBooked {
-  background-color: #fff0f6;
-  color: #ff4b82;
-  font-weight: 700;
-}
-
-.miniDayStart {
-  background-color: #ff4b82;
-  color: #ffffff;
-}
-
-.miniDayEmpty {
-  background-color: transparent;
-  cursor: default;
-}
-
-/* Detail Modal in CalendarSection */
 .detailBody {
-  padding: 1.5rem 0;
+  flex: 1;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.5rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .detailRow {
@@ -482,10 +457,46 @@
   color: #3182f6;
 }
 
+.miniDay {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.miniDayEmpty {
+  cursor: default;
+}
+
+.miniDayAvailable {
+  background-color: #f9fafb;
+  color: #adb5bd;
+}
+
+.miniDayBooked {
+  background-color: #fff0f6;
+  color: #ff4b82;
+  font-weight: 700;
+}
+
+.miniDayStart {
+  background-color: #ff4b82;
+  color: #ffffff;
+}
+
 .modalFooter {
   display: flex;
   gap: 0.75rem;
-  margin-top: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid #f2f4f6;
+  background: white;
+  position: sticky;
+  bottom: 0;
 }
 
 .secondaryBtn {
@@ -535,6 +546,12 @@
   background: #f9fafb;
 }
 
+.editRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .editTextarea {
   padding: 0.75rem;
   border-radius: 12px;
@@ -552,23 +569,23 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: #ffffff; /* Full white background for full popup */
   display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 3000; /* Higher than FullscreenModal which is 2000 */
+  flex-direction: column;
+  z-index: 3000;
 }
 
 .modalContent {
   background: white;
-  width: 90%;
-  max-width: 500px;
-  max-height: 85vh;
-  border-radius: 20px;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  border-radius: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  box-shadow: none;
 }
 
 .modalHeader {
@@ -577,6 +594,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
 }
 
 .modalHeader h3 {

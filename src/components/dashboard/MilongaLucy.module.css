@@ -10,26 +10,96 @@
   position: relative;
   width: 100%;
   background: var(--bg-base);
+  padding: 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.posterCard {
+  background: #1a1a1a;
+  border-radius: 20px;
   overflow: hidden;
-  border-bottom: 1px solid var(--border-light);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
 }
 
 .heroImageWrapper {
   width: 100%;
-  min-height: 240px;
+  position: relative;
+}
+
+.heroImageContainer {
+  width: 100%;
+  cursor: zoom-in;
+}
+
+
+/* Tab Navigation Styles - Standardized */
+.tabNav {
+  display: flex;
+  background: #fff;
+  border-bottom: 1px solid #e5e8eb;
+  padding: 0 1rem;
+  margin: 0;
+  gap: 0;
+}
+
+.tabBtn {
+  flex: 1;
+  padding: 14px 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-tertiary);
-  position: relative;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #8b95a1;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative; /* For absolute badge */
+}
+
+.badge {
+  position: absolute;
+  top: 6px;
+  right: calc(50% - 32px);
+  background-color: #ff4d4f;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  border: 1.5px solid #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.activeTabBtn {
+  color: #3182f6;
+  border-bottom-color: #3182f6;
 }
 
 .heroImage {
   width: 100%;
   height: auto;
-  max-height: 60vh;
   display: block;
   object-fit: contain;
+}
+
+
+.heroImage:hover {
+  opacity: 0.95;
 }
 
 .editOverlay {
@@ -63,18 +133,35 @@
 }
 
 .messageArea {
-  padding: var(--space-6) var(--space-4);
-  background: var(--bg-base);
+  padding: 1.5rem 1.25rem;
+  background: #1a1a1a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .milongaMessage {
-  font-size: 1.05rem;
-  line-height: 1.6;
-  color: var(--text-primary);
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: #ffffff;
   white-space: pre-wrap;
-  letter-spacing: -0.02em;
-  font-weight: 600;
-  text-align: center;
+  letter-spacing: -0.01em;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+}
+
+.creditLine {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 0.75rem;
+  width: auto;
+  white-space: nowrap;
 }
 
 .eventSection {
@@ -144,7 +231,7 @@
 .bookingBtn {
   width: 100%;
   padding: var(--space-4);
-  background: var(--accent);
+  background: #3182f6;
   color: #fff;
   border: none;
   border-radius: var(--radius-md);
@@ -156,6 +243,98 @@
 
 .bookingBtn:active {
   transform: scale(0.98);
+}
+
+.bookingClosed {
+  width: 100%;
+  padding: var(--space-4);
+  background: #f2f4f6;
+  color: #adb5bd;
+  text-align: center;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  border: 1px solid #e5e8eb;
+}
+
+/* Live Tab (Lucy Live) Styles */
+.liveContainer {
+  padding: 0;
+  min-height: 400px;
+}
+
+.liveHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+}
+
+.uploadFab {
+  position: fixed;
+  bottom: 90px; /* Above Bottom Menu */
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #3182f6;
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(49, 130, 246, 0.4);
+  z-index: 100;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.uploadFab:active {
+  transform: scale(0.9);
+}
+
+.uploadFab svg {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.navControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.navBtn {
+  background: #fff;
+  border: 1px solid var(--border-light);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.navBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.navBtn:not(:disabled):hover {
+  background: #f8f9fa;
+  transform: translateY(-1px);
+}
+
+.navDateLabel {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: 0.05em;
 }
 
 
@@ -200,6 +379,21 @@
   padding: 0.75rem 0;
   background: #fff;
   border-bottom: 1px solid #f2f4f6;
+}
+
+.resBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #3182f6;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  margin-left: 2px;
 }
 
 .resItemVip {
@@ -347,3 +541,173 @@
   opacity: 0.6;
 }
 
+.fullscreenPosterContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+  min-height: 100vh;
+  position: relative;
+}
+
+.fullscreenPoster {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  background: #fff;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.detailCardWrapper {
+  width: 92%;
+  max-width: 450px;
+  background: #fff;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.modalCloseBtn {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 100;
+}
+
+.zoomHint {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  padding: 4px 10px;
+  background: rgba(0,0,0,0.4);
+  color: #fff;
+  font-size: 0.75rem;
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.fullscreenActions {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.circleDownloadBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.6rem 1rem;
+  background: #3182f6;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: all 0.2s;
+}
+
+.circleDownloadBtn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.circleDownloadBtn:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+.deleteActionBtn {
+  background: #ff4d4f;
+}
+
+/* Date Grouping Styles */
+.dateGroup {
+  margin-bottom: 1.5rem;
+}
+
+.dateDivider {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 12px 1rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dateDivider span {
+  font-size: 13px;
+  font-weight: 800;
+  color: #4e5968;
+  white-space: nowrap;
+  background: #f2f4f6;
+  padding: 4px 12px;
+  border-radius: 10px;
+}
+
+.dividerLine {
+  flex: 1;
+  height: 1px;
+  background: #e5e8eb;
+  opacity: 0.6;
+}
+
+.noAccess {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  color: #adb5bd;
+}
+
+.noAccess p {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+.priceDisplay {
+  margin-top: 1rem;
+  padding: 1.25rem;
+  background: #f2f4f6;
+  border-radius: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #e5e8eb;
+}
+
+.priceLabel {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #4e5968;
+}
+
+.priceValue {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #3182f6;
+}

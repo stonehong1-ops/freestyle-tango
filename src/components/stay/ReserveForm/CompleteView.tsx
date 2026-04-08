@@ -29,17 +29,15 @@ export default function CompleteView({ data, onHome }: CompleteViewProps) {
     setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent));
   }, []);
 
-  const fullBody = `[${stayName} 예약확인]
-예약자: ${data.name}님
-날짜: ${data.checkIn} ~ ${data.checkOut}
-인원: ${data.guests}명
-금액: ${data.totalAmount.toLocaleString()}원
-
-[입실 안내]
-시간: 오후 4시
-비밀번호: 9999
-
-감사합니다!`;
+  // Fill the localized template
+  const template = (t.reserve as any).smsTemplate || '';
+  const fullBody = template
+    .replace('{stayName}', stayName)
+    .replace('{name}', data.name)
+    .replace('{checkIn}', data.checkIn)
+    .replace('{checkOut}', data.checkOut)
+    .replace('{guests}', data.guests.toString())
+    .replace('{amount}', data.totalAmount.toLocaleString());
   
   const separator = isIOS ? '&' : '?';
   const smsUrl = `sms:${data.phone}${separator}body=${encodeURIComponent(fullBody)}`;

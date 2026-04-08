@@ -1,27 +1,45 @@
 .overlay {
   position: fixed;
-  bottom: 100px;
-  left: 20px;
-  right: 20px;
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 10000;
-  padding: 1.25rem;
-  animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-  border: 1px solid #f2f4f6;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-out;
 }
 
-@keyframes slideUp {
-  from { transform: translateY(100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.container {
+  width: 100%;
+  max-width: 360px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 28px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  animation: scaleUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1.1);
+  position: relative;
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 .header {
+  padding: 20px 24px 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.75rem;
 }
 
 .header h3 {
@@ -31,40 +49,96 @@
   color: #191f28;
 }
 
-.header button {
-  background: none;
+.closeBtn {
+  background: #f2f4f6;
   border: none;
-  font-size: 1.25rem;
-  color: #adb5bd;
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4e5968;
   cursor: pointer;
-  padding: 0.25rem;
+  font-size: 14px;
 }
 
-.container p {
-  margin: 0 0 1.25rem;
+.content {
+  padding: 0 24px 24px;
+}
+
+.desc {
   font-size: 0.95rem;
   color: #4e5968;
-  line-height: 1.5;
+  line-height: 1.6;
+  margin: 0 0 20px;
+  text-align: center;
+}
+
+.imageBox {
+  width: 100%;
+  background: #f9fafb;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  border: 1px solid #eee;
+}
+
+.guideImage {
+  width: 100%;
+  display: block;
+}
+
+.confirmBtn {
+  width: 100%;
+  background: #3182f6;
+  color: white;
+  border: none;
+  padding: 16px;
+  border-radius: 16px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.confirmBtn:active {
+  transform: scale(0.98);
+  background: #1b64da;
+}
+
+/* Kakao Guide Styling */
+.kakaoGuide {
+  padding-top: 10px;
 }
 
 .steps {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  background: #f9fafb;
-  padding: 1rem;
-  border-radius: 14px;
+  gap: 12px;
 }
 
 .step {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  font-size: 0.9rem;
+  gap: 12px;
+  background: #f9fafb;
+  padding: 14px;
+  border-radius: 14px;
+  font-size: 0.95rem;
   font-weight: 600;
   color: #333d4b;
 }
 
-.icon {
-  font-size: 1.2rem;
+.stepNum {
+  background: #3182f6;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
 }
