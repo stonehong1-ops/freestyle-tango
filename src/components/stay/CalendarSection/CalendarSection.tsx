@@ -236,7 +236,10 @@ export default function CalendarSection({
         "2024-05-15", "2024-06-06", "2024-08-15", "2024-09-16", "2024-09-17", "2024-09-18", "2024-10-03",
         "2024-10-09", "2024-12-25",
         "2025-01-01", "2025-01-28", "2025-01-29", "2025-01-30", "2025-03-03", "2025-05-05", "2025-05-06",
-        "2025-06-06", "2025-08-15", "2025-10-03", "2025-10-06", "2025-10-07", "2025-10-08", "2025-10-09", "2025-12-25"
+        "2025-06-06", "2025-08-15", "2025-10-03", "2025-10-06", "2025-10-07", "2025-10-08", "2025-10-09", "2025-12-25",
+        "2026-01-01", "2026-02-16", "2026-02-17", "2026-02-18", "2026-03-01", "2026-03-02", "2026-05-05",
+        "2026-05-24", "2026-05-25", "2026-06-06", "2026-08-15", "2026-08-17", "2026-09-24", "2026-09-25",
+        "2026-09-26", "2026-09-28", "2026-10-03", "2026-10-05", "2026-10-09", "2026-12-25"
     ];
 
     for (let i = 0; i < nights; i++) {
@@ -253,7 +256,7 @@ export default function CalendarSection({
             guestSurcharge += (gCount - 1) * 10000;
         }
         
-        const isWeekend = day === 5 || day === 6;
+        const isWeekend = day === 5 || day === 6; // Friday/Saturday nights (weekend pricing)
         if (isWeekend || holidays.includes(dateStr)) {
             weekendSurcharge += 10000;
         }
@@ -281,7 +284,8 @@ export default function CalendarSection({
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstDay = new Date(year, month, 1).getDay();
+  // Monday start logic: (getDay() + 6) % 7
+  const firstDay = (new Date(year, month, 1).getDay() + 6) % 7;
   
   const days: (string | null)[] = Array.from({ length: firstDay }, () => null);
   for (let i = 1; i <= daysInMonth; i++) {
@@ -670,7 +674,7 @@ export default function CalendarSection({
               </div>
               
               <div className={styles.weekdays}>
-                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
+                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => (
                   <div key={d}>{t.calendar[d as keyof typeof t.calendar]}</div>
                 ))}
               </div>
@@ -679,6 +683,17 @@ export default function CalendarSection({
                 {days.map((dStr, idx) => {
                   if (!dStr) return <div key={`empty-${idx}`} className={styles.emptyDay} />;
                   
+                  const dateObj = new Date(dStr);
+                  const dayOfWeek = dateObj.getDay(); 
+                  const isKoreanHoliday = (date: string) => {
+                    const holidays = [
+                      "2026-01-01", "2026-02-16", "2026-02-17", "2026-02-18", "2026-03-01", "2026-03-02", "2026-05-05",
+                      "2026-05-24", "2026-05-25", "2026-06-06", "2026-08-15", "2026-08-17", "2026-09-24", "2026-09-25",
+                      "2026-09-26", "2026-09-28", "2026-10-03", "2026-10-05", "2026-10-09", "2026-12-25"
+                    ];
+                    return holidays.includes(date);
+                  };
+
                   const bookedInfo = blockedDates.find(b => b.date === dStr);
                   const isBlocked = !!bookedInfo;
                   const isStartOfBooking = isBlocked && bookedInfo?.checkIn === dStr;
@@ -687,6 +702,7 @@ export default function CalendarSection({
                   const isCheckIn = checkIn === dStr;
                   const isCheckOut = checkOut === dStr;
                   const isInRange = checkIn && checkOut && dStr > checkIn && dStr < checkOut;
+                  const isHoliday = isKoreanHoliday(dStr);
                   
                   let classNames = `${styles.dayBtn}`;
                   if (isPast) classNames += ` ${styles.past}`;
@@ -695,6 +711,9 @@ export default function CalendarSection({
                   if (isStartOfBooking) classNames += ` ${styles.bookedStart}`;
                   if (isCheckIn || isCheckOut) classNames += ` ${styles.selected}`;
                   if (isInRange) classNames += ` ${styles.inRange}`;
+                  
+                  if (isHoliday || dayOfWeek === 0) classNames += ` ${styles.sunday}`;
+                  else if (dayOfWeek === 6) classNames += ` ${styles.saturday}`;
 
                   const dayNum = parseInt(dStr.split('-')[2]);
 

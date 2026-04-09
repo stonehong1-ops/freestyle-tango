@@ -12,6 +12,9 @@ import {
   leaveChatRoom,
   updateChatRoom
 } from '@/lib/chat';
+import { getClasses, getRegistrations, TangoClass, Registration, toggleUserPinnedRoom } from '@/lib/db';
+import { db } from '@/lib/firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Language } from '@/locales';
 import { formatRelativeTime } from '@/lib/utils';
@@ -76,6 +79,27 @@ const SplitAvatar = ({ photos, names, type }: { photos: string[], names: string[
   );
 };
 
+const ChatHeader = ({ searchTerm, setSearchTerm, onSearch }: {
+  searchTerm: string;
+  setSearchTerm: (value: string) => void;
+  onSearch: () => void;
+}) => {
+  const { language } = useLanguage();
+  return (
+    <div className={styles.searchContainer}>
+      <h1 className={styles.title} style={{ margin: '0 0 16px 0', fontSize: '1.6rem', fontWeight: 800 }}>
+        {language === 'ko' ? '채팅' : 'Chats'}
+      </h1>
+      <div className={styles.searchBarWrapper} onClick={onSearch}>
+        <span className={styles.searchIcon}>🔍</span>
+        <div style={{ flex: 1, color: '#8b95a1', fontSize: '0.95rem' }}>
+          {language === 'ko' ? '대화 상대 검색...' : 'Search people...'}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function ChatList({ userPhone, isAdmin, onSelectRoom, selectedRoomId }: ChatListProps) {
   const { language } = useLanguage();
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
@@ -84,15 +108,30 @@ export default function ChatList({ userPhone, isAdmin, onSelectRoom, selectedRoo
   const [selectedUsers, setSelectedUsers] = useState<{ nickname: string; phone: string }[]>([]);
   const [customRoomName, setCustomRoomName] = useState('');
   const [participantCache, setParticipantCache] = useState<{ [phone: string]: { nickname: string, photoURL?: string } }>({});
+  const [classes, setClasses] = useState<TangoClass[]>([]);
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [pinnedRoomIds, setPinnedRoomIds] = useState<string[]>([]);
 
   const cleanUserPhone = userPhone.replace(/[^0-9]/g, '');
 
   useEffect(() => {
     if (!cleanUserPhone) return;
+    const userRef = doc(db, 'users', cleanUserPhone);
+    const unsubUser = onSnapshot(userRef, (snap) => {
+      if (snap.exists()) {
+        const userData = snap.data();
+        setPinnedRoomIds(userData.settings?.pinnedRooms || []);
+      }
+    });
+    return () => unsubUser();
+  }, [cleanUserPhone]);
+
+  useEffect(() => {
+    if (!cleanUserPhone) return;
     initializeSystemRooms();
-    const unsubscribe = subscribeRooms(cleanUserPhone, !!isAdmin, (updatedRooms) => {
+    const unsubscribe = subscribeRooms(cleanUserPhone, !!isAdmin, pinnedRoomIds, (updatedRooms) => {
       setRooms(updatedRooms);
       
       // Fetch missing participant info for cache
@@ -106,6 +145,13 @@ export default function ChatList({ userPhone, isAdmin, onSelectRoom, selectedRoo
     });
     return () => unsubscribe();
   }, [cleanUserPhone, isAdmin, participantCache]);
+
+  useEffect(() => {
+    if (isAdmin) {
+      getClasses().then(setClasses);
+      getRegistrations().then(setRegistrations);
+    }
+  }, [isAdmin]);
 
   // Load Search Results
   useEffect(() => {
@@ -148,32 +194,40 @@ export default function ChatList({ userPhone, isAdmin, onSelectRoom, selectedRoo
 
   const sortedRooms = useMemo(() => {
     const notice = rooms.find(r => r.id === NOTICE_ROOM_ID);
-    const open = rooms.find(r => r.id === COMMUNITY_ROOM_ID);
+    const suda = rooms.find(r => r.id === COMMUNITY_ROOM_ID);
     const others = rooms.filter(r => r.id !== NOTICE_ROOM_ID && r.id !== COMMUNITY_ROOM_ID);
     
+    // Split others into pinned and unpinned, then sort by time
+    const pinned = others.filter(r => pinnedRoomIds.includes(r.id));
+    const unpinned = others.filter(r => !pinnedRoomIds.includes(r.id));
+
     const result: ChatRoom[] = [];
     if (notice) result.push(notice);
-    if (open) result.push(open);
+    if (suda) result.push(suda);
     
-    // Sort others by time
-    const sortedOthers = others.sort((a, b) => {
-      const timeA = a.lastMessageTime?.toMillis() || 0;
-      const timeB = b.lastMessageTime?.toMillis() || 0;
-      return timeB - timeA;
-    });
-    
-    return [...result, ...sortedOthers];
-  }, [rooms]);
+    // Sort subgroups by time
+    const sortByTime = (a: ChatRoom, b: ChatRoom) => (b.lastMessageTime?.toMillis() || 0) - (a.lastMessageTime?.toMillis() || 0);
+
+    return [...result, ...pinned.sort(sortByTime), ...unpinned.sort(sortByTime)];
+  }, [rooms, pinnedRoomIds]);
 
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
 
+  const isRoomPinned = (id: string) => pinnedRoomIds.includes(id);
+
   return (
     <div className={styles.container}>
+      <ChatHeader 
+        searchTerm={searchTerm} 
+        setSearchTerm={setSearchTerm} 
+        onSearch={() => setIsSearchModalOpen(true)}
+      />
+
       <div className={styles.roomList}>
-        {sortedRooms.map(room => (
+        {sortedRooms.map((room) => (
           <RoomItem 
-            key={room.id}
-            room={room}
+            key={room.id} 
+            room={room} 
             cleanUserPhone={cleanUserPhone}
             selectedRoomId={selectedRoomId}
             language={language}
@@ -181,14 +235,26 @@ export default function ChatList({ userPhone, isAdmin, onSelectRoom, selectedRoo
             onSelectRoom={onSelectRoom}
             activeMenuId={activeMenuId}
             setActiveMenuId={setActiveMenuId}
+            isPinned={isRoomPinned(room.id)}
           />
         ))}
+      </div>
+
+      {activeMenuId && (
+        <RoomMenu 
+          roomId={activeMenuId} 
+          rooms={rooms}
+          cleanUserPhone={cleanUserPhone} 
+          language={language}
+          setActiveMenuId={setActiveMenuId}
+          pinnedRoomIds={pinnedRoomIds}
+        />
+      )}
         {sortedRooms.length === 0 && (
           <div className={styles.emptyState}>
             {language === 'ko' ? '진행 중인 채팅이 없습니다.' : 'No active chats.'}
           </div>
         )}
-      </div>
 
       <button 
         className={styles.fab} 
@@ -306,6 +372,7 @@ interface RoomItemProps {
   selectedRoomId?: string;
   language: Language;
   participantCache: { [phone: string]: { nickname: string, photoURL?: string } };
+  isAdmin?: boolean;
   onSelectRoom: (roomId: string, roomName: string, participants?: string[]) => void;
   activeMenuId: string | null;
   setActiveMenuId: (id: string | null) => void;
@@ -319,8 +386,9 @@ const RoomItem = ({
   participantCache, 
   onSelectRoom,
   activeMenuId,
-  setActiveMenuId
-}: RoomItemProps) => {
+  setActiveMenuId,
+  isPinned
+}: RoomItemProps & { isPinned: boolean }) => {
   const isNotice = room.id === NOTICE_ROOM_ID;
   const isPublic = room.id === COMMUNITY_ROOM_ID;
   
@@ -363,11 +431,10 @@ const RoomItem = ({
   });
 
   return (
-    <div key={room.id} className={styles.roomItemWrapper}>
-      <button 
-        className={`${styles.roomItem} ${selectedRoomId === room.id ? styles.activeRoom : ''}`}
-        {...longPressProps}
-      >
+    <div 
+      className={`${styles.roomItem} ${selectedRoomId === room.id ? styles.activeRoom : ''}`}
+      {...longPressProps}
+    >
         <SplitAvatar photos={photos} names={names} type={room.type} />
         
         <div className={styles.roomInfo}>
@@ -375,59 +442,129 @@ const RoomItem = ({
             <span className={styles.roomName}>
               {displayName}
               {isNotice && <span className={styles.noticeBadge}>NOTICE</span>}
+              {isPinned && <span className={styles.pinnedIcon} title="고정됨">📌</span>}
             </span>
             <span className={styles.time}>{timeStr}</span>
           </div>
           <div className={styles.roomBottom}>
-             <div className={styles.lastMessage}>
-               {room.lastMessageSenderId && room.lastMessageSenderId !== cleanUserPhone && (
-                 <span className={styles.lastSenderName}>
-                   {participantCache[room.lastMessageSenderId]?.nickname || '...'} : 
-                 </span>
-               )}
-               {room.lastMessage?.startsWith('[REPLY]') ? '↩️ ' : ''}
-               {room.lastMessage?.replace('[REPLY]', '')}
+             <div className={styles.lastMessageContainer}>
+               <div className={styles.lastMessage}>
+                 {room.lastMessageSenderId && room.lastMessageSenderId !== cleanUserPhone && (
+                   <span className={styles.lastSenderName}>
+                     {participantCache[room.lastMessageSenderId]?.nickname || '...'} : 
+                   </span>
+                 )}
+                 {room.lastMessage?.startsWith('[REPLY]') ? '↩️ ' : ''}
+                 {room.lastMessage?.replace('[REPLY]', '')}
+               </div>
              </div>
-             {room.unreadCounts?.[cleanUserPhone] ? (
-               <div className={styles.unreadBadge}>{room.unreadCounts[cleanUserPhone]}</div>
-             ) : (
-               unread && <div className={styles.unreadBadge}>N</div>
-             )}
+             <div className={styles.badgeContainer}>
+               {room.unreadCounts?.[cleanUserPhone] ? (
+                 <div className={styles.unreadBadge}>{room.unreadCounts[cleanUserPhone]}</div>
+               ) : (
+                 unread && <div className={styles.unreadBadge}>N</div>
+               )}
+               {!isNotice && !isPublic && (
+                  <div 
+                    className={styles.moreButton} 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveMenuId(room.id);
+                    }}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onTouchStart={(e) => e.stopPropagation()}
+                    onMouseUp={(e) => e.stopPropagation()}
+                    onTouchEnd={(e) => e.stopPropagation()}
+                  >
+                    ⋮
+                  </div>
+               )}
+             </div>
           </div>
         </div>
-      </button>
-
-      {activeMenuId === room.id && (
-        <div className={styles.contextMenuOverlay} onClick={() => setActiveMenuId(null)}>
-          <div className={styles.contextMenu} onClick={e => e.stopPropagation()}>
-            <div className={styles.menuHeader}>{displayName}</div>
-            <button 
-              className={styles.menuItem}
-              onClick={() => {
-                const newName = prompt(language === 'ko' ? '방 이름 변경:' : 'Rename Room:', displayName);
-                if (newName) updateChatRoom(room.id, { customName: newName });
-                setActiveMenuId(null);
-              }}
-            >
-              ✏️ {language === 'ko' ? '이름 변경' : 'Rename'}
-            </button>
-            <button 
-              className={`${styles.menuItem} ${styles.danger}`}
-              onClick={() => {
-                if (confirm(language === 'ko' ? '방을 나가시겠습니까?' : 'Leave Room?')) {
-                  leaveChatRoom(room.id, cleanUserPhone);
-                }
-                setActiveMenuId(null);
-              }}
-            >
-              🚪 {language === 'ko' ? '대화방 나가기' : 'Leave Room'}
-            </button>
-            <button className={styles.menuClose} onClick={() => setActiveMenuId(null)}>
-              {language === 'ko' ? '닫기' : 'Close'}
-            </button>
-          </div>
-        </div>
-      )}
     </div>
+  );
+};
+
+const RoomMenu = ({ roomId, rooms, cleanUserPhone, language, setActiveMenuId, pinnedRoomIds }: { 
+  roomId: string, 
+  rooms: ChatRoom[], 
+  cleanUserPhone: string, 
+  language: Language,
+  setActiveMenuId: (id: string | null) => void,
+  pinnedRoomIds: string[]
+}) => {
+  const room = rooms.find(r => r.id === roomId);
+  const isPinned = pinnedRoomIds.includes(roomId);
+  if (!room) return null;
+
+  const displayName = room.customName || room.name;
+
+  return (
+    <>
+      <div className={styles.menuOverlay} onClick={() => setActiveMenuId(null)} />
+      <div className={styles.bottomSheet} onClick={e => e.stopPropagation()}>
+        <div className={styles.sheetHandle} />
+        <div className={styles.menuHeader}>{displayName}</div>
+        
+        <div className={styles.menuActionList}>
+          <button 
+            className={styles.menuItem}
+            onClick={async () => {
+              await toggleUserPinnedRoom(cleanUserPhone, room.id, !isPinned);
+              setActiveMenuId(null);
+            }}
+          >
+            <div className={styles.menuIconWrapper}>
+              {isPinned ? (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+               ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+               )}
+            </div>
+            {isPinned 
+              ? (language === 'ko' ? '최상위 고정 해제' : 'Unpin from Top') 
+              : (language === 'ko' ? '최상위 고정' : 'Pin to Top')}
+          </button>
+
+          <button 
+            className={styles.menuItem}
+            onClick={() => {
+              const newName = prompt(language === 'ko' ? '방 이름 변경:' : 'Rename Room:', displayName);
+              if (newName) updateChatRoom(room.id, { customName: newName });
+              setActiveMenuId(null);
+            }}
+          >
+            <div className={styles.menuIconWrapper}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </div>
+            {language === 'ko' ? '방 이름 변경' : 'Rename Room'}
+          </button>
+          
+          <button 
+            className={`${styles.menuItem} ${styles.dangerItem}`}
+            onClick={() => {
+              if (confirm(language === 'ko' ? '방을 나가시겠습니까?' : 'Leave Room?')) {
+                leaveChatRoom(room.id, cleanUserPhone);
+              }
+              setActiveMenuId(null);
+            }}
+          >
+            <div className={styles.menuIconWrapper}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </div>
+            {language === 'ko' ? '대화방 나가기' : 'Leave Room'}
+          </button>
+        </div>
+        
+        <button 
+          className={styles.menuClose} 
+          onClick={() => setActiveMenuId(null)} 
+          style={{ marginTop: '12px', background: '#f2f4f6', border: 'none', borderRadius: '12px', padding: '14px', fontWeight: '600', color: '#8b95a1', width: '100%' }}
+        >
+          {language === 'ko' ? '닫기' : 'Close'}
+        </button>
+      </div>
+    </>
   );
 };

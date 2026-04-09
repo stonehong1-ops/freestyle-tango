@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+
+export const dynamic = 'force-dynamic';
 import { adminMessaging, adminFirestore } from '@/lib/firebase-admin';
 
 /**
@@ -9,31 +11,44 @@ export async function POST(req: NextRequest) {
   try {
     const { targetPhones, title, body, link, data } = await req.json();
 
-    if (!targetPhones || (targetPhones !== 'all' && (!Array.isArray(targetPhones) || targetPhones.length === 0))) {
-      return NextResponse.json({ error: '대상 전화번호가 필요합니다.' }, { status: 400 });
-    }
+    // 1. 수신 거부 유저 필터링
+    const optOutUsersSnap = await adminFirestore.collection('users')
+      .where('settings.pushEnabled', '==', false)
+      .get();
+    const optOutPhones = new Set(optOutUsersSnap.docs.map((d: any) => d.id));
 
-    // 1. 대상 전화번호들에 등록된 FCM 토큰들 조회
+    // 2. 대상 전화번호들에 등록된 FCM 토큰들 조회
     let tokens: string[] = [];
     if (targetPhones === 'all') {
       const tokensSnapshot = await adminFirestore.collection('fcm_tokens').get();
-      tokens = tokensSnapshot.docs.map(doc => doc.data().token).filter(t => !!t);
+      tokens = tokensSnapshot.docs
+        .map((doc: any) => doc.data())
+        .filter((data: any) => data.token && (!data.userId || !optOutPhones.has(data.userId)))
+        .map((data: any) => data.token);
     } else {
       const cleanPhones = targetPhones.map((p: string) => p.replace(/[^0-9]/g, ''));
-      const tokensSnapshot = await adminFirestore
-        .collection('fcm_tokens')
-        .where('userId', 'in', cleanPhones)
-        .get();
-      tokens = tokensSnapshot.docs.map(doc => doc.data().token).filter(t => !!t);
+      const activePhones = cleanPhones.filter((p: string) => !optOutPhones.has(p));
+      
+      if (activePhones.length > 0) {
+        const tokensSnapshot = await adminFirestore
+          .collection('fcm_tokens')
+          .where('userId', 'in', activePhones)
+          .get();
+        tokens = tokensSnapshot.docs.map((doc: any) => doc.data().token).filter((t: any) => !!t);
+      }
     }
 
+
     if (tokens.length === 0) {
+      // Trace which users are missing tokens
+      if (targetPhones !== 'all') {
+        console.warn(`[FCM WARNING] No tokens found for active users: ${targetPhones.join(', ')}`);
+      }
       return NextResponse.json({ success: true, message: '등록된 기기 토큰이 없습니다.', sentCount: 0 });
     }
 
     // 2. 메시지 구성 (FCM Payload)
-    // - notification: 시스템 레이어 알림 (앱이 꺼져있을 때 표시)
-    // - data: 클릭 시 이동 링크 등 커스텀 데이터 (앱 내부에서 활용)
+    const roomId = data?.roomId || '';
     const messagePayload = {
       notification: {
         title: title || '프리스타일 탱고',
@@ -41,8 +56,9 @@ export async function POST(req: NextRequest) {
       },
       data: {
         ...(data || {}),
-        link: link || '/mypage', // 클릭 시 이동할 경로 (기본값: 마이페이지)
-        click_action: 'FLUTTER_NOTIFICATION_CLICK', // 범용 클릭 액션 상업적 명칭 유지
+        roomId: roomId, // Ensure roomId is passed for deep linking
+        link: link || (roomId ? `/chatting?roomId=${roomId}` : '/mypage'), 
+        click_action: 'FLUTTER_NOTIFICATION_CLICK',
       },
       tokens: tokens,
     };
@@ -50,13 +66,39 @@ export async function POST(req: NextRequest) {
     // 3. 일괄 전송
     const response = await adminMessaging.sendEachForMulticast(messagePayload);
 
-    console.log(`[FCM SUCCESS] ${response.successCount} messages sent. ${response.failureCount} failed.`);
+    console.log(`[FCM SUMMARY] Success: ${response.successCount}, Failure: ${response.failureCount}`);
 
-    // 4. 만료된 토큰 정리 (실패한 토큰 중 만료된 것은 DB에서 삭제 권장하지만, 일단 성공 결과만 반환)
+    // 4. 만료된 토큰 정리
+    if (response.failureCount > 0) {
+      const tokensToRemove: string[] = [];
+      response.responses.forEach((resp: any, idx: number) => {
+        if (!resp.success) {
+          const errorCode = resp.error?.code;
+          // Clean up tokens that are no longer valid
+          if (
+            errorCode === 'messaging/invalid-registration-token' ||
+            errorCode === 'messaging/registration-token-not-registered'
+          ) {
+            tokensToRemove.push(tokens[idx]);
+          }
+          console.error(`[FCM TOKEN ERROR] Token: ${tokens[idx].substring(0, 10)}..., Error: ${errorCode}`);
+        }
+      });
+
+      if (tokensToRemove.length > 0) {
+        console.log(`[FCM CLEANUP] Removing ${tokensToRemove.length} invalid tokens...`);
+        const cleanupPromises = tokensToRemove.map(token => 
+          adminFirestore.collection('fcm_tokens').doc(token).delete()
+        );
+        await Promise.all(cleanupPromises);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       sentCount: response.successCount,
       failureCount: response.failureCount,
+      cleanedCount: response.failureCount > 0 ? tokens.length : 0 
     });
   } catch (error: any) {
     console.error('[FCM ERROR]', error);

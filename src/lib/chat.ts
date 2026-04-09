@@ -26,7 +26,7 @@ export const COMMUNITY_ROOM_ID = 'freestyle_suda_bang';
 export const NOTICE_ROOM_ID = 'freestyle_notice';
 
 // Get rooms accessible by user
-export const subscribeRooms = (userPhone: string, isAdmin: boolean, callback: (rooms: ChatRoom[]) => void) => {
+export const subscribeRooms = (userPhone: string, isAdmin: boolean, pinnedRoomIds: string[], callback: (rooms: ChatRoom[]) => void) => {
   const roomsRef = collection(db, ROOMS_COLLECTION);
   const cleanPhone = userPhone.replace(/[^0-9]/g, '');
   
@@ -37,16 +37,23 @@ export const subscribeRooms = (userPhone: string, isAdmin: boolean, callback: (r
   const privateQ = query(roomsRef, where('participants', 'array-contains', cleanPhone));
 
   const handleSnapshot = (allRooms: ChatRoom[]) => {
-    // Pin notice, then community, then sort others by time
+    // Sort logic: Notice > Community > Pinned > Time
     const sorted = allRooms.sort((a, b) => {
-      // Community Room FIRST (프리스타일 수다방)
-      if (a.id === COMMUNITY_ROOM_ID) return -1;
-      if (b.id === COMMUNITY_ROOM_ID) return 1;
-      
-      // Notice second
+      // 1. Notice Room (공지사항)
       if (a.id === NOTICE_ROOM_ID) return -1;
       if (b.id === NOTICE_ROOM_ID) return 1;
+
+      // 2. Community Room (수다방)
+      if (a.id === COMMUNITY_ROOM_ID) return -1;
+      if (b.id === COMMUNITY_ROOM_ID) return 1;
+
+      // 3. User Pinned Rooms (개인 고정)
+      const isAPinned = pinnedRoomIds.includes(a.id);
+      const isBPinned = pinnedRoomIds.includes(b.id);
+      if (isAPinned && !isBPinned) return -1;
+      if (!isAPinned && isBPinned) return 1;
       
+      // 4. By Time (최신 메시지 순)
       const timeA = a.lastMessageTime?.toMillis() || 0;
       const timeB = b.lastMessageTime?.toMillis() || 0;
       return timeB - timeA;
@@ -75,6 +82,22 @@ export const subscribeRooms = (userPhone: string, isAdmin: boolean, callback: (r
     unsubPublic();
     unsubPrivate();
   };
+};
+
+// Get a single chat room data
+export const getChatRoom = async (roomId: string): Promise<ChatRoom | null> => {
+  try {
+    const roomRef = doc(db, ROOMS_COLLECTION, roomId);
+    const roomSnap = await getDoc(roomRef);
+    
+    if (roomSnap.exists()) {
+      return { id: roomSnap.id, ...roomSnap.data() } as ChatRoom;
+    }
+    return null;
+  } catch (error) {
+    console.error('[GET CHAT ROOM ERROR]', error);
+    return null;
+  }
 };
 
 // Subscribe to messages for a room
@@ -113,8 +136,10 @@ export const sendMessage = async (message: Omit<ChatMessage, 'id' | 'timestamp' 
     // Update unreadCounts for others
     const currentUnreadCounts = roomDataFirestore.unreadCounts || {};
     participants.forEach((p: string) => {
-      if (p.replace(/[^0-9]/g, '') !== message.senderId.replace(/[^0-9]/g, '')) {
-        currentUnreadCounts[p] = (currentUnreadCounts[p] || 0) + 1;
+      const cleanP = p.replace(/[^0-9]/g, '');
+      const cleanSender = message.senderId.replace(/[^0-9]/g, '');
+      if (cleanP !== cleanSender) {
+        currentUnreadCounts[cleanP] = (currentUnreadCounts[cleanP] || 0) + 1;
       }
     });
 
@@ -200,10 +225,14 @@ export const markMessageAsRead = async (roomId: string, messageId: string, userP
       readBy: arrayUnion(cleanPhone)
     });
 
-    // 2. Update room's lastMessageReadBy if it's the latest
+    // 2. Update room's lastMessageReadBy
     const roomRef = doc(db, ROOMS_COLLECTION, roomId);
+    
+    // Optimization: We could check if it's already in unreadCounts, but decrementing is safer
+    // To prevent infinite calls, we usually handle this in the UI too
     await updateDoc(roomRef, {
-      lastMessageReadBy: arrayUnion(cleanPhone)
+      lastMessageReadBy: arrayUnion(cleanPhone),
+      [`unreadCounts.${cleanPhone}`]: 0 // Resetting individual count on read
     });
   } catch (error) {
     console.error("Error marking message as read:", error);

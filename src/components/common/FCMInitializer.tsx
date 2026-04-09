@@ -5,7 +5,7 @@ import { requestNotificationPermission, registerFCMToken, onMessageListener } fr
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function FCMInitializer() {
-  const { user } = useAuth();
+  const { currentUser: user } = useAuth();
 
   useEffect(() => {
     // 1. Request permission and register token on mount (if user is logged in)
@@ -16,8 +16,16 @@ export default function FCMInitializer() {
           // If permission is already granted or not denied, try registering
           if (Notification.permission !== 'denied') {
             const granted = await requestNotificationPermission();
-            if (granted && user?.phone) {
-              await registerFCMToken(user.phone);
+            if (granted) {
+              const stored = typeof window !== 'undefined' ? localStorage.getItem('ft_user') : null;
+              let phone = '';
+              if (stored) {
+                try {
+                  const identity = JSON.parse(stored);
+                  phone = identity.phone;
+                } catch (e) {}
+              }
+              await registerFCMToken(phone || user?.phoneNumber || undefined);
             }
           }
         }
@@ -31,8 +39,22 @@ export default function FCMInitializer() {
     }
 
     // 2. Set up foreground message listener
-    const unsubscribe = onMessageListener();
-    
+    const unsubscribe = onMessageListener((payload) => {
+      console.log('Foreground Message in FCMInitializer:', payload);
+      
+      // Dispatch chat notification event for UI toast
+      if (payload.data?.type === 'chat' || payload.data?.roomId) {
+        window.dispatchEvent(new CustomEvent('CHAT_NOTIFICATION', {
+          detail: {
+            senderName: payload.notification?.title || payload.data?.senderName || '알림',
+            text: payload.notification?.body || payload.data?.text || '',
+            roomId: payload.data?.roomId || '',
+            timestamp: new Date().toISOString()
+          }
+        }));
+      }
+    });
+
     return () => unsubscribe && unsubscribe();
   }, [user]);
 

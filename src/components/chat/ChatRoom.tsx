@@ -19,6 +19,7 @@ import { uploadFile } from '@/lib/storage';
 import styles from './ChatRoom.module.css';
 import { useModalHistory } from '@/hooks/useModalHistory';
 import VoiceBubble from './VoiceBubble';
+import ImageViewer from '@/components/common/ImageViewer';
 
 interface ChatRoomProps {
   roomId: string;
@@ -32,17 +33,20 @@ interface ChatRoomProps {
   isAdmin?: boolean;
   onBack: () => void;
   hideHeader?: boolean;
+  onImageClick?: (src: string) => void;
 }
 
-export default function ChatRoom({ roomId, roomName, user, participants, isAdmin, onBack, hideHeader }: ChatRoomProps) {
+export default function ChatRoom({ roomId, roomName, user, participants, isAdmin, onBack, hideHeader, onImageClick }: ChatRoomProps) {
   const { language } = useLanguage();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [menuMsgId, setMenuMsgId] = useState<string | null>(null);
   const [editingMsgId, setEditingMsgId] = useState<string | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [editText, setEditText] = useState('');
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
+  const [selectedViewerImage, setSelectedViewerImage] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showMembers, setShowMembers] = useState(false);
@@ -60,6 +64,7 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -70,14 +75,32 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
 
   // Long-press detection
   const pressTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const touchStartPosRef = useRef<{ x: number, y: number } | null>(null);
 
-  const handlePressStart = (msgId: string) => {
+  const handlePressStart = (msgId: string, e?: React.TouchEvent | React.MouseEvent) => {
+    if (e && 'touches' in e) {
+      touchStartPosRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
     pressTimerRef.current = setTimeout(() => {
       setMenuMsgId(msgId);
     }, 500); // 0.5s for long press
   };
 
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchStartPosRef.current || !pressTimerRef.current) return;
+    const touch = e.touches[0];
+    const dx = Math.abs(touch.clientX - touchStartPosRef.current.x);
+    const dy = Math.abs(touch.clientY - touchStartPosRef.current.y);
+    if (dx > 10 || dy > 10) {
+      if (pressTimerRef.current) {
+        clearTimeout(pressTimerRef.current);
+        pressTimerRef.current = null;
+      }
+    }
+  }
+
   const handlePressEnd = () => {
+    touchStartPosRef.current = null;
     if (pressTimerRef.current) {
       clearTimeout(pressTimerRef.current);
       pressTimerRef.current = null;
@@ -85,14 +108,25 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
   };
 
   useEffect(() => {
+    if (participants) {
+      setCurrentParticipants(participants);
+    }
+  }, [participants]);
+
+  useEffect(() => {
     const unsubscribe = subscribeMessages(roomId, (newMessages) => {
       setMessages(newMessages);
-      newMessages.forEach(msg => {
-        const cleanPhone = user.phone.replace(/[^0-9]/g, '');
-        if (!msg.readBy?.includes(cleanPhone)) {
-          markMessageAsRead(roomId, msg.id, cleanPhone);
-        }
-      });
+      
+      // Batch update messages as read
+      const unreadMsgIds = newMessages
+        .filter(msg => !msg.readBy?.includes(cleanUserPhone))
+        .map(msg => msg.id);
+
+      if (unreadMsgIds.length > 0) {
+        unreadMsgIds.forEach(id => {
+          markMessageAsRead(roomId, id, cleanUserPhone);
+        });
+      }
     });
 
     // Subscribe to participant info for real-time status and photos
@@ -136,6 +170,8 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
 
   useModalHistory(showMembers, () => setShowMembers(false), 'members');
   useModalHistory(menuMsgId !== null, () => setMenuMsgId(null), 'message-menu');
+  useModalHistory(showEditModal, () => setShowEditModal(false), 'edit-message');
+  useModalHistory(selectedViewerImage !== null, () => setSelectedViewerImage(null), 'image-viewer');
 
   const handleOpenMembers = () => {
     setShowMembers(true);
@@ -212,6 +248,7 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
       replyTo: replyTo?.id
     }, { name: roomName, participants });
     setReplyTo(null);
+    if (textareaRef.current) textareaRef.current.style.height = 'auto';
   };
 
   const startRecording = async () => {
@@ -291,10 +328,7 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
 
   const handleFileClick = () => fileInputRef.current?.click();
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const uploadAndSendMedia = async (file: File | Blob, customFileName?: string) => {
     if (roomId === NOTICE_ROOM_ID && !isAdmin) {
       alert(language === 'ko' ? '공지방에는 관리자만 파일을 업로드할 수 있습니다.' : 'Only admins can upload files in the notice room.');
       return;
@@ -303,7 +337,8 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
     setIsUploading(true);
     try {
       const fileType: ChatMessageType = file.type.startsWith('video/') ? 'video' : 'image';
-      const path = `chat/${roomId}/${Date.now()}_${file.name}`;
+      const fileName = customFileName || (file instanceof File ? file.name : `${Date.now()}.png`);
+      const path = `chat/${roomId}/${Date.now()}_${fileName}`;
       
       const url = await uploadFile(file, path);
 
@@ -311,7 +346,7 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
         roomId,
         senderId: cleanUserPhone,
         senderName: user.nickname || 'Guest',
-        text: fileType === 'image' ? 'Sent a photo' : 'Sent a video',
+        text: fileType === 'image' ? (language === 'ko' ? '사진을 보냈습니다' : 'Sent a photo') : (language === 'ko' ? '동영상을 보냈습니다' : 'Sent a video'),
         type: fileType,
         mediaUrl: url,
         replyTo: replyTo?.id
@@ -319,10 +354,31 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
       setReplyTo(null);
     } catch (err: any) {
       console.error("Upload Error:", err);
-      alert(err.message || '업로드 실패');
+      alert(err.message || (language === 'ko' ? '업로드 실패' : 'Upload failed'));
     } finally {
       setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await uploadAndSendMedia(file);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handlePaste = async (e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const blob = items[i].getAsFile();
+        if (blob) {
+          e.preventDefault();
+          await uploadAndSendMedia(blob, `pasted_image_${Date.now()}.png`);
+        }
+      }
     }
   };
 
@@ -379,6 +435,7 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
   const handleEdit = (msg: ChatMessage) => {
     setEditingMsgId(msg.id);
     setEditText(msg.text);
+    setShowEditModal(true);
     setMenuMsgId(null);
   };
 
@@ -388,6 +445,7 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
       const { updateChatMessage } = await import('@/lib/chat');
       await updateChatMessage(editingMsgId, { text: editText });
       setEditingMsgId(null);
+      setShowEditModal(false);
       setEditText('');
     } catch (err) {
       console.error("Failed to edit message:", err);
@@ -484,6 +542,8 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
                           src={other.photoURL} 
                           alt="Profile" 
                           className={styles.headerAvatar} 
+                          onClick={() => setSelectedViewerImage(other.photoURL!)}
+                          style={{ cursor: 'pointer' }}
                         />
                       ) : (
                         <div className={`${styles.headerAvatarPlaceholder} ${getPlaceholderColor(name)}`}>
@@ -617,7 +677,13 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
                 {!isOwn && (
                   <div className={styles.avatarImgWrapper}>
                     {memberInfo[msg.senderId.replace(/[^0-9]/g, '')]?.photoURL ? (
-                      <img src={memberInfo[msg.senderId.replace(/[^0-9]/g, '')].photoURL} className={styles.msgAvatar} alt="" />
+                      <img 
+                        src={memberInfo[msg.senderId.replace(/[^0-9]/g, '')].photoURL} 
+                        className={styles.msgAvatar} 
+                        alt="" 
+                        onClick={() => setSelectedViewerImage(memberInfo[msg.senderId.replace(/[^0-9]/g, '')].photoURL)}
+                        style={{ cursor: 'pointer' }}
+                      />
                     ) : (
                       <div className={styles.msgAvatarPlaceholder}>
                         {msg.senderName[0]}
@@ -638,7 +704,8 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
                       onMouseDown={() => handlePressStart(msg.id)}
                       onMouseUp={handlePressEnd}
                       onMouseLeave={handlePressEnd}
-                      onTouchStart={() => handlePressStart(msg.id)}
+                      onTouchStart={(e) => handlePressStart(msg.id, e)}
+                      onTouchMove={handleTouchMove}
                       onTouchEnd={handlePressEnd}
                     >
                       {msg.replyTo && (
@@ -661,7 +728,13 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
                       
                       {msg.type === 'image' ? (
                         <div className={styles.mediaMessage}>
-                          <img src={msg.mediaUrl} alt="chat" />
+                          <img 
+                            src={msg.mediaUrl} 
+                            className={styles.chatImage}
+                            alt="chat" 
+                            onClick={() => setSelectedViewerImage(msg.mediaUrl!)}
+                            style={{ cursor: 'pointer' }}
+                          />
                         </div>
                       ) : msg.type === 'video' ? (
                         <div className={styles.mediaMessage}>
@@ -674,24 +747,9 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
                           timestamp={formatTime(msg.timestamp)}
                         />
                       ) : (
-                        editingMsgId === msg.id ? (
-                          <div className={styles.editContainer}>
-                            <textarea 
-                              className={styles.editInput}
-                              value={editText}
-                              onChange={(e) => setEditText(e.target.value)}
-                              autoFocus
-                            />
-                            <div className={styles.editActions}>
-                              <button onClick={() => setEditingMsgId(null)}>{language === 'ko' ? '취소' : 'Cancel'}</button>
-                              <button onClick={handleSaveEdit}>{language === 'ko' ? '저장' : 'Save'}</button>
-                            </div>
-                          </div>
-                        ) : (
                           <p className={msg.isDeleted ? styles.deletedMsg : ''}>
                             {renderMessageText(msg.text)}
                           </p>
-                        )
                       )}
 
                       {msg.reactions && Object.keys(msg.reactions).length > 0 && (
@@ -710,12 +768,8 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
                       )}
                     </div>
                     <div className={styles.msgStatus}>
-                      {isPublicRoom ? (
-                        <span className={styles.readCount}>👁️ {msg.readBy?.length || 0}</span>
-                      ) : (
-                        participants && (participants.length - (msg.readBy?.length || 0)) > 0 && (
-                          <span className={styles.unreadCount}>{participants.length - (msg.readBy?.length || 0)}</span>
-                        )
+                      {!isPublicRoom && currentParticipants.length > 0 && (currentParticipants.length - (msg.readBy?.length || 0)) > 0 && (
+                        <span className={styles.unreadCount}>{currentParticipants.length - (msg.readBy?.length || 0)}</span>
                       )}
                       {showTime && <span className={styles.time}>{formatTime(msg.timestamp)}</span>}
                     </div>
@@ -823,7 +877,7 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
               </div>
             </div>
           ) : (
-            <form className={styles.inputBar} onSubmit={handleSend}>
+            <div className={styles.inputBar}>
               <button type="button" className={styles.iconBtn} onClick={handleFileClick} disabled={isUploading}>
                 {isUploading ? <div className={styles.loader} /> : <span className={styles.plusIcon}>+</span>}
               </button>
@@ -835,11 +889,26 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
                 onChange={handleFileChange}
               />
               <div className={styles.inputWrapper}>
-                <input 
+                <textarea 
+                  ref={textareaRef}
                   className={styles.inputField}
                   placeholder={language === 'ko' ? '메시지를 입력하세요...' : 'Type message...'}
                   value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
+                  onPaste={handlePaste}
+                  onChange={(e) => {
+                    setInputText(e.target.value);
+                    if (textareaRef.current) {
+                      textareaRef.current.style.height = 'auto';
+                      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      // Just newline, don't send (buttons only for send as per user requirement)
+                      return;
+                    }
+                  }}
+                  rows={1}
                 />
               </div>
               
@@ -851,13 +920,13 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
                   </svg>
                 </button>
               ) : (
-                <button className={styles.sendBtn} disabled={isUploading}>
+                <button type="button" className={styles.sendBtn} onClick={() => handleSend()} disabled={isUploading}>
                   <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
                     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
                   </svg>
                 </button>
               )}
-            </form>
+            </div>
           )}
         </div>
       )}
@@ -918,9 +987,9 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
                 const info = memberInfo[cleanPhone];
                 return (
                   <div key={p} className={styles.memberItem}>
-                    <div className={styles.memberAvatarWrapper}>
+                    <div className={styles.memberAvatarWrapper} onClick={() => info?.photoURL && setSelectedViewerImage(info.photoURL)}>
                       {info?.photoURL ? (
-                        <img src={info.photoURL} className={styles.memberAvatar} alt="" />
+                        <img src={info.photoURL} className={styles.memberAvatar} alt="" style={{ cursor: 'pointer' }} />
                       ) : (
                         <div className={styles.memberAvatarPlaceholder}>{info?.nickname?.[0] || '?' }</div>
                       )}
@@ -933,6 +1002,33 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
           </div>
         </div>
       )}
+      {showEditModal && (
+        <div className={styles.editModal} onClick={() => setShowEditModal(false)}>
+          <div className={styles.editModalContent} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h4>{language === 'ko' ? '메시지 수정' : 'Edit Message'}</h4>
+              <button className={styles.modalCloseBtn} onClick={() => setShowEditModal(false)}>✕</button>
+            </div>
+            <div className={styles.editArea}>
+              <textarea 
+                className={styles.editField}
+                value={editText}
+                onChange={(e) => setEditText(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div className={styles.editModalActions}>
+              <button className={styles.cancelEditBtn} onClick={() => setShowEditModal(false)}>
+                {language === 'ko' ? '취소' : 'Cancel'}
+              </button>
+              <button className={styles.saveEditBtn} onClick={handleSaveEdit}>
+                {language === 'ko' ? '저장' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      <ImageViewer src={selectedViewerImage} onClose={() => setSelectedViewerImage(null)} />
     </div>
   );
 }

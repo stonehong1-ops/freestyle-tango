@@ -1,3 +1,4 @@
+import React, { useState, useRef, useEffect } from 'react';
 import { Registration } from '@/lib/db';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -56,6 +57,21 @@ export default function ClassDetail({
   isAdmin
 }: ClassDetailProps) {
   const { t, language } = useLanguage();
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+    if (showMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showMenu]);
+
   // Filter registrations for THIS class ID
   const classRegs = registrations.filter(r => r.classIds && r.classIds.includes(id));
   
@@ -80,9 +96,76 @@ export default function ClassDetail({
       )}
 
       <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-        <header>
-          <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#3182f6', marginBottom: '0.5rem' }}>{level} · {type}</div>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#191f28', marginBottom: '0.5rem' }}>{title}</h2>
+        <header style={{ position: 'relative' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#3182f6', marginBottom: '0.5rem' }}>{level} · {type}</div>
+            
+            {isAdmin && (
+              <div style={{ position: 'relative' }} ref={menuRef}>
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowMenu(!showMenu);
+                  }}
+                  style={{ 
+                    background: '#f2f4f6', 
+                    border: 'none', 
+                    width: '32px', 
+                    height: '32px', 
+                    borderRadius: '50%', 
+                    cursor: 'pointer', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    color: '#4e5968', 
+                    fontSize: '1.2rem' 
+                  }}
+                >
+                  ⋮
+                </button>
+                {showMenu && (
+                  <div style={{ 
+                    position: 'absolute', 
+                    top: '100%', 
+                    right: 0, 
+                    background: '#fff', 
+                    borderRadius: '12px', 
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.15)', 
+                    padding: '8px', 
+                    zIndex: 100, 
+                    minWidth: '120px',
+                    marginTop: '4px'
+                  }}>
+                    <div 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowMenu(false);
+                        onEdit?.(id);
+                      }}
+                      style={{ padding: '12px 16px', fontSize: '0.9rem', fontWeight: 600, color: '#191f28', cursor: 'pointer', borderRadius: '8px' }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f2f4f6')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                    >
+                      {t.home.registration.edit}
+                    </div>
+                    <div 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowMenu(false);
+                        onDelete?.(id);
+                      }}
+                      style={{ padding: '12px 16px', fontSize: '0.9rem', fontWeight: 600, color: '#ef4444', cursor: 'pointer', borderRadius: '8px' }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#fdf2f2')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                    >
+                      {t.home.registration.delete}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#191f28', marginBottom: '0.5rem', paddingRight: isAdmin ? '40px' : '0' }}>{title}</h2>
           <div style={{ color: '#4e5968', fontSize: '0.95rem' }}>{time}</div>
           <div style={{ color: '#8b95a1', fontSize: '0.9rem', marginTop: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span>{t.home.registration.teacherLabel} {teacher1} {teacher2 && `& ${teacher2}`}</span>

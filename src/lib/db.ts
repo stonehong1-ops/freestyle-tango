@@ -16,11 +16,14 @@ import {
   doc, 
   setDoc,
   serverTimestamp,
-  query, 
+  arrayUnion,
+  arrayRemove,
+  query,
   where,
   orderBy,
   limit,
-  increment
+  increment,
+  or
 } from 'firebase/firestore';
 
 export interface TangoClass {
@@ -97,7 +100,7 @@ export interface ExtraSchedule {
 
 export interface MediaItem {
   id?: string;
-  type: 'youtube' | 'demonstration' | 'general' | 'image' | 'video';
+  type: 'youtube' | 'demonstration' | 'general' | 'image' | 'video' | 'lucy';
   title: string;
   description?: string;
   videoUrl: string; // Youtube ID or Storage URL
@@ -160,6 +163,8 @@ export interface User {
   nickname: string;
   photoURL?: string;
   role?: string;
+  isInstructor?: boolean;
+  staffRole?: 'admin' | 'staff' | 'instructor' | 'none';
   lastVisit: any; // Firestore Timestamp
   createdAt?: any;
   device?: 'ios' | 'android' | 'pc' | 'unknown';
@@ -170,7 +175,35 @@ export interface User {
     openChat: boolean;
     privateChat: boolean;
     token?: string;
+    pinnedRooms?: string[];
   }
+}
+
+export interface CoachingItem {
+  id: string;
+  title: string;
+  description?: string;
+  progress: number;
+  status: 'ongoing' | 'solved';
+  studentPhone: string;
+  studentNickname: string;
+  studentPhotoURL?: string;
+  instructorPhone: string;
+  instructorNickname: string;
+  instructorPhotoURL?: string;
+  createdAt: string;
+  updatedAt: string;
+  lastComment?: string;
+  milestones?: { progress: number, date: string }[];
+}
+
+export interface CoachingUpdate {
+  id: string;
+  coachingItemId: string;
+  progress: number;
+  comment: string;
+  mediaUrls: string[];
+  createdAt: string;
 }
 
 const COLLECTION_NAME = 'tango_classes';
@@ -304,10 +337,32 @@ export const updateRegistrationPhoto = async (phone: string, photoURL: string) =
   return await Promise.all([...regPromises, userPromise]);
 };
 
-export const updateUserProfile = async (phone: string, data: { nickname?: string, photoURL?: string, role?: string }) => {
+export const toggleUserPinnedRoom = async (phone: string, roomId: string, isPinned: boolean) => {
+  try {
+    const cleanPhone = phone.replace(/[^0-9]/g, '');
+    const userRef = doc(db, 'users', cleanPhone);
+    
+    // Check if user exists first or just try update
+    if (isPinned) {
+      await updateDoc(userRef, {
+        'settings.pinnedRooms': arrayUnion(roomId)
+      });
+    } else {
+      await updateDoc(userRef, {
+        'settings.pinnedRooms': arrayRemove(roomId)
+      });
+    }
+    return { success: true };
+  } catch (err) {
+    console.error("Error toggling pinned room:", err);
+    return { success: false, error: err };
+  }
+};
+
+export const updateUserProfile = async (phone: string, data: Partial<User>) => {
   const cleanPhone = phone.replace(/[^0-9]/g, '');
   
-  // 1. Update in registrations (nickname, photoURL, role)
+  // 1. Update in registrations (nickname, photoURL, role - but NOT isInstructor/staffRole as they are global user roles)
   const q = query(
     collection(db, REG_COLLECTION), 
     where('phone', '==', cleanPhone),
@@ -315,8 +370,12 @@ export const updateUserProfile = async (phone: string, data: { nickname?: string
     limit(10)
   );
   const snap = await getDocs(q);
+  const regData: any = { ...data };
+  delete regData.isInstructor; // Don't propagate isInstructor to registrations as it doesn't exist there
+  delete regData.staffRole;    // Don't propagate staffRole to registrations as it doesn't exist there
+
   const regPromises = snap.docs.map(docSnap => 
-    updateDoc(doc(db, REG_COLLECTION, docSnap.id), data)
+    updateDoc(doc(db, REG_COLLECTION, docSnap.id), regData)
   );
   
   // 2. Update in users
@@ -692,8 +751,39 @@ export const getMedia = async (type?: string, classId?: string, milongaDate?: st
 };
 
 export const addMedia = async (data: Omit<MediaItem, 'id'>) => {
-  return await addDoc(collection(db, MEDIA_COLLECTION), data);
+  const docRef = await addDoc(collection(db, MEDIA_COLLECTION), data);
+  
+  // [Trigger Notification] 
+  // 수업 관련 영상(시연/참고) 등록 시 수강생들에게 알림 발송
+  if (data.relatedClassId && typeof window !== 'undefined') {
+    (async () => {
+      try {
+        // 해당 수업 수강생 전화번호 목록 조회
+        const q = query(collection(db, 'registrations'), where('classIds', 'array-contains', data.relatedClassId));
+        const snap = await getDocs(q);
+        const targetPhones = Array.from(new Set(snap.docs.map(d => d.data().phone))).filter(Boolean);
+
+        if (targetPhones.length > 0) {
+          fetch('/api/notifications/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              targetPhones,
+              title: '📹 신규 수업 영상이 등록되었습니다',
+              body: `[${data.title}] 영상을 확인해 보세요!`,
+              link: '/media'
+            })
+          });
+        }
+      } catch (e) {
+        console.error("Media notification error:", e);
+      }
+    })();
+  }
+  
+  return docRef;
 };
+
 
 export const updateMedia = async (id: string, data: Partial<MediaItem>) => {
   const docRef = doc(db, MEDIA_COLLECTION, id);
@@ -811,7 +901,7 @@ export const useUserCoupon = async (phone: string, couponType: string, month: st
 // --- User Table Functions ---
 const USERS_COLLECTION = 'users';
 
-export const trackUserVisit = async (phone: string, nickname: string, photoURL?: string, role?: string, device?: string) => {
+export const trackUserVisit = async (phone: string, nickname: string, photoURL?: string, role?: string, device?: string, staffRole?: string) => {
   if (!phone) return;
   const cleanPhone = phone.replace(/[^0-9]/g, '');
   const docRef = doc(db, USERS_COLLECTION, cleanPhone);
@@ -825,6 +915,7 @@ export const trackUserVisit = async (phone: string, nickname: string, photoURL?:
   if (device) data.device = device;
   if (photoURL) data.photoURL = photoURL;
   if (role) data.role = role;
+  if (staffRole) data.staffRole = staffRole;
   
   // Create if not exists, merge for visits
   const docSnap = await getDoc(docRef);
@@ -901,4 +992,107 @@ export const updateUserSettings = async (phone: string, settings: Partial<User['
       ...settings
     }
   }, { merge: true });
+};
+
+// --- Coaching Functions ---
+const COACHING_COLLECTION = 'coaching_items';
+const COACHING_UPDATES_COLLECTION = 'coaching_updates';
+
+export const getCoachingItems = async (params: { studentPhone?: string, instructorPhone?: string, isAdmin?: boolean, relatedPhone?: string }): Promise<CoachingItem[]> => {
+  try {
+    let q;
+    if (params.isAdmin) {
+      q = query(collection(db, COACHING_COLLECTION));
+    } else if (params.relatedPhone) {
+      // Show items where the user is either the student OR the instructor
+      q = query(
+        collection(db, COACHING_COLLECTION),
+        or(
+          where('studentPhone', '==', params.relatedPhone),
+          where('instructorPhone', '==', params.relatedPhone)
+        )
+      );
+    } else {
+      if (params.studentPhone) {
+        q = query(collection(db, COACHING_COLLECTION), where('studentPhone', '==', params.studentPhone));
+      } else if (params.instructorPhone) {
+        q = query(collection(db, COACHING_COLLECTION), where('instructorPhone', '==', params.instructorPhone));
+      } else {
+        q = query(collection(db, COACHING_COLLECTION));
+      }
+    }
+
+    const snap = await getDocs(q);
+    const results = snap.docs.map(d => ({ id: d.id, ...d.data() } as CoachingItem));
+    
+    // Final filter and sort
+    results.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+    return results;
+  } catch (error) {
+    console.error("Error fetching coaching items:", error);
+    return [];
+  }
+};
+
+export const addCoachingItem = async (data: Omit<CoachingItem, 'id'>) => {
+  // Ensure we have photos if available
+  const student = await getUserByPhone(data.studentPhone);
+  const instructor = await getUserByPhone(data.instructorPhone);
+  
+  const finalData = {
+    ...data,
+    studentPhotoURL: student?.photoURL || '',
+    instructorPhotoURL: instructor?.photoURL || '',
+    milestones: data.milestones || []
+  };
+  
+  return await addDoc(collection(db, COACHING_COLLECTION), finalData);
+};
+
+export const updateCoachingItem = async (id: string, data: Partial<CoachingItem>) => {
+  const docRef = doc(db, COACHING_COLLECTION, id);
+  return await updateDoc(docRef, { ...data, updatedAt: new Date().toISOString() });
+};
+
+export const getCoachingUpdates = async (coachingItemId: string): Promise<CoachingUpdate[]> => {
+  try {
+    const q = query(
+      collection(db, COACHING_UPDATES_COLLECTION), 
+      where('coachingItemId', '==', coachingItemId),
+      orderBy('createdAt', 'asc')
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() } as CoachingUpdate));
+  } catch (error) {
+    console.warn("Could not fetch coaching updates with index:", error);
+    const qSimple = query(collection(db, COACHING_UPDATES_COLLECTION), where('coachingItemId', '==', coachingItemId));
+    const snap = await getDocs(qSimple);
+    const results = snap.docs.map(d => ({ id: d.id, ...d.data() } as CoachingUpdate));
+    return results.sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
+  }
+};
+
+export const addCoachingUpdate = async (coachingItemId: string, data: Omit<CoachingUpdate, 'id' | 'coachingItemId' | 'createdAt'>) => {
+  const now = new Date();
+  const updateData = {
+    ...data,
+    coachingItemId,
+    createdAt: now.toISOString()
+  };
+  const docRef = await addDoc(collection(db, COACHING_UPDATES_COLLECTION), updateData);
+  
+  // Format date as M/D for milestone
+  const milestoneDate = `${now.getMonth() + 1}/${now.getDate()}`;
+  
+  // Update the main item's progress, updatedAt and push to milestones
+  const itemRef = doc(db, COACHING_COLLECTION, coachingItemId);
+  await updateDoc(itemRef, { 
+    progress: data.progress,
+    lastComment: data.comment,
+    status: data.progress === 100 ? 'solved' : 'ongoing',
+    updatedAt: now.toISOString(),
+    milestones: arrayUnion({ progress: data.progress, date: milestoneDate })
+  });
+  
+  return docRef;
 };

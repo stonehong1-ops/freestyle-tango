@@ -4,7 +4,7 @@
   height: 100%;
   background: #ffffff;
   overflow-y: auto;
-  padding-bottom: 180px;
+  position: relative; /* For sticky footer */
 }
 .headerDesc {
   padding: 1.5rem;
@@ -72,22 +72,22 @@
   font-size: 0.85rem;
 }
 .footer {
-  position: fixed;
-  bottom: 80px; /* Above FooterMenu (70px + margin) */
-  left: 50%;
-  transform: translateX(-50%);
+  position: sticky;
+  bottom: 0;
   width: 100%;
   max-width: 600px;
-  padding: 1.25rem 1.5rem;
-  background: rgba(255, 255, 255, 0.9);
+  margin: 0 auto;
+  padding: 1.25rem 1.5rem 2rem; /* Added bottom padding for mobile safety */
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-top: 1px solid rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
-  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.04);
-  z-index: 100;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.08);
+  z-index: 1000;
+  margin-top: auto; /* Push to bottom if content is short */
 }
 .actionBtn, .actionBtnPrimary, .actionBtnMembership {
   width: 100%;
@@ -138,8 +138,33 @@
   margin-bottom: 1.5rem;
 }
 
-.historySection, .selectionSection {
+.historySection {
   padding: 2rem 1.5rem;
+}
+
+.selectionSection {
+  padding: 1.5rem 1.5rem 2rem;
+}
+
+.typeSelectorArea {
+  padding: 1.5rem;
+  background: #f8faff;
+  border-radius: 20px;
+  border: 1px solid #e1e9ff;
+  margin-bottom: 1rem;
+}
+
+.typeHint {
+  font-size: 0.85rem;
+  color: #3182f6;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.dividerLight {
+  height: 1px;
+  background: #f2f4f6;
+  margin: 0.5rem 0;
 }
 
 .historyList {

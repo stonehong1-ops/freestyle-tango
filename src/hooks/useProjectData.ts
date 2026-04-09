@@ -6,6 +6,7 @@ import {
   getRegistrations, 
   getMonthlyNotice, 
   getStayReservationList,
+  getUserByPhone,
   TangoClass, 
   Registration, 
   FullStayReservation,
@@ -18,7 +19,7 @@ export function useProjectData() {
   const [classes, setClasses] = useState<TangoClass[]>([]);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [reservations, setReservations] = useState<FullStayReservation[]>([]);
-  const [currentUser, setCurrentUser] = useState<{ nickname: string, phone: string, role?: 'leader' | 'follower', photoURL?: string } | null>(null);
+  const [currentUser, setCurrentUser] = useState<{ nickname: string, phone: string, role?: string, staffRole?: 'admin' | 'staff' | 'instructor' | 'none', photoURL?: string } | null>(null);
   const [appliedClassIds, setAppliedClassIds] = useState<Set<string>>(new Set());
   const [selectedMonth, setSelectedMonth] = useState(CURRENT_REGISTRATION_MONTH);
   const [isLoading, setIsLoading] = useState(true);
@@ -27,12 +28,32 @@ export function useProjectData() {
   
   const { t } = useLanguage();
 
-  const checkAdminStatus = (user: { phone: string } | null) => {
-    const adminPhones = ['01072092468', '01012345678'];
-    if (user && adminPhones.includes(user.phone.replace(/[^0-9]/g, ''))) {
+  const checkAdminStatus = (user: { phone: string, role?: string, staffRole?: string } | null) => {
+    if (user && user.staffRole === 'admin') {
       setIsAdminLogged(true);
     } else {
       setIsAdminLogged(false);
+    }
+  };
+
+  const syncUserFromDB = async (phone: string) => {
+    try {
+      const dbUser = await getUserByPhone(phone);
+      if (dbUser) {
+        const updatedUser = {
+          nickname: dbUser.nickname,
+          phone: dbUser.phone,
+          role: dbUser.role,
+          staffRole: dbUser.staffRole,
+          photoURL: dbUser.photoURL
+        };
+        setCurrentUser(updatedUser);
+        SafeStorage.setJson('ft_user', updatedUser);
+        checkAdminStatus(updatedUser);
+        console.log('User profile synced from DB:', updatedUser.staffRole);
+      }
+    } catch (error) {
+      console.error('Error syncing user from DB:', error);
     }
   };
 
@@ -94,6 +115,10 @@ export function useProjectData() {
       const user = SafeStorage.getJson<any>('ft_user');
       setCurrentUser(user);
       checkAdminStatus(user);
+      
+      if (user?.phone) {
+        syncUserFromDB(user.phone);
+      }
       
       const savedClasses = SafeStorage.getJson<string[]>('my_tango_classes');
       if (savedClasses) setAppliedClassIds(new Set(savedClasses));

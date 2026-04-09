@@ -4,7 +4,9 @@ export default {
     location: '숙소 위치',
     guide: '상세 정보',
     contact: '문의하기',
-    login: '등록'
+    login: '등록',
+    community: '커뮤니티',
+    join: '함께하기'
   },
   nav: {
     home: 'Class',
@@ -21,6 +23,7 @@ export default {
     media: '미디어',
     story: '스토리'
   },
+
   reserve: {
     closed: '마감되었습니다',
     title: '숙소 예약 신청',
@@ -306,9 +309,11 @@ export default {
     },
     tabs: {
       registration: '04월 소식/신청',
-      history: '수업신청내역',
-      wallet: '지갑.쿠폰',
-      profile: '내 정보'
+      history: '기록',
+      wallet: '지갑',
+      coaching: '코칭',
+      profile: '내 정보',
+      admin: '어드민'
     },
     walletDesc: '보유하신 쿠폰 목록입니다.',
     wallet: {
@@ -317,8 +322,8 @@ export default {
       useCoupon: '사용하기',
       usedCoupon: '사용완료',
       membershipCoupon: {
-        title: '1개월 멤버쉽 5% 할인쿠폰',
-        desc: '3회차 수업 신청 시 5% 할인 (10,000원 할인 안내)',
+        title: '1개월 멤버쉽 쿠폰',
+        desc: '수업 신청 시 사용 가능한 쿠폰',
         target: '멤버십 회원 대상'
       },
       milongaCoupon: {
@@ -328,6 +333,26 @@ export default {
       },
       usageConfirm: '쿠폰을 사용하시겠습니까?\n사용한 쿠폰은 되돌릴 수 없습니다.',
       usageSuccess: '쿠폰 사용이 완료되었습니다.'
+    }
+  },
+  admin: {
+    member: {
+      searchPlaceholder: '닉네임 또는 번호 검색',
+      searchBtn: '검색',
+      engagement: '열성도',
+      joinDate: '가입일자',
+      recentVisit: '최근방문',
+      loading: '데이터 로딩 중...',
+      noResults: '계정 정보를 찾을 수 없습니다.',
+      instructor: '강사',
+      pushStatus: '알림 설정',
+      lastRegMonth: '최종 수업 신청월',
+      topPercent: '상위 {percent}%',
+      grantInstructor: '강사 권한 부여',
+      revokeInstructor: '강사 권한 해제',
+      leader: '리더',
+      follower: '팔로어',
+      errorToggle: '권한 변경 중 오류가 발생했습니다.'
     }
   },
   info: {
@@ -697,6 +722,9 @@ export default {
     }
   },
   common: {
+    save: '저장',
+    cancel: '취소',
+    loading: '로딩 중...',
     contact: {
       title: '문의하기',
       desc: '궁금하신 점은 언제든 문의주세요.',
@@ -755,8 +783,9 @@ export default {
   endTime: '종료 시간',
   media: {
     title: '미디어',
+    edit: '영상 수정',
     type: {
-      youtube: '유투브',
+      youtube: '유튜브',
       demonstration: '시연',
       general: '일반'
     },
@@ -765,7 +794,7 @@ export default {
     like: '좋아요',
     comment: '댓글',
     views: '조회수',
-    noAccess: '해당 수업 신청자만 볼 수 있는 시연 영상입니다.',
+    noAccess: '수업 신청자만 볼 수 있습니다',
     placeholder: {
       title: '제목을 입력하세요',
       url: '유투브 ID 또는 영상 URL',
@@ -843,5 +872,34 @@ export default {
         lockers: '개인 사물함 외 물품 보관은 불가합니다.'
       }
     }
+  },
+  coaching: {
+    title: '코칭 관리',
+    newCoaching: '새 코칭 등록',
+    empty: '등록된 코칭 항목이 없습니다.',
+    student: '수강생',
+    instructor: '담당 강사',
+    progress: '진행률',
+    status: '상태',
+    ongoing: '진행중',
+    solved: '문제해결',
+    solvedBadge: '해결됨',
+    itemTitle: '코칭 제목',
+    itemDesc: '코칭 설명',
+    selectStudent: '수강생 선택',
+    searchStudentPlaceholder: '이름 또는 전화번호 검색',
+    searchSearching: '검색 중...',
+    searchNoResults: '검색 결과가 없습니다.',
+    creating: '등록 중...',
+    updates: '활동 기록',
+    activityAdd: '활동 추가',
+    addComment: '코멘트 작성...',
+    uploadMedia: '사진/동영상 추가',
+    updateProgress: '진행률 업데이트',
+    saveUpdate: '기록 저장',
+    noUpdates: '기록이 없습니다.',
+    confirmStatusChange: '상태를 변경하시겠습니까?',
+    reopen: '재개',
+    errorSave: '저장 중 오류가 발생했습니다.'
   }
 };

@@ -1148,3 +1148,26 @@ input:disabled + .toggleSlider:before {
 .cancelIssuanceBtn:active {
   transform: scale(0.95);
 }
+
+.fullModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #fff;
+  z-index: 2000;
+  animation: modalFadeIn 0.3s ease-out;
+  overflow-y: auto;
+}
+
+.fullModalContent {
+  width: 100%;
+  min-height: 100%;
+  background: #fff;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

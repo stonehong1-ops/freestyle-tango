@@ -248,6 +248,22 @@
 .editActionBtn:hover { color: #3182f6; }
 .deleteActionBtn:hover { color: #ff4d4f; }
 
+.saturday .dayNum {
+  color: #ff8e99;
+}
+
+.sunday .dayNum {
+  color: #ff4d4f !important;
+}
+
+.weekendHeader {
+  color: #ff4d4f;
+}
+
+.weekendHeader:nth-child(6) {
+  color: #ff8e99; /* Sat */
+}
+
 @media (max-width: 480px) {
   .dayCell {
     height: 50px;

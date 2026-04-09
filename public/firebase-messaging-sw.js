@@ -19,9 +19,16 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   console.log('[SW] Background Message:', payload);
 
-  const notificationTitle = payload.notification.title;
+  // 만약 payload에 notification 객체가 있으면, FCM SDK가 자동으로 알림을 표시하므로
+  // 여기서 또 showNotification을 호출하면 중복 알림이 발생합니다.
+  if (payload.notification) {
+    console.log('[SW] Notification payload present, skipping manual showNotification to avoid duplicates.');
+    return;
+  }
+
+  const notificationTitle = payload.data?.title || '프리스타일 탱고';
   const notificationOptions = {
-    body: payload.notification.body,
+    body: payload.data?.body || '',
     icon: '/icons/icon-192x192.png',
     data: {
       link: payload.data?.link // 서버에서 보낸 이동 링크 데이터

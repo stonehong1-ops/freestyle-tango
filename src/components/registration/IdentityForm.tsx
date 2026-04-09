@@ -61,7 +61,8 @@ export default function IdentityForm({ onClose, onComplete, isEdit = false }: Id
           nickname: existingUser.nickname, 
           phone: existingUser.phone, 
           role: existingUser.role || 'leader',
-          photoURL: existingUser.photoURL || ''
+          photoURL: existingUser.photoURL || '',
+          staffRole: existingUser.staffRole
         };
         
         // Update states to fill the profile form
@@ -70,7 +71,7 @@ export default function IdentityForm({ onClose, onComplete, isEdit = false }: Id
         setPhotoURL(existingUser.photoURL || '');
         
         localStorage.setItem('ft_user', JSON.stringify(userData));
-        await trackUserVisit(userData.phone, userData.nickname, userData.photoURL, userData.role, getDeviceType());
+        await trackUserVisit(userData.phone, userData.nickname, userData.photoURL, userData.role, getDeviceType(), userData.staffRole);
         window.dispatchEvent(new Event('ft_user_updated'));
         
         if (isEdit) {
@@ -99,10 +100,11 @@ export default function IdentityForm({ onClose, onComplete, isEdit = false }: Id
   const handleComplete = async () => {
     if (role && name && phone.length >= 10) {
       const userData = { nickname: name, phone, role, photoURL };
+      // Note: We don't set staffRole here for new users as it defaults to none in DB
       localStorage.setItem('ft_user', JSON.stringify(userData));
       
       try {
-        await trackUserVisit(phone, name, photoURL, role, getDeviceType());
+        await trackUserVisit(phone, name, photoURL, role, getDeviceType(), undefined); // staffRole is undefined for new profile completions here
         await updateUserProfile(phone, { nickname: name, photoURL, role });
       } catch (e) {
         console.error("Error updating user profile:", e);

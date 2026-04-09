@@ -38,13 +38,17 @@ const MediaDetail: React.FC<MediaDetailProps> = ({ item, onClose, t, user, isAdm
 
   const checkAccess = async () => {
     if (item.type === 'demonstration' && user?.phone) {
+      // Admin/Instructor/Staff bypass check
+      const isStaff = user.staffRole === 'admin' || user.staffRole === 'instructor' || user.staffRole === 'staff';
+      if (isStaff) {
+        setHasAccess(true);
+        return;
+      }
+
       const allowed = await checkClassAccess(user.phone, item.relatedClassId || '');
       setHasAccess(allowed || isAdmin);
     } else if (item.type === 'demonstration' && !user) {
       setHasAccess(false);
-    } else if (item.relatedMilongaDate) {
-      // Milonga Live is open to everyone
-      setHasAccess(true);
     } else {
       setHasAccess(true);
     }
@@ -200,7 +204,7 @@ const MediaDetail: React.FC<MediaDetailProps> = ({ item, onClose, t, user, isAdm
               <div className={styles.uploaderInfo}>
                 <span>{item.uploaderNickname}</span>
                 <span>•</span>
-                <span>{new Date(item.createdAt).toLocaleDateString()}</span>
+                <span>{item.createdAt ? `${item.createdAt.split('T')[0].replace(/-/g, '.')} ${item.createdAt.split('T')[1].substring(0, 5)}` : ''}</span>
                 <span>•</span>
                 <span>👁️ {viewCount}</span>
               </div>
@@ -244,7 +248,7 @@ const MediaDetail: React.FC<MediaDetailProps> = ({ item, onClose, t, user, isAdm
                       <div className={styles.commentMeta}>
                         <span className={styles.commentNick}>{c.nickname}</span>
                         <span className={styles.commentDate}>
-                          {new Date(c.createdAt).toLocaleDateString()}
+                          {c.createdAt ? `${c.createdAt.split('T')[0].replace(/-/g, '.')} ${c.createdAt.split('T')[1].substring(0, 5)}` : ''}
                         </span>
                       </div>
                       <p className={styles.commentText}>{c.content}</p>

@@ -4,7 +4,9 @@ export default {
     "location": "Ubicación",
     "guide": "Detalles y Guía",
     "contact": "Contáctanos",
-    "login": "Register"
+    "login": "Register",
+    "community": "Community",
+    "join": "Join"
   },
   "nav": {
     "home": "Class",
@@ -308,7 +310,9 @@ export default {
       "registration": "Apr. News/Apply",
       "history": "History",
       "wallet": "Wallet & Coupons",
-      "profile": "My Info"
+      "coaching": "Coaching",
+      "profile": "My Info",
+      "admin": "Admin"
     },
     "walletDesc": "List of your active coupons.",
     "wallet": {
@@ -328,6 +332,26 @@ export default {
       },
       "usageConfirm": "Would you like to use this coupon?\nUsed coupons cannot be restored.",
       "usageSuccess": "Coupon successfully used."
+    }
+  },
+  "admin": {
+    "member": {
+      "searchPlaceholder": "Search nickname or number",
+      "searchBtn": "Search",
+      "engagement": "Engagement",
+      "joinDate": "Join Date",
+      "recentVisit": "Recent Visit",
+      "loading": "Loading data...",
+      "noResults": "No members found.",
+      "instructor": "Instructor",
+      "pushStatus": "Notifications",
+      "lastRegMonth": "Last Applied",
+      "topPercent": "Top {percent}%",
+      "grantInstructor": "Grant Instructor",
+      "revokeInstructor": "Revoke Instructor",
+      "leader": "Leader",
+      "follower": "Follower",
+      "errorToggle": "Error changing permissions."
     }
   },
   "info": {
@@ -612,6 +636,9 @@ export default {
     }
   },
   "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "loading": "Loading...",
     "contact": {
       "title": "Contáctanos",
       "desc": "No dudes en escribirnos en cualquier momento si tienes preguntas.",
@@ -670,6 +697,7 @@ export default {
   "endTime": "End Time",
   "media": {
     "title": "Media",
+    "edit": "Edit Media",
     "type": {
       "youtube": "YouTube",
       "demonstration": "Demo",
@@ -758,5 +786,34 @@ export default {
         "lockers": "Items cannot be stored outside personal lockers."
       }
     }
+  },
+  "coaching": {
+    "title": "Gestión de Coaching",
+    "newCoaching": "Nuevo Coaching",
+    "empty": "No se encontraron elementos de coaching.",
+    "student": "Estudiante",
+    "instructor": "Instructor",
+    "progress": "Progreso",
+    "status": "Estado",
+    "ongoing": "En curso",
+    "solved": "Resuelto",
+    "solvedBadge": "Resuelto",
+    "itemTitle": "Título",
+    "itemDesc": "Descripción",
+    "selectStudent": "Seleccionar Estudiante",
+    "searchStudentPlaceholder": "Search name or phone...",
+    "searchSearching": "Searching...",
+    "searchNoResults": "No results found.",
+    "creating": "Creating...",
+    "updates": "Registros de Actividad",
+    "activityAdd": "Add Activity",
+    "addComment": "Añadir un comentario...",
+    "uploadMedia": "Añadir Foto/Video",
+    "updateProgress": "Actualizar Progreso",
+    "saveUpdate": "Guardar Registro",
+    "noUpdates": "Sin registros aún.",
+    "confirmStatusChange": "¿Cambiar estado?",
+    "reopen": "Reopen",
+    "errorSave": "Error saving update."
   }
 };

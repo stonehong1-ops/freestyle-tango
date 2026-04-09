@@ -149,6 +149,22 @@
   border: 1.5px solid #3182f6;
 }
 
+.saturday {
+  color: #ff8e99 !important;
+}
+
+.sunday {
+  color: #ff4d4f !important;
+}
+
+.weekendLabel {
+  color: #ff4d4f; /* Default Sun */
+}
+
+.weekendLabel:nth-last-child(2) {
+  color: #ff8e99; /* Sat */
+}
+
 .legend {
   margin-top: 1.5rem;
   display: flex;

@@ -152,7 +152,7 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
     if (index === 0) { // 개별수강
       amount = 120000;
     } else if (index === 1) { // 1개월멤버쉽
-      amount = 171000; // 5% Discount 
+      amount = 180000; 
     } else if (index === 2) { // 6개월멤버쉽(1차)
       amount = 860000;
     } else { // 6개월멤버쉽(2차~6차)
@@ -274,17 +274,18 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
 
   return (
     <div className={styles.container}>
-      {/* 1. History Section */}
-      {!hideHistory && (
+      {/* 1. History Section - Now shows current month's registration even if hideHistory is true */}
+      {(!hideHistory || existingRegForMonth) && (
         <div className={styles.historySection}>
-          <h3 className={styles.sectionTitle}>{t.home.history.title}</h3>
+          <h3 className={styles.sectionTitle}>{hideHistory ? t.home.registration.currentStatus : t.home.history.title}</h3>
           {isLoading ? (
             <div className={styles.loadingSmall}>{t.home.history.loading}</div>
-          ) : dbRegs.length === 0 ? (
+          ) : (hideHistory ? [existingRegForMonth] : dbRegs).length === 0 ? (
             <div className={styles.emptyHistory}>{t.home.history.empty}</div>
           ) : (
             <div className={styles.historyList}>
-              {dbRegs.map(reg => {
+              {(hideHistory ? [existingRegForMonth] : dbRegs).filter(Boolean).map(reg => {
+                if (!reg) return null;
                 const monthName = reg.month ? reg.month.split('-')[1] : '4';
                 const dayMap: Record<string, number> = {
                   '월요일': 0, '화요일': 1, '수요일': 2, '목요일': 3, '금요일': 4, '토요일': 5, '일요일': 6, '기타': 7
@@ -380,7 +381,7 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
       <div className={styles.divider} />
 
       {/* 2. Current Selection Section */}
-      {(!hideForm && !isLoading && (editingRegId || !existingRegForMonth)) ? (
+      {(!hideForm && !isLoading && (editingRegId || !existingRegForMonth || hideHistory)) ? (
         <>
           <div id="selection-section" className={styles.selectionSection}>
             <h3 className={styles.sectionTitle}>
@@ -395,15 +396,13 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
                 setSelectedType('');
               }}>{t.home.registrationStatus.cancelEdit}</button>
             )}
-            <p className={styles.sectionDesc}>{t.home.registrationStatus.desc}</p>
-
             <div className={styles.typeSelectorArea}>
-              <h4 className={styles.dayTitle}>{t.home.registrationStatus.typeSelectorTitle}</h4>
+              <h4 className={styles.dayTitle}>Step 1. {t.home.registrationStatus.typeSelectorTitle}</h4>
+              <p className={styles.typeHint}>{t.home.payment.placeholder || '먼저 신청 유형을 선택해주세요'}</p>
               <select
                 className={styles.paymentSelect}
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
-                style={{ marginTop: '5px', marginBottom: '20px' }}
               >
                 <option value="">{t.home.payment.placeholder}</option>
                 {t.home.payment.options.map((opt: string, i: number) => (
@@ -412,7 +411,10 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
               </select>
             </div>
 
+            <div className={styles.dividerLight} />
+
             <div className={styles.listContainer}>
+              <h4 className={styles.dayTitle} style={{ padding: '1.5rem 0 0' }}>Step 2. {t.home.registrationStatus.selectPrompt || '수업 선택'}</h4>
               {daysOrdered.map(day => {
                 if (!grouped[day] || grouped[day].length === 0) return null;
                 return (
@@ -450,7 +452,7 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
                 if (selectedIds.size === 0 || selectedType === '') return '0원';
                 const idx = t.home.payment.options.indexOf(selectedType);
                 if (idx === 0) return '120,000원';
-                if (idx === 1) return '171,000원';
+                if (idx === 1) return '180,000원';
                 if (idx === 2) return '860,000원';
                 return '0원';
               })()}
@@ -503,7 +505,7 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
                   {(() => {
                     const idx = t.home.payment.options.indexOf(selectedOption);
                     if (idx === 0) return '120,000원';
-                    if (idx === 1) return '171,000원 (5% 할인 적용)';
+                    if (idx === 1) return '180,000원';
                     if (idx === 2) return '860,000원';
                     return '0원';
                   })()}

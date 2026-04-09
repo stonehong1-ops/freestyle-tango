@@ -24,9 +24,9 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
     time: initialData?.time || '',
     videoUrl: initialData?.videoUrl || '',
     teacherProfile: initialData?.teacherProfile || '',
-    leaderCount: initialData?.leaderCount || 0,
-    followerCount: initialData?.followerCount || 0,
-    maxCount: initialData?.maxCount || 15,
+    leaderCount: typeof initialData?.leaderCount === 'number' ? initialData.leaderCount : 0,
+    followerCount: typeof initialData?.followerCount === 'number' ? initialData.followerCount : 0,
+    maxCount: typeof initialData?.maxCount === 'number' ? initialData.maxCount : 15,
     targetMonth: initialData?.targetMonth || CURRENT_REGISTRATION_MONTH,
   });
 
@@ -40,7 +40,8 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
     if (parts[0]) extractedStart = parts[0].trim().padStart(5, '0');
     if (parts[1]) extractedEnd = parts[1].trim().padStart(5, '0');
   } else if (initialData?.time) {
-    const match = initialData.time.match(/(\d{1,2}:\d{2})\s*(?:-|~)\s*(\d{1,2}:\d{2})/);
+    // Robust regex for time range (e.g. "20:00~21:30" or "20:00 - 21:30")
+    const match = initialData.time.match(/(\d{1,2}:\d{2})\s*[:\-\~]\s*(\d{1,2}:\d{2})/);
     if (match) {
       extractedStart = match[1].padStart(5, '0');
       extractedEnd = match[2].padStart(5, '0');
@@ -52,8 +53,8 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
   
   const [hasCurriculum, setHasCurriculum] = useState(!!initialData?.curriculum);
   const [curriculumWeeks, setCurriculumWeeks] = useState<string[]>(
-    initialData?.curriculum 
-      ? initialData.curriculum.split('\n').map((s: string) => s.replace(/^\d+주차:\s*/, '')) 
+    (initialData?.curriculum && typeof initialData.curriculum === 'string')
+      ? initialData.curriculum.split('\n\n').map((s: string) => s.replace(/^\d+주차:\n/, '')) 
       : ['', '', '', '']
   );
   
@@ -202,9 +203,14 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
     let finalCurriculum = '';
     if (hasCurriculum) {
       finalCurriculum = curriculumWeeks
-        .map((text, i) => text.trim() ? `${i+1}주차: ${text}` : '')
+        .map((text, i) => {
+          const trimmed = text.trim();
+          if (!trimmed) return '';
+          // Ensure each week is separate, but allow line breaks WITHIN the week
+          return `${i+1}주차:\n${trimmed}`;
+        })
         .filter(Boolean)
-        .join('\n');
+        .join('\n\n');
     }
     
     let finalTime = formData.time;
@@ -503,11 +509,12 @@ export default function ClassEditor({ initialData, onSave }: ClassEditorProps) {
               {curriculumWeeks.map((text, index) => (
                 <div key={index} className={styles.curriculumRow}>
                   <span className={styles.weekLabel}>{index + 1}주차</span>
-                  <input 
-                    className={styles.input} 
+                  <textarea 
+                    className={`${styles.input} ${styles.textarea}`} 
                     value={text} 
                     onChange={(e) => handleCurriculumChange(index, e.target.value)} 
-                    placeholder="해당 주차의 수업 내용 입력"
+                    placeholder="해당 주차의 수업 내용 입력 (줄바꿈 가능)"
+                    rows={2}
                   />
                 </div>
               ))}

@@ -1,8 +1,5 @@
 {
   "framework": "nextjs",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
-  ],
   "crons": [
     {
       "path": "/api/notifications/cron?type=morning",

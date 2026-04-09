@@ -4,7 +4,9 @@ export default {
     location: 'Location',
     guide: 'Details',
     contact: 'Contact',
-    login: 'Register'
+    login: 'Register',
+    community: 'Community',
+    join: 'Join'
   },
   nav: {
     home: 'Class',
@@ -21,6 +23,7 @@ export default {
     media: 'Media',
     story: 'Story'
   },
+
   reserve: {
     closed: 'Reservation Closed',
     title: 'Reservation Request',
@@ -285,12 +288,14 @@ export default {
       role: 'Role'
     },
     tabs: {
-      registration: 'Apr. News/Apply',
-      history: 'Registration History',
-      wallet: 'Wallet & Coupons',
-      profile: 'My Profile'
+      registration: 'April News/Apply',
+      history: 'History',
+      wallet: 'Wallet',
+      coaching: 'Coaching',
+      profile: 'My Info',
+      admin: 'Admin'
     },
-    walletDesc: 'List of your active coupons.',
+    walletDesc: 'Your coupon list.',
     wallet: {
       title: 'My Wallet & Coupons',
       noCoupons: 'No coupons found.',
@@ -307,7 +312,27 @@ export default {
         target: 'For Class Registrants'
       },
       usageConfirm: 'Would you like to use this coupon?\nUsed coupons cannot be restored.',
-      usageSuccess: 'Coupon successfully used.'
+      usageSuccess: 'Payment check request sent.'
+    }
+  },
+  admin: {
+    member: {
+      searchPlaceholder: 'Search nickname or number',
+      searchBtn: 'Search',
+      engagement: 'Engagement',
+      joinDate: 'Join Date',
+      recentVisit: 'Recent Visit',
+      loading: 'Loading data...',
+      noResults: 'No members found.',
+      instructor: 'Instructor',
+      pushStatus: 'Notifications',
+      lastRegMonth: 'Last Applied',
+      topPercent: 'Top {percent}%',
+      grantInstructor: 'Grant Instructor',
+      revokeInstructor: 'Revoke Instructor',
+      leader: 'Leader',
+      follower: 'Follower',
+      errorToggle: 'Error changing permissions.'
     }
   },
   info: {
@@ -596,6 +621,9 @@ export default {
     }
   },
   common: {
+    save: 'Save',
+    cancel: 'Cancel',
+    loading: 'Loading...',
     contact: {
       title: 'Contact',
       desc: 'Feel free to contact us anytime.',
@@ -645,6 +673,7 @@ export default {
   endTime: 'End Time',
   media: {
     title: 'Media',
+    edit: 'Edit Media',
     type: {
       youtube: 'YouTube',
       demonstration: 'Demo',
@@ -733,5 +762,34 @@ export default {
         lockers: 'Items cannot be stored outside personal lockers.'
       }
     }
+  },
+  coaching: {
+    title: 'Coaching Management',
+    newCoaching: 'New Coaching',
+    empty: 'No coaching items registered.',
+    student: 'Student',
+    instructor: 'Instructor',
+    progress: 'Progress',
+    status: 'Status',
+    ongoing: 'In Progress',
+    solved: 'Solve',
+    solvedBadge: 'Solved',
+    itemTitle: 'Coaching Title',
+    itemDesc: 'Coaching Description',
+    selectStudent: 'Select Student',
+    searchStudentPlaceholder: 'Search name or phone...',
+    searchSearching: 'Searching...',
+    searchNoResults: 'No results found.',
+    creating: 'Creating...',
+    updates: 'Activity Log',
+    activityAdd: 'Add Activity',
+    addComment: 'Write a comment...',
+    uploadMedia: 'Add Photo/Video',
+    updateProgress: 'Update Progress',
+    saveUpdate: 'Save Log',
+    noUpdates: 'No logs found.',
+    confirmStatusChange: 'Change status?',
+    reopen: 'Reopen',
+    errorSave: 'Error saving update.'
   }
 };

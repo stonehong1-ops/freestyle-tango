@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { uploadFile } from '@/lib/storage';
 
 interface MediaEditorProps {
+  initialData?: MediaItem | null;
   onClose: () => void;
   onSave: () => void;
   t: any;
@@ -15,9 +16,9 @@ interface MediaEditorProps {
   user: any;
 }
 
-const MediaEditor: React.FC<MediaEditorProps> = ({ onClose, onSave, t, classes, user }) => {
+const MediaEditor: React.FC<MediaEditorProps> = ({ initialData, onClose, onSave, t, classes, user }) => {
   const { currentUser } = useAuth();
-  const [formData, setFormData] = useState<Partial<MediaItem>>({
+  const [formData, setFormData] = useState<Partial<MediaItem>>(initialData || {
     type: 'youtube',
     title: '',
     videoUrl: '',
@@ -26,7 +27,12 @@ const MediaEditor: React.FC<MediaEditorProps> = ({ onClose, onSave, t, classes, 
     likeCount: 0
   });
 
-  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(
+    initialData?.thumbnailUrl || 
+    (initialData?.type === 'youtube' ? `https://img.youtube.com/vi/${initialData.videoUrl}/mqdefault.jpg` : null) ||
+    (initialData?.type === 'image' ? initialData.videoUrl : null) ||
+    null
+  );
   const [file, setFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
@@ -119,34 +125,30 @@ const MediaEditor: React.FC<MediaEditorProps> = ({ onClose, onSave, t, classes, 
         finalVideoUrl = id;
         thumbnailUrl = `https://img.youtube.com/vi/${id}/mqdefault.jpg`;
       } else {
-        // For demonstration/general, prefer class image if linked
-        if (formData.relatedClassId) {
-          const relatedClass = classes.find(c => c.id === formData.relatedClassId);
-          if (relatedClass?.imageUrl) {
-            thumbnailUrl = relatedClass.imageUrl;
-          }
-        }
-        
-        // If still no thumbnail, and it's a demonstration, use a default specific to it
-        if (!thumbnailUrl && formData.type === 'demonstration') {
-          // Use a generic demonstration placeholder or the video itself with a fragment
-          thumbnailUrl = '/images/demo-placeholder.png'; // Make sure this exists or use a better URL
-        }
+        // We no longer force class poster as thumbnail for demonstration/general
+        // These will now fallback to video frame (#t=0.5) in MediaList
       }
 
-      await addMedia({
+      const mediaData = {
         type: formData.type as any,
         title: formData.title || '',
         videoUrl: finalVideoUrl,
-        thumbnailUrl: thumbnailUrl || '/api/placeholder/400/225',
+        thumbnailUrl: (formData.type === 'youtube' ? (thumbnailUrl || formData.thumbnailUrl) : ''),
         relatedClassId: formData.relatedClassId || '',
-        uploaderNickname: user?.nickname || 'Admin',
-        uploaderPhone: user?.phone || '',
-        createdAt: new Date().toISOString(),
-        viewCount: 0,
-        likeCount: 0,
-        commentCount: 0
-      });
+        uploaderNickname: formData.uploaderNickname || user?.nickname || 'Admin',
+        uploaderPhone: formData.uploaderPhone || user?.phone || '',
+        createdAt: formData.createdAt || new Date().toISOString(),
+        viewCount: formData.viewCount || 0,
+        likeCount: formData.likeCount || 0,
+        commentCount: formData.commentCount || 0
+      };
+
+      if (initialData?.id) {
+        const { updateMedia } = await import('@/lib/db');
+        await updateMedia(initialData.id, mediaData);
+      } else {
+        await addMedia(mediaData);
+      }
       
       onSave();
     } catch (error: any) {
@@ -165,7 +167,7 @@ const MediaEditor: React.FC<MediaEditorProps> = ({ onClose, onSave, t, classes, 
     <div className={styles.overlay}>
       <div className={styles.modal}>
         <div className={styles.header}>
-          <h3>미디어 등록</h3>
+          <h3>{initialData ? '미디어 수정' : '미디어 등록'}</h3>
           <button onClick={onClose} className={styles.closeBtn}>×</button>
         </div>
 
@@ -178,8 +180,8 @@ const MediaEditor: React.FC<MediaEditorProps> = ({ onClose, onSave, t, classes, 
               className={styles.input}
             >
               <option value="youtube">유튜브</option>
-              <option value="demonstration">수업 데모</option>
-              <option value="general">일반 동영상</option>
+              <option value="demonstration">시연</option>
+              <option value="general">일반</option>
             </select>
           </div>
 
@@ -200,7 +202,7 @@ const MediaEditor: React.FC<MediaEditorProps> = ({ onClose, onSave, t, classes, 
                   className={styles.fileDropZone}
                   onClick={() => document.getElementById('videoFile')?.click()}
                 >
-                  <p>{file ? file.name : '동영상을 선택하려면 이곳을 클릭하세요.'}</p>
+                  <p>{file ? file.name : (initialData?.videoUrl ? '기존 동영상이 등록되어 있습니다. 변경하려면 클릭하세요.' : '동영상을 선택하려면 이곳을 클릭하세요.')}</p>
                   <input 
                     id="videoFile"
                     type="file" 
@@ -215,8 +217,10 @@ const MediaEditor: React.FC<MediaEditorProps> = ({ onClose, onSave, t, classes, 
                 <div className={styles.thumbnailPreview}>
                    {formData.type === 'youtube' ? (
                      <img src={thumbnailPreview} alt="Youtube Preview" />
+                   ) : formData.type === 'image' ? (
+                     <img src={thumbnailPreview} alt="Image Preview" />
                    ) : (
-                     <video src={thumbnailPreview} />
+                     <video src={thumbnailPreview.startsWith('data:') ? thumbnailPreview : `${thumbnailPreview}#t=0.5`} controls={thumbnailPreview.startsWith('data:')} />
                    )}
                 </div>
               )}

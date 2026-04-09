@@ -18,6 +18,9 @@ interface ClassCardProps {
   curriculum?: string;
   isApplied?: boolean;
   isRegistered?: boolean;
+  isAdmin?: boolean;
+  onEdit?: (id: string, e: React.MouseEvent) => void;
+  onDelete?: (id: string, e: React.MouseEvent) => void;
   onClick: (id: string) => void;
 }
 
@@ -35,9 +38,26 @@ export default function ClassCard({
   maxCount,
   isApplied,
   isRegistered,
+  isAdmin,
+  onEdit,
+  onDelete,
   onClick
 }: ClassCardProps) {
   const { t, language } = useLanguage();
+  const [showMenu, setShowMenu] = React.useState(false);
+  const menuRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+    if (showMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showMenu]);
   const leadPercent = (leaderCount / maxCount) * 100;
   const followPercent = (followerCount / maxCount) * 100;
 
@@ -64,7 +84,40 @@ export default function ClassCard({
       </div>
       
       <div className={styles.contentArea}>
-        <div className={styles.level}>{level}</div>
+        <div className={styles.headerRow}>
+          <div className={styles.level}>{level}</div>
+          {isAdmin && (
+            <div className={styles.adminMenuWrapper} ref={menuRef}>
+              <button 
+                className={styles.menuBtn} 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowMenu(!showMenu);
+                }}
+              >
+                ⋮
+              </button>
+              {showMenu && (
+                <div className={styles.dropdownMenu}>
+                  <div className={styles.menuItem} onClick={(e) => {
+                    e.stopPropagation();
+                    setShowMenu(false);
+                    onEdit?.(id, e);
+                  }}>
+                    {t.home.registration.edit || '수정'}
+                  </div>
+                  <div className={`${styles.menuItem} ${styles.deleteItem}`} onClick={(e) => {
+                    e.stopPropagation();
+                    setShowMenu(false);
+                    onDelete?.(id, e);
+                  }}>
+                    {t.home.registration.delete || '삭제'}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
         <h3 className={styles.title}>{title}</h3>
         {curriculum && <div className={styles.curriculum}>{curriculum}</div>}
         <div className={styles.time}>{time}</div>

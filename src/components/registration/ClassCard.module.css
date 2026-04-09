@@ -70,12 +70,81 @@
   min-width: 0;
 }
 
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-1);
+}
+
 .level {
   font-size: 0.65rem;
   font-weight: 800;
   color: var(--accent);
   text-transform: uppercase;
-  margin-bottom: var(--space-1);
+}
+
+.adminMenuWrapper {
+  position: relative;
+}
+
+.menuBtn {
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 1.2rem;
+  padding: 0 var(--space-1);
+  cursor: pointer;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+  height: 24px;
+  width: 24px;
+}
+
+.menuBtn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--bg-base);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  min-width: 80px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.menuItem {
+  padding: var(--space-2) var(--space-4);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.2s;
+  text-align: center;
+}
+
+.menuItem:hover {
+  background: var(--bg-secondary);
+}
+
+.deleteItem {
+  border-top: 1px solid var(--border-light);
+  color: #fa5252;
+}
+
+.deleteItem:hover {
+  background: #fff5f5;
 }
 
 .title {

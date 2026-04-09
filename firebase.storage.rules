@@ -51,6 +51,12 @@ service firebase.storage {
       allow write: if isAuthenticated() && isValidImage(5);
     }
 
+    // Coaching activity media (Up to 100MB)
+    match /coaching/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAuthenticated() && (isValidImage(50) || isValidVideo(100));
+    }
+
     // General assets or other future needs
     match /{allPaths=**} {
       allow read: if true;

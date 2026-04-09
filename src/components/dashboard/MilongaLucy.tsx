@@ -3,15 +3,28 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styles from './MilongaLucy.module.css';
 import { toJpeg } from 'html-to-image';
-import { addMilongaReservation, getMilongaReservations, MilongaReservation, MilongaInfo, getMilongaInfo, updateMilongaReservation, deleteMilongaReservation, deleteMilongaInfo } from '@/lib/db';
-import FullscreenModal from '@/components/common/FullscreenModal';
+import { 
+  addMilongaReservation, 
+  getMilongaReservations, 
+  MilongaReservation, 
+  MilongaInfo, 
+  getMilongaInfo, 
+  updateMilongaReservation, 
+  deleteMilongaReservation, 
+  deleteMilongaInfo,
+  MediaItem,
+  getMedia,
+  getClasses,
+  TangoClass,
+  deleteMedia
+} from '@/lib/db';
+import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useModalHistory } from '@/hooks/useModalHistory';
-import Skeleton from '@/components/common/Skeleton';
+import FullscreenModal from '../common/FullscreenModal';
+import Skeleton from '../common/Skeleton';
 import MediaList from './MediaList';
 import MediaDetail from './MediaDetail';
-import { MediaItem, getMedia } from '@/lib/db';
-import { useAuth } from '@/contexts/AuthContext';
 
 export default function MilongaLucy({ 
   selectedDate, 
@@ -60,6 +73,9 @@ export default function MilongaLucy({
   const [lucyCountLast7Days, setLucyCountLast7Days] = useState(0);
   const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
   const [mediaLoading, setMediaLoading] = useState(false);
+  const [editingMedia, setEditingMedia] = useState<MediaItem | null>(null);
+  const [showEditor, setShowEditor] = useState(false);
+  const [classes, setClasses] = useState<TangoClass[]>([]);
 
   useEffect(() => {
     const savedPhone = localStorage.getItem('ft_milonga_phone');
@@ -101,10 +117,12 @@ export default function MilongaLucy({
   const handleCloseForm = React.useCallback(() => setShowForm(false), []);
   const handleClosePoster = React.useCallback(() => setShowPosterFullscreen(false), []);
   const handleCloseMedia = React.useCallback(() => setSelectedMedia(null), []);
+  const handleCloseEditor = React.useCallback(() => setShowEditor(false), []);
 
   useModalHistory(showForm, handleCloseForm, 'milongaForm');
   useModalHistory(showPosterFullscreen, handleClosePoster, 'posterFullscreen');
   useModalHistory(!!selectedMedia, handleCloseMedia, 'lucyMediaDetail');
+  useModalHistory(showEditor, handleCloseEditor, 'lucyMediaEditor');
 
   const fetchMilongaInfo = async () => {
     if (!selectedDate) return;
@@ -146,6 +164,31 @@ export default function MilongaLucy({
     
     const recentCount = lucyMedia.filter(m => new Date(m.createdAt) > oneWeekAgo).length;
     setLucyCountLast7Days(recentCount);
+  };
+
+  const fetchClasses = async () => {
+    const data = await getClasses();
+    setClasses(data);
+  };
+
+  useEffect(() => {
+    fetchClasses();
+  }, []);
+
+  const handleMediaEdit = (item: MediaItem, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingMedia(item);
+    setShowEditor(true);
+  };
+
+  const handleMediaDelete = async (item: MediaItem, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!item.id) return;
+    if (confirm(t.home?.registration?.deleteConfirm || '정말 삭제하시겠습니까?')) {
+      await deleteMedia(item.id);
+      fetchMedia();
+      fetchLucyLiveCount();
+    }
   };
 
   const formatDateLabel = (dateStr: string) => {
@@ -526,6 +569,11 @@ export default function MilongaLucy({
                   t={t}
                   loading={false}
                   onSelect={setSelectedMedia}
+                  isAdmin={isAdmin}
+                  classes={classes}
+                  onEdit={handleMediaEdit}
+                  onDelete={handleMediaDelete}
+                  language={language}
                 />
               </div>
             ));
@@ -541,6 +589,37 @@ export default function MilongaLucy({
               onUpdate={fetchMedia}
               customTitle={language === 'ko' ? '루씨 Live' : 'Lucy Live'}
             />
+          )}
+
+          {showEditor && (
+            <div className={styles.fullPopup} style={{ zIndex: 3000 }}>
+              <div className={styles.popupHeader}>
+                <button className={styles.backBtn} onClick={() => setShowEditor(false)}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <h2 className={styles.sectionTitle} style={{ margin: 0 }}>{t.media?.edit || '영상 수정'}</h2>
+                <div style={{ width: 40 }} />
+              </div>
+              <div className={styles.popupContent} style={{ padding: 20 }}>
+                {(() => {
+                  const MediaEditor = require('@/components/admin/MediaEditor').default;
+                  return (
+                    <MediaEditor 
+                      initialData={editingMedia}
+                      onClose={() => setShowEditor(false)} 
+                      onSave={() => {
+                        setShowEditor(false);
+                        fetchMedia();
+                        fetchLucyLiveCount();
+                      }}
+                      t={t}
+                      classes={classes}
+                      user={currentUser}
+                    />
+                  );
+                })()}
+              </div>
+            </div>
           )}
         </section>
       )}

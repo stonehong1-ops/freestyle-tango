@@ -2,16 +2,48 @@
 
 import React, { memo } from 'react';
 import styles from './Media.module.css';
-import { MediaItem } from '@/lib/db';
+import { MediaItem, TangoClass } from '@/lib/db';
+import { formatRelativeTime } from '@/lib/utils';
+import { Language } from '@/locales';
 
 interface MediaListProps {
   media: MediaItem[];
   t: any;
   onSelect: (item: MediaItem) => void;
   loading: boolean;
+  isAdmin?: boolean;
+  classes?: TangoClass[];
+  onEdit?: (item: MediaItem, e: React.MouseEvent) => void;
+  onDelete?: (item: MediaItem, e: React.MouseEvent) => void;
+  language?: Language;
 }
 
-const MediaList: React.FC<MediaListProps> = ({ media, t, onSelect, loading }) => {
+const MediaList: React.FC<MediaListProps> = ({ 
+  media, 
+  t, 
+  onSelect, 
+  loading, 
+  isAdmin, 
+  classes = [],
+  onEdit,
+  onDelete,
+  language = 'ko'
+}) => {
+  const [showMenuId, setShowMenuId] = React.useState<string | null>(null);
+  const menuRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenuId(null);
+      }
+    };
+    if (showMenuId) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showMenuId]);
+
   const getYTThumbnail = (url: string) => {
     let id = url;
     if (url.includes('youtube.com/watch?v=')) {
@@ -111,9 +143,49 @@ const MediaList: React.FC<MediaListProps> = ({ media, t, onSelect, loading }) =>
           </div>
 
           <div className={styles.cardInfo}>
-            {item.title && item.title !== `${item.uploaderNickname}의 루씨 Live` && (
-              <div className={styles.title}>{item.title}</div>
+            <div className={styles.titleRow}>
+              {item.title && item.title !== `${item.uploaderNickname}의 루씨 Live` && (
+                <div className={styles.title}>{item.title}</div>
+              )}
+              {isAdmin && (
+                <div className={styles.adminMenuWrapper} ref={showMenuId === item.id ? menuRef : null}>
+                  <button 
+                    className={styles.menuBtn} 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowMenuId(showMenuId === item.id ? null : (item.id || null));
+                    }}
+                  >
+                    ⋮
+                  </button>
+                  {showMenuId === item.id && (
+                    <div className={styles.adminDropdownMenu}>
+                      <div className={styles.menuItem} onClick={(e) => {
+                        e.stopPropagation();
+                        setShowMenuId(null);
+                        onEdit?.(item, e);
+                      }}>
+                        {t.home?.registration?.edit || t.common?.edit || '수정'}
+                      </div>
+                      <div className={`${styles.menuItem} ${styles.deleteItem}`} onClick={(e) => {
+                        e.stopPropagation();
+                        setShowMenuId(null);
+                        onDelete?.(item, e);
+                      }}>
+                        {t.home?.registration?.delete || t.common?.delete || '삭제'}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            
+            {item.relatedClassId && (
+              <div className={styles.relatedClass}>
+                🏷️ {classes.find(c => c.id === item.relatedClassId)?.title || '연관 수업'}
+              </div>
             )}
+
             <div className={styles.meta}>
               <span className={styles.uploaderName}>{item.uploaderNickname}</span>
               <div className={styles.counts}>

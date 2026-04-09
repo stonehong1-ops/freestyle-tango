@@ -4,7 +4,9 @@ export default {
     "location": "住宿位置",
     "guide": "详细信息与使用指南",
     "contact": "联系我们",
-    "login": "Register"
+    "login": "Register",
+    "community": "Community",
+    "join": "Join"
   },
   "nav": {
     "home": "Class",
@@ -308,7 +310,9 @@ export default {
       "registration": "Apr. News/Apply",
       "history": "History",
       "wallet": "Wallet & Coupons",
-      "profile": "My Info"
+      "coaching": "Coaching",
+      "profile": "My Info",
+      "admin": "Admin"
     },
     "walletDesc": "List of your active coupons.",
     "wallet": {
@@ -328,6 +332,26 @@ export default {
       },
       "usageConfirm": "Would you like to use this coupon?\nUsed coupons cannot be restored.",
       "usageSuccess": "Coupon successfully used."
+    }
+  },
+  "admin": {
+    "member": {
+      "searchPlaceholder": "Search nickname or number",
+      "searchBtn": "Search",
+      "engagement": "Engagement",
+      "joinDate": "Join Date",
+      "recentVisit": "Recent Visit",
+      "loading": "Loading data...",
+      "noResults": "No members found.",
+      "instructor": "Instructor",
+      "pushStatus": "Notifications",
+      "lastRegMonth": "Last Applied",
+      "topPercent": "Top {percent}%",
+      "grantInstructor": "Grant Instructor",
+      "revokeInstructor": "Revoke Instructor",
+      "leader": "Leader",
+      "follower": "Follower",
+      "errorToggle": "Error changing permissions."
     }
   },
   "info": {
@@ -760,6 +784,9 @@ export default {
     }
   },
   "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "loading": "Loading...",
     "contact": {
       "title": "联系我们",
       "desc": "如有任何疑问，请随时联系我们。",
@@ -818,6 +845,7 @@ export default {
   "endTime": "End Time",
   "media": {
     "title": "Media",
+    "edit": "Edit Media",
     "type": {
       "youtube": "YouTube",
       "demonstration": "Demo",
@@ -906,5 +934,34 @@ export default {
         "lockers": "Items cannot be stored outside personal lockers."
       }
     }
+  },
+  "coaching": {
+    "title": "Coaching Management",
+    "newCoaching": "New Coaching",
+    "empty": "No coaching items found.",
+    "student": "Student",
+    "instructor": "Instructor",
+    "progress": "Progress",
+    "status": "Status",
+    "ongoing": "Ongoing",
+    "solved": "Solved",
+    "solvedBadge": "Solved",
+    "itemTitle": "Title",
+    "itemDesc": "Description",
+    "selectStudent": "Select Student",
+    "searchStudentPlaceholder": "Search name or phone...",
+    "searchSearching": "Searching...",
+    "searchNoResults": "No results found.",
+    "creating": "Creating...",
+    "updates": "Activity Logs",
+    "activityAdd": "Add Activity",
+    "addComment": "Add a comment...",
+    "uploadMedia": "Add Photo/Video",
+    "updateProgress": "Update Progress",
+    "saveUpdate": "Save Log",
+    "noUpdates": "No logs yet.",
+    "confirmStatusChange": "更改状态？",
+    "reopen": "Reopen",
+    "errorSave": "Error saving update."
   }
 };

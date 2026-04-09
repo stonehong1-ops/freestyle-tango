@@ -272,7 +272,7 @@
   font-size: 0.95rem;
   line-height: 1.5;
   position: relative;
-  word-break: break-all;
+  word-break: break-word;
   white-space: pre-wrap;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -433,9 +433,10 @@
 }
 
 .unreadCount {
-  font-size: 0.65rem;
-  color: #4A90E2;
-  font-weight: 600;
+  font-size: 0.7rem;
+  color: #ff9500; /* Vibrant Orange for visibility like KakaoTalk */
+  font-weight: 700;
+  line-height: 1;
 }
 
 .time {
@@ -458,7 +459,7 @@
 
 .readCount {
   font-size: 0.65rem;
-  color: #4A90E2; 
+  color: #ff9500; 
   font-weight: 600;
   margin-bottom: 2px;
 }
@@ -477,10 +478,19 @@
 
 .mediaMessage img, .mediaMessage video {
   width: 100%;
-  max-width: 260px;
-  max-height: 320px;
+  max-width: 280px;
+  max-height: 360px;
   object-fit: contain;
   display: block;
+  border-radius: 8px;
+}
+
+.chatImage {
+  max-width: 280px;
+  max-height: 360px;
+  border-radius: 12px;
+  display: block;
+  object-fit: cover;
 }
 
 .youtubeCard {
@@ -782,6 +792,12 @@
   font-size: 1rem;
   outline: none;
   color: #1a1a1a;
+  resize: none;
+  min-height: 38px;
+  max-height: 120px;
+  overflow-y: auto;
+  font-family: inherit;
+  line-height: 1.4;
 }
 
 .micBtn, .sendBtn {
@@ -1206,4 +1222,101 @@
   border-radius: 4px;
   margin-left: 6px;
   text-transform: uppercase;
+}
+
+/* Edit Message Modal - Glassmorphism & Premium Feel */
+.editModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 4000;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  animation: fadeIn 0.3s ease;
+}
+
+.editModalContent {
+  background: white;
+  width: 100%;
+  max-height: 90%;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+  padding-bottom: env(safe-area-inset-bottom, 20px);
+}
+
+.editArea {
+  padding: 1.25rem;
+  flex: 1;
+}
+
+.editField {
+  width: 100%;
+  min-height: 200px;
+  max-height: 400px;
+  padding: 1rem;
+  border-radius: 16px;
+  border: 1.5px solid #f2f4f6;
+  background: #f8f9fa;
+  font-size: 1rem;
+  line-height: 1.6;
+  outline: none;
+  resize: none;
+  font-family: inherit;
+  color: #1a1a1a;
+  transition: all 0.2s;
+}
+
+.editField:focus {
+  border-color: #3182f6;
+  background: white;
+  box-shadow: 0 4px 12px rgba(49, 130, 246, 0.08);
+}
+
+.editModalActions {
+  padding: 0 1.25rem 1.25rem;
+  display: flex;
+  gap: 12px;
+}
+
+.cancelEditBtn,
+.saveEditBtn {
+  flex: 1;
+  padding: 14px;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.cancelEditBtn {
+  background: #f2f4f6;
+  color: #4e5968;
+}
+
+.cancelEditBtn:active {
+  background: #e5e8eb;
+  transform: scale(0.98);
+}
+
+.saveEditBtn {
+  background: #3182f6;
+  color: white;
+  box-shadow: 0 4px 12px rgba(49, 130, 246, 0.3);
+}
+
+.saveEditBtn:active {
+  background: #1b64da;
+  transform: scale(0.98);
 }

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { User, Registration, getUsers } from '@/lib/db';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Props {
   registrations: Registration[];
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export default function MemberManagement({ registrations, onClose }: Props) {
+  const { t } = useLanguage();
   const [users, setUsers] = useState<User[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -153,9 +155,24 @@ export default function MemberManagement({ registrations, onClose }: Props) {
     return userRegs.length > 0 ? userRegs[0].month : '-';
   };
 
+  const handleToggleInstructor = async (phone: string, currentStatus: boolean) => {
+    try {
+      const { updateUserProfile } = await import('@/lib/db');
+      await updateUserProfile(phone, { isInstructor: !currentStatus });
+      
+      // Update local state
+      setUsers(prev => prev.map(u => 
+        u.phone === phone ? { ...u, isInstructor: !currentStatus } : u
+      ));
+    } catch (error) {
+      console.error("Toggle Instructor Error:", error);
+      alert(t.admin.member.errorToggle);
+    }
+  };
+
   const SortIcon = ({ type }: { type: typeof sortBy }) => {
-    if (sortBy !== type) return null;
-    return <span style={{ fontSize: '0.7rem', marginLeft: '2px' }}>{sortOrder === 'desc' ? '▼' : '▲'}</span>;
+    if (sortBy !== type) return <span style={{ opacity: 0.3, fontSize: '0.7rem' }}>↕</span>;
+    return <span style={{ fontSize: '0.7rem' }}>{sortOrder === 'asc' ? '▲' : '▼'}</span>;
   };
 
   return (
@@ -165,7 +182,7 @@ export default function MemberManagement({ registrations, onClose }: Props) {
         <div style={{ display: 'flex', gap: '8px', marginBottom: '1rem' }}>
           <input 
             type="text" 
-            placeholder="닉네임 또는 번호 검색"
+            placeholder={t.admin.member.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{ 
@@ -173,8 +190,6 @@ export default function MemberManagement({ registrations, onClose }: Props) {
               fontSize: '0.95rem', outline: 'none', background: '#f9fafb'
             }}
           />
-          {/* Note: In this version, filtering happens in real-time for UX, 
-              but we keep the button for visual consistency if needed, though it does nothing now besides blur */}
           <button 
             style={{ 
               padding: '0 20px', borderRadius: '12px', border: 'none', 
@@ -183,7 +198,7 @@ export default function MemberManagement({ registrations, onClose }: Props) {
             }}
             onClick={() => {(document?.activeElement as any)?.blur()}}
           >
-            검색
+            {t.admin.member.searchBtn}
           </button>
         </div>
 
@@ -198,7 +213,7 @@ export default function MemberManagement({ registrations, onClose }: Props) {
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px'
             }}
           >
-            🔥 열성도 <SortIcon type="engagement" />
+            🔥 {t.admin.member.engagement} <SortIcon type="engagement" />
           </button>
           <button 
             onClick={() => handleSort('createdAt')}
@@ -210,7 +225,7 @@ export default function MemberManagement({ registrations, onClose }: Props) {
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px'
             }}
           >
-            가입일자 <SortIcon type="createdAt" />
+            {t.admin.member.joinDate} <SortIcon type="createdAt" />
           </button>
           <button 
             onClick={() => handleSort('lastVisit')}
@@ -222,7 +237,7 @@ export default function MemberManagement({ registrations, onClose }: Props) {
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px'
             }}
           >
-            최근방문 <SortIcon type="lastVisit" />
+            {t.admin.member.recentVisit} <SortIcon type="lastVisit" />
           </button>
         </div>
       </div>
@@ -230,7 +245,7 @@ export default function MemberManagement({ registrations, onClose }: Props) {
       {/* Member List */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '1rem' }}>
         {isLoading ? (
-          <div style={{ textAlign: 'center', padding: '3rem', color: '#8b95a1' }}>데이터 로딩 중...</div>
+          <div style={{ textAlign: 'center', padding: '3rem', color: '#8b95a1' }}>{t.admin.member.loading}</div>
         ) : filteredMembers.length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {filteredMembers.map(user => {
@@ -251,7 +266,16 @@ export default function MemberManagement({ registrations, onClose }: Props) {
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <div style={{ fontWeight: 800, color: '#191f28', fontSize: '1rem' }}>{user.nickname || 'Guest'}</div>
+                            <div style={{ fontWeight: 800, color: '#191f28', fontSize: '1.1rem' }}>{user.nickname || 'Guest'}</div>
+                            {user.isInstructor && (
+                              <div style={{ 
+                                padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem', 
+                                background: '#e0f2f1', color: '#00796b', fontWeight: 800,
+                                border: '1px solid #b2dfdb'
+                              }}>
+                                {t.admin.member.instructor}
+                              </div>
+                            )}
                             {user.device && (
                               <div title={user.device} style={{ display: 'flex', alignItems: 'center', opacity: 0.7 }}>
                                 {user.device === 'ios' && (
@@ -284,7 +308,7 @@ export default function MemberManagement({ registrations, onClose }: Props) {
                           background: user.role === 'leader' ? '#e8f3ff' : '#fff0f0',
                           color: user.role === 'leader' ? '#3182f6' : '#f04452'
                         }}>
-                          {user.role === 'leader' ? '리더' : '팔로어'}
+                          {user.role === 'leader' ? t.admin.member.leader : t.admin.member.follower}
                         </div>
                       </div>
                     </div>
@@ -292,28 +316,60 @@ export default function MemberManagement({ registrations, onClose }: Props) {
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', paddingTop: '12px', borderTop: '1px solid #f2f4f6' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span style={{ fontSize: '0.75rem', color: '#8b95a1' }}>가입일</span>
+                      <span style={{ fontSize: '0.75rem', color: '#8b95a1' }}>{t.admin.member.joinDate}</span>
                       <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#4e5968' }}>{formatDateOnly(user.createdAt)}</span>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span style={{ fontSize: '0.75rem', color: '#8b95a1' }}>알림 설정</span>
+                      <span style={{ fontSize: '0.75rem', color: '#8b95a1' }}>{t.admin.member.pushStatus}</span>
                       <span style={{ fontSize: '0.85rem', fontWeight: 700, color: pushStatus === 'ON' ? '#3182f6' : '#f04452' }}>
                         {pushStatus}
                       </span>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span style={{ fontSize: '0.75rem', color: '#8b95a1' }}>최근 방문</span>
+                      <span style={{ fontSize: '0.75rem', color: '#8b95a1' }}>{t.admin.member.recentVisit}</span>
                       <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#4e5968' }}>{formatVisitDate(user.lastVisit)}</span>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span style={{ fontSize: '0.75rem', color: '#8b95a1' }}>최종 수업 신청월</span>
+                      <span style={{ fontSize: '0.75rem', color: '#8b95a1' }}>{t.admin.member.lastRegMonth}</span>
                       <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#191f28' }}>{lastMonth}</span>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span style={{ fontSize: '0.75rem', color: '#3182f6', fontWeight: 600 }}>🔥 열성도</span>
+                      <span style={{ fontSize: '0.75rem', color: '#3182f6', fontWeight: 600 }}>🔥 {t.admin.member.engagement}</span>
                       <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#3182f6' }}>
-                        상위 {user.topPercent}%
+                        {t.admin.member.topPercent.replace('{percent}', String(user.topPercent))}
                       </span>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px dashed #eee', paddingTop: '10px', gridColumn: 'span 2' }}>
+                      <span style={{ fontSize: '0.75rem', color: '#8b95a1', marginBottom: '2px' }}>회원 역할 설정</span>
+                      <select 
+                        value={user.staffRole || (user.isInstructor ? 'instructor' : 'none')}
+                        onChange={async (e) => {
+                          const newRole = e.target.value as any;
+                          try {
+                            const { updateUserProfile } = await import('@/lib/db');
+                            await updateUserProfile(user.phone, { 
+                              staffRole: newRole,
+                              isInstructor: newRole === 'instructor' || newRole === 'admin'
+                            });
+                            setUsers(prev => prev.map(u => 
+                              u.phone === user.phone ? { ...u, staffRole: newRole, isInstructor: newRole === 'instructor' || newRole === 'admin' } : u
+                            ));
+                          } catch (error) {
+                            console.error("Update Role Error:", error);
+                            alert("역할 변경 중 오류가 발생했습니다.");
+                          }
+                        }}
+                        style={{ 
+                          width: '100%', padding: '10px', borderRadius: '12px', border: '1px solid #e5e8eb',
+                          background: '#f9fafb', color: '#191f28', fontSize: '0.85rem', fontWeight: 700,
+                          outline: 'none', cursor: 'pointer'
+                        }}
+                      >
+                        <option value="none">일반 회원 (None)</option>
+                        <option value="instructor">강사 (Instructor)</option>
+                        <option value="staff">운영스탭 (Staff)</option>
+                        <option value="admin">관리자 (Admin)</option>
+                      </select>
                     </div>
                   </div>
                 </div>
@@ -322,7 +378,7 @@ export default function MemberManagement({ registrations, onClose }: Props) {
           </div>
         ) : (
           <div style={{ textAlign: 'center', padding: '5rem 0', color: '#8b95a1' }}>
-            계정 정보를 찾을 수 없습니다.
+            {t.admin.member.noResults}
           </div>
         )}
       </div>

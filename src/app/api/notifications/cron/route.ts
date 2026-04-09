@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDb, adminMessaging } from '@/lib/firebase-admin';
+
+export const dynamic = 'force-dynamic';
+import { adminFirestore, adminMessaging, FieldValue } from '@/lib/firebase-admin';
 import { COMMUNITY_ROOM_ID } from '@/lib/chat';
 
 /**
@@ -9,12 +11,25 @@ import { COMMUNITY_ROOM_ID } from '@/lib/chat';
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const type = searchParams.get('type');
-  
-  // 보안 검증 (Vercel 환경 변수 CRON_SECRET 확인)
   const authHeader = req.headers.get('authorization');
+  
+  // [임시 진단용] 요청이 들어왔음을 Firestore에 즉시 기록
+  try {
+    await adminFirestore.collection('cron_logs').add({
+      type: `triggered_${type}`,
+      timestamp: FieldValue.serverTimestamp(),
+      authHeader: authHeader ? 'present' : 'missing',
+      envSecret: process.env.CRON_SECRET ? 'configured' : 'missing'
+    });
+  } catch (e) {
+    console.error('Failed to log trigger', e);
+  }
+
+  // 보안 검증
   if (process.env.NODE_ENV === 'production' && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+
 
   try {
     if (type === 'morning') {
@@ -36,36 +51,81 @@ export async function GET(req: NextRequest) {
 async function handleMorningSchedule() {
   const now = new Date();
   const kstOffset = 9 * 60 * 60 * 1000;
-  const kstToday = new Date(now.getTime() + kstOffset).toISOString().split('T')[0]; // YYYY-MM-DD (KST)
+  const kstTime = new Date(now.getTime() + kstOffset);
+  const kstToday = kstTime.toISOString().split('T')[0]; // YYYY-MM-DD (KST)
+  
+  // 날짜 제목 포맷팅: [4/9(목) 프리스타일 일정]
+  const month = kstTime.getMonth() + 1;
+  const date = kstTime.getDate();
+  const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+  const weekday = weekdays[kstTime.getDay()];
+  const displayTitle = `[${month}/${date}(${weekday}) 프리스타일 일정]`;
 
-  // 1. 오늘 날짜의 일정이 하나라도 있는지 확인 (수업 / 밀롱가 등)
-  const [classesSnap, milongaSnap] = await Promise.all([
-    adminDb.collection('tango_classes')
+  // 1. 오늘 날짜의 모든 일정 수집
+  const [classesSnap, milongaSnap, extraSnap] = await Promise.all([
+    adminFirestore.collection('tango_classes')
       .where('dates', 'array-contains', kstToday)
-      .limit(1)
       .get(),
-    adminDb.collection('milonga_reservations')
-      .where('milongaDate', '==', kstToday)
-      .limit(1)
+    adminFirestore.collection('milonga_info')
+      .where('activeDate', '==', kstToday)
+      .get(),
+    adminFirestore.collection('extra_schedules')
+      .where('date', '==', kstToday)
       .get()
   ]);
 
-  const hasEvent = !classesSnap.empty || !milongaSnap.empty;
+  const events: { time: string; title: string }[] = [];
 
-  if (!hasEvent) {
-    return NextResponse.json({ message: '오늘 등록된 일정이 없습니다.' });
+  classesSnap.docs.forEach((doc: any) => {
+    const data = doc.data();
+    events.push({ time: data.timeStr || '', title: data.title });
+  });
+
+  milongaSnap.docs.forEach((doc: any) => {
+    const data = doc.data();
+    events.push({ time: data.startTime || '', title: '밀롱가 루씨' });
+  });
+
+  extraSnap.docs.forEach((doc: any) => {
+    const data = doc.data();
+    events.push({ time: data.time || '', title: data.title });
+  });
+
+
+  // 시간순 정렬
+  events.sort((a, b) => a.time.localeCompare(b.time));
+
+  if (events.length === 0) {
+    return NextResponse.json({ success: true, message: '오늘 일정이 없습니다.' });
   }
 
-  // 2. 전체 사용자(토큰)에게 알림 발송
-  const allTokensSnap = await adminDb.collection('fcm_tokens').get();
-  const tokens = allTokensSnap.docs.map(d => d.data().token);
+  // 본문 구성: [시간] [제목]
+  const bodyText = events.map(e => `[${e.time}] ${e.title}`).join('\n');
+
+  // 2. 수신 거부 유저 필터링
+  const optOutUsersSnap = await adminFirestore.collection('users')
+    .where('settings.pushEnabled', '==', false)
+    .get();
+  const optOutPhones = new Set(optOutUsersSnap.docs.map((d: any) => d.id));
+
+  // 3. 토큰 가져오기 (필터링 적용)
+  const allTokensSnap = await adminFirestore.collection('fcm_tokens').get();
+  const tokens = Array.from(new Set(
+    allTokensSnap.docs
+      .map((d: any) => d.data())
+      .filter((data: any) => data.token && (!data.userId || !optOutPhones.has(data.userId)))
+      .map((data: any) => data.token)
+  )) as string[];
+
+  let successCount = 0;
+  let failureCount = 0;
 
   if (tokens.length > 0) {
-    await adminMessaging.sendEachForMulticast({
+    const response = await adminMessaging.sendEachForMulticast({
       tokens,
       notification: {
-        title: '☀️ 오늘 일정을 확인하세요!',
-        body: '오늘은 즐거운 탱고 일정이 있는 날입니다. 시간을 확인하고 늦지 않게 방문해 주세요!',
+        title: displayTitle,
+        body: bodyText,
       },
       data: { 
         link: '/calendar',
@@ -75,13 +135,29 @@ async function handleMorningSchedule() {
         fcmOptions: { link: '/calendar' }
       }
     });
+    successCount = response.successCount;
+    failureCount = response.failureCount;
   }
+
+  // 4. 실행 로그 기록 (Firestore)
+  await adminFirestore.collection('cron_logs').add({
+    type: 'morning',
+    timestamp: FieldValue.serverTimestamp(),
+    kstDate: kstToday,
+    eventCount: events.length,
+    tokenCount: tokens.length,
+    successCount,
+    failureCount,
+    executedAt: kstTime.toISOString()
+  });
 
   return NextResponse.json({ 
     success: true, 
-    recipients: tokens.length, 
-    date: kstToday,
-    eventCheck: hasEvent
+    title: displayTitle,
+    recipients: tokens.length,
+    sent: successCount,
+    failed: failureCount,
+    date: kstToday
   });
 }
 
@@ -89,10 +165,14 @@ async function handleMorningSchedule() {
  * 오후 2시: 수다방 신규 메시지 요약 알림
  */
 async function handleAfternoonSummary() {
+  const now = new Date();
+  const kstOffset = 9 * 60 * 60 * 1000;
+  const kstTime = new Date(now.getTime() + kstOffset);
+  const kstToday = kstTime.toISOString().split('T')[0];
   const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
   
   // 1. 최근 24시간 메시지 카운트 (수다방)
-  const msgsSnap = await adminDb.collection('chat_messages')
+  const msgsSnap = await adminFirestore.collection('chat_messages')
     .where('roomId', '==', COMMUNITY_ROOM_ID)
     .where('timestamp', '>=', yesterday)
     .count()
@@ -101,19 +181,36 @@ async function handleAfternoonSummary() {
   const newCount = msgsSnap.data().count;
 
   if (newCount === 0) {
-    return NextResponse.json({ message: '신규 메시지 없음' });
+    return NextResponse.json({ success: true, message: '새로운 이야기가 없습니다.' });
   }
 
-  // 2. 전체 사용자(토큰)에게 알림 발송
-  const allTokensSnap = await adminDb.collection('fcm_tokens').get();
-  const tokens = allTokensSnap.docs.map(d => d.data().token);
+  // 2. 수신 거부 유저 필터링
+  const optOutUsersSnap = await adminFirestore.collection('users')
+    .where('settings.pushEnabled', '==', false)
+    .get();
+  const optOutPhones = new Set(optOutUsersSnap.docs.map((d: any) => d.id));
+
+  // 3. 토큰 가져오기 (필터링 적용)
+  const allTokensSnap = await adminFirestore.collection('fcm_tokens').get();
+  const tokens = Array.from(new Set(
+    allTokensSnap.docs
+      .map((d: any) => d.data())
+      .filter((data: any) => data.token && (!data.userId || !optOutPhones.has(data.userId)))
+      .map((data: any) => data.token)
+  )) as string[];
+
+  const displayTitle = '💬 수다방 소식';
+  const displayBody = `오늘 수다방에 ${newCount}개의 새로운 이야기가 올라왔습니다. 내용을 확인하세요~`;
+
+  let successCount = 0;
+  let failureCount = 0;
 
   if (tokens.length > 0) {
-    await adminMessaging.sendEachForMulticast({
+    const response = await adminMessaging.sendEachForMulticast({
       tokens,
       notification: {
-        title: '💬 수다방 소식',
-        body: `오늘 수다방에 ${newCount}개의 새로운 이야기가 등록되었습니다. 지금 확인해 보세요!`,
+        title: displayTitle,
+        body: displayBody,
       },
       data: {
         link: '/chatting',
@@ -123,7 +220,27 @@ async function handleAfternoonSummary() {
         fcmOptions: { link: '/chatting' }
       }
     });
+    successCount = response.successCount;
+    failureCount = response.failureCount;
   }
 
-  return NextResponse.json({ success: true, newMessages: newCount, recipients: tokens.length });
+  // 4. 실행 로그 기록 (Firestore)
+  await adminFirestore.collection('cron_logs').add({
+    type: 'afternoon',
+    timestamp: FieldValue.serverTimestamp(),
+    kstDate: kstToday,
+    newMessages: newCount,
+    tokenCount: tokens.length,
+    successCount,
+    failureCount,
+    executedAt: kstTime.toISOString()
+  });
+
+  return NextResponse.json({ 
+    success: true, 
+    newMessages: newCount, 
+    recipients: tokens.length,
+    sent: successCount,
+    failed: failureCount
+  });
 }

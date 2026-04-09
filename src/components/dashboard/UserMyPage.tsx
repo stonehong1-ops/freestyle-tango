@@ -13,6 +13,10 @@ import { getActiveCoupons, getUserCoupons, issueCoupon, useCoupon, getAllCouponI
 import { useModalHistory } from '@/hooks/useModalHistory';
 import { Timestamp } from 'firebase/firestore';
 import { requestNotificationPermission, registerFCMToken } from '@/lib/messaging';
+import CoachingList from './CoachingList';
+import CoachingDetail from './CoachingDetail';
+import { CoachingItem, User } from '@/lib/db';
+import { getEffectiveRole, hasPermission, UserRole } from '@/utils/auth';
 
 interface Props {
   classes: TangoClass[];
@@ -40,7 +44,8 @@ export default function UserMyPage({
   requireIdentity 
 }: Props) {
   const { t, language } = useLanguage();
-  const [activeSubTab, setActiveSubTab] = useState<'history' | 'profile' | 'wallet' | 'admin'>('history');
+  const [activeSubTab, setActiveSubTab] = useState<'history' | 'profile' | 'wallet' | 'coaching' | 'admin'>('coaching');
+  const [selectedCoachingItem, setSelectedCoachingItem] = useState<CoachingItem | null>(null);
   const [showMemberManagement, setShowMemberManagement] = useState(false);
   const [showStayChecklist, setShowStayChecklist] = useState(false);
   const [showStaySMS, setShowStaySMS] = useState(false);
@@ -48,9 +53,18 @@ export default function UserMyPage({
   useModalHistory(showMemberManagement, () => setShowMemberManagement(false), 'memberManagement');
   useModalHistory(showStayChecklist, () => setShowStayChecklist(false), 'stayChecklist');
   useModalHistory(showStaySMS, () => setShowStaySMS(false), 'staySMS');
-  const [identity, setIdentity] = useState<{nickname: string, phone: string, role?: string, photoURL?: string} | null>(null);
+  const [identity, setIdentity] = useState<User | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showRecipientsModal, setShowRecipientsModal] = useState(false);
+
+  // Derive specialized role
+  const userRole = getEffectiveRole(identity as any, !!isAdmin);
+  const canAccessAdmin = hasPermission(userRole, 'view_admin_tab');
+
+  useModalHistory(showEditModal, () => setShowEditModal(false), 'profileEdit');
+  useModalHistory(showRecipientsModal, () => setShowRecipientsModal(false), 'couponRecipients');
+  useModalHistory(!!selectedCoachingItem, () => setSelectedCoachingItem(null), 'coachingDetail');
+
   const [selectedRecipients, setSelectedRecipients] = useState<{title: string, participants: any[]}>({ title: '', participants: [] });
   const [userCoupons, setUserCoupons] = useState<UserCoupon[]>([]);
   const [activeCoupons, setActiveCoupons] = useState<Coupon[]>([]);
@@ -288,10 +302,10 @@ export default function UserMyPage({
     <div className={styles.container}>
       <div className={styles.subTabs}>
         <button 
-          className={`${styles.subTabBtn} ${activeSubTab === 'history' ? styles.active : ''}`}
-          onClick={() => setActiveSubTab('history')}
+          className={`${styles.subTabBtn} ${activeSubTab === 'coaching' ? styles.active : ''}`}
+          onClick={() => setActiveSubTab('coaching')}
         >
-          {t.mypage.tabs.history}
+          {t.mypage.tabs.coaching}
         </button>
         <button 
           className={`${styles.subTabBtn} ${activeSubTab === 'wallet' ? styles.active : ''}`}
@@ -300,19 +314,25 @@ export default function UserMyPage({
           {t.mypage.tabs.wallet}
         </button>
         <button 
+          className={`${styles.subTabBtn} ${activeSubTab === 'history' ? styles.active : ''}`}
+          onClick={() => setActiveSubTab('history')}
+        >
+          {t.mypage.tabs.history}
+        </button>
+        <button 
           className={`${styles.subTabBtn} ${activeSubTab === 'profile' ? styles.active : ''}`}
           onClick={() => setActiveSubTab('profile')}
         >
           {t.mypage.tabs.profile}
         </button>
-        {isAdmin && (
-          <button 
-            className={`${styles.subTabBtn} ${activeSubTab === 'admin' ? styles.active : ''}`}
-            onClick={() => setActiveSubTab('admin')}
-          >
-            어드민
-          </button>
-        )}
+          {canAccessAdmin && (
+            <button 
+              className={`${styles.subTabBtn} ${activeSubTab === 'admin' ? styles.active : ''}`}
+              onClick={() => setActiveSubTab('admin')}
+            >
+              {t.mypage.tabs.admin}
+            </button>
+          )}
       </div>
 
       {activeSubTab === 'history' && (
@@ -566,6 +586,16 @@ export default function UserMyPage({
           </section>
         )}
 
+        {activeSubTab === 'coaching' && identity && (
+          <section className={styles.section} style={{ padding: 0 }}>
+              <CoachingList 
+                isAdmin={isAdmin}
+                onClose={() => setActiveSubTab('history')} 
+                onSelectItem={(item) => setSelectedCoachingItem(item)} 
+              />
+          </section>
+        )}
+
         {activeSubTab === 'profile' && identity && (
           <section className={styles.section}>
             <div className={styles.profileHeader}>
@@ -583,8 +613,15 @@ export default function UserMyPage({
               </div>
               <div className={styles.userNameGroup}>
                 <h2 className={styles.userNickname}>{identity.nickname}</h2>
-                <div className={styles.userRoleBadge}>
-                  {identity.role === 'leader' ? (language === 'ko' ? '리더' : 'Leader') : (language === 'ko' ? '팔로어' : 'Follower')}
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  <div className={styles.userRoleBadge}>
+                    {identity.role === 'leader' ? (language === 'ko' ? '리더' : 'Leader') : (language === 'ko' ? '팔로어' : 'Follower')}
+                  </div>
+                  {identity.isInstructor && (
+                    <div className={styles.instructorBadge} style={{ background: '#0070f3', color: 'white', fontSize: '10px', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>
+                      INSTRUCTOR
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -621,44 +658,52 @@ export default function UserMyPage({
           </section>
         )}
 
-        {activeSubTab === 'admin' && isAdmin && (
+        {canAccessAdmin && (
           <section className={styles.adminSection}>
             <div className={styles.adminMenuList}>
-              <button className={styles.adminMenuItem} onClick={() => setShowMemberManagement(true)}>
-                <div className={styles.adminMenuIcon}>👥</div>
-                <div className={styles.adminMenuContent}>
-                  <span className={styles.adminMenuLabel}>{language === 'ko' ? '회원 관리' : 'Members'}</span>
-                  <span className={styles.adminMenuSubLabel}>{language === 'ko' ? '전체 회원 목록 및 정보 관리' : 'Manage all members and info'}</span>
-                </div>
-                <div className={styles.adminMenuArrow}>›</div>
-              </button>
+              {hasPermission(userRole, 'manage_members') && (
+                <button className={styles.adminMenuItem} onClick={() => setShowMemberManagement(true)}>
+                  <div className={styles.adminMenuIcon}>👥</div>
+                  <div className={styles.adminMenuContent}>
+                    <span className={styles.adminMenuLabel}>{language === 'ko' ? '회원 관리' : 'Members'}</span>
+                    <span className={styles.adminMenuSubLabel}>{language === 'ko' ? '전체 회원 목록 및 정보 관리' : 'Manage all members and info'}</span>
+                  </div>
+                  <div className={styles.adminMenuArrow}>›</div>
+                </button>
+              )}
               
-              <button className={styles.adminMenuItem} onClick={() => setShowStayChecklist(true)}>
-                <div className={styles.adminMenuIcon}>📋</div>
-                <div className={styles.adminMenuContent}>
-                  <span className={styles.adminMenuLabel}>{language === 'ko' ? '스테이 체크리스트' : 'Stay Checklist'}</span>
-                  <span className={styles.adminMenuSubLabel}>{language === 'ko' ? '숙소 예약 평면도 및 체크리스트' : 'Stay reservations and checklist'}</span>
-                </div>
-                <div className={styles.adminMenuArrow}>›</div>
-              </button>
+              {hasPermission(userRole, 'manage_stays') && (
+                <>
+                  <button className={styles.adminMenuItem} onClick={() => setShowStayChecklist(true)}>
+                    <div className={styles.adminMenuIcon}>📋</div>
+                    <div className={styles.adminMenuContent}>
+                      <span className={styles.adminMenuLabel}>{language === 'ko' ? '스테이 체크리스트' : 'Stay Checklist'}</span>
+                      <span className={styles.adminMenuSubLabel}>{language === 'ko' ? '숙소 예약 평면도 및 체크리스트' : 'Stay reservations and checklist'}</span>
+                    </div>
+                    <div className={styles.adminMenuArrow}>›</div>
+                  </button>
+                  
+                  <button className={styles.adminMenuItem} onClick={() => setShowStaySMS(true)}>
+                    <div className={styles.adminMenuIcon}>💬</div>
+                    <div className={styles.adminMenuContent}>
+                      <span className={styles.adminMenuLabel}>{language === 'ko' ? '스테이 문자설정' : 'Stay SMS'}</span>
+                      <span className={styles.adminMenuSubLabel}>{language === 'ko' ? '예약 확정 및 안내 메시지 관리' : 'Manage confirmation messages'}</span>
+                    </div>
+                    <div className={styles.adminMenuArrow}>›</div>
+                  </button>
+                </>
+              )}
               
-              <button className={styles.adminMenuItem} onClick={() => setShowStaySMS(true)}>
-                <div className={styles.adminMenuIcon}>💬</div>
-                <div className={styles.adminMenuContent}>
-                  <span className={styles.adminMenuLabel}>{language === 'ko' ? '스테이 문자설정' : 'Stay SMS'}</span>
-                  <span className={styles.adminMenuSubLabel}>{language === 'ko' ? '예약 확정 및 안내 메시지 관리' : 'Manage confirmation messages'}</span>
-                </div>
-                <div className={styles.adminMenuArrow}>›</div>
-              </button>
-              
-              <button className={styles.adminMenuItem} onClick={onOpenCouponEditor}>
-                <div className={styles.adminMenuIcon}>🎫</div>
-                <div className={styles.adminMenuContent}>
-                  <span className={styles.adminMenuLabel}>{language === 'ko' ? '쿠폰 발행 및 관리' : 'Coupons'}</span>
-                  <span className={styles.adminMenuSubLabel}>{language === 'ko' ? '신규 쿠폰 발행 및 사용 현황' : 'Issue and manage coupons'}</span>
-                </div>
-                <div className={styles.adminMenuArrow}>›</div>
-              </button>
+              {userRole === 'admin' && (
+                <button className={styles.adminMenuItem} onClick={onOpenCouponEditor}>
+                  <div className={styles.adminMenuIcon}>🎫</div>
+                  <div className={styles.adminMenuContent}>
+                    <span className={styles.adminMenuLabel}>{language === 'ko' ? '쿠폰 발행 및 관리' : 'Coupons'}</span>
+                    <span className={styles.adminMenuSubLabel}>{language === 'ko' ? '신규 쿠폰 발행 및 사용 현황' : 'Issue and manage coupons'}</span>
+                  </div>
+                  <div className={styles.adminMenuArrow}>›</div>
+                </button>
+              )}
             </div>
           </section>
         )}
@@ -779,6 +824,18 @@ export default function UserMyPage({
           </div>
         </div>
       </FullscreenModal>
+      {selectedCoachingItem && (
+        <div className={styles.fullModalOverlay}>
+          <div className={styles.fullModalContent}>
+            <CoachingDetail 
+              item={selectedCoachingItem} 
+              currentUser={identity!} 
+              isAdmin={isAdmin}
+              onBack={() => setSelectedCoachingItem(null)} 
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

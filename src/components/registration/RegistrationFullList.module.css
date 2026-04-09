@@ -455,3 +455,77 @@
   background-color: #fff1f2;
   border-color: #ffe4e6;
 }
+
+.menuBtn {
+  background: transparent;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b95a1;
+  font-size: 1.1rem;
+  transition: background 0.2s;
+}
+
+.menuBtn:hover {
+  background: #f2f4f6;
+  color: #4e5968;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+  z-index: 100;
+  minWidth: 100px;
+  border: 1px solid #eef3f6;
+}
+
+.dropdownItem {
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #191f28;
+  cursor: pointer;
+  border-radius: 6px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.dropdownItem:hover {
+  background: #f2f4f6;
+}
+
+.dropdownItem.danger {
+  color: #f04452;
+}
+
+.dropdownItem.danger:hover {
+  background: #fff1f2;
+}
+
+.editSelect {
+  padding: 4px 8px;
+  border: 1px solid #e5e8eb;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333d4b;
+  background-color: #f9fafb;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.editSelect:focus {
+  border-color: #3182f6;
+  background-color: #fff;
+}

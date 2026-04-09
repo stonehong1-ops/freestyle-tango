@@ -19,7 +19,8 @@ import InfoCenter from '@/components/dashboard/InfoCenter';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProjectData } from '@/hooks/useProjectData';
 import styles from './page.module.css';
-import { subscribeRooms } from '@/lib/chat';
+import ImageViewer from '@/components/common/ImageViewer';
+import { subscribeRooms, getChatRoom } from '@/lib/chat';
 import { registerFCMToken } from '@/lib/messaging';
 import RegistrationStatus from '@/components/dashboard/RegistrationStatus';
 import HomeTab from '@/components/dashboard/HomeTab';
@@ -39,10 +40,43 @@ const getDeviceType = () => {
   return 'unknown';
 };
 
-export default function Home({ params: paramsPromise }: { params: Promise<{ slug?: string[] }> }) {
+export default function Home({ 
+  params: paramsPromise,
+  searchParams: searchParamsPromise 
+}: { 
+  params: Promise<{ slug?: string[] }>,
+  searchParams: Promise<{ roomId?: string }>
+}) {
   const params = use(paramsPromise);
-  const slug = params.slug?.[0];
-  const initialTab = slug === 'stay' ? 'stay' : (slug === 'class' ? 'home' : 'lucy');
+  const searchParams = use(searchParamsPromise);
+  const roomIdFromUrl = searchParams.roomId;
+  const slugArray = params.slug || [];
+  const slug = slugArray[0];
+  
+  // Define initial states based on slug
+  let initialTab = 'lucy';
+  let initialHomeSubTab: 'guide' | 'schedule' | 'media' = 'guide';
+  let initialMilongaSubTab: 'poster' | 'reserve' | 'live' = 'poster';
+
+  if (slug === 'stay') {
+    initialTab = 'stay';
+  } else if (slug === 'class' || slug === 'home') {
+    initialTab = 'home';
+    initialHomeSubTab = 'guide';
+  } else if (slug === 'calendar' || slug === 'schedule') {
+    initialTab = 'home';
+    initialHomeSubTab = 'schedule';
+  } else if (slug === 'media') {
+    initialTab = 'home';
+    initialHomeSubTab = 'media';
+  } else if (slug === 'chatting' || slug === 'chat') {
+    initialTab = 'chat';
+  } else if (slug === 'mypage' || slug === 'profile') {
+    initialTab = 'mypage';
+  } else if (slug === 'lucy') {
+    initialTab = 'lucy';
+  }
+
 
   const { t, language, setLanguage } = useLanguage();
   const projectData = useProjectData();
@@ -72,8 +106,8 @@ export default function Home({ params: paramsPromise }: { params: Promise<{ slug
   useEffect(() => {
     setActiveTab(initialTab);
   }, [initialTab]);
-  const [homeSubTab, setHomeSubTab] = useState<'guide' | 'schedule' | 'media'>('guide');
-  const [milongaSubTab, setMilongaSubTab] = useState<'poster' | 'reserve' | 'live'>('poster');
+  const [homeSubTab, setHomeSubTab] = useState<'guide' | 'schedule' | 'media'>(initialHomeSubTab);
+  const [milongaSubTab, setMilongaSubTab] = useState<'poster' | 'reserve' | 'live'>(initialMilongaSubTab);
   const [selectedMilongaDate, setSelectedMilongaDate] = useState<string>('');
   const [showMediaEditor, setShowMediaEditor] = useState(false);
 const [showLucyEditor, setShowLucyEditor] = useState(false);
@@ -94,6 +128,7 @@ const [showLucyEditor, setShowLucyEditor] = useState(false);
   const [showExitToast, setShowExitToast] = useState(false);
   const [lastBackPress, setLastBackPress] = useState(0);
   const [showIdentityForm, setShowIdentityForm] = useState(false);
+  const [viewerImage, setViewerImage] = useState<string | null>(null);
 
   // Available months for UserMyPage
   const availableMonths = Array.from(new Set(classes.map(c => c.targetMonth).filter(Boolean) as string[])).sort();
@@ -113,14 +148,13 @@ const [showLucyEditor, setShowLucyEditor] = useState(false);
     const user = SafeStorage.getJson<any>('ft_user');
     if (user) {
       setCurrentUser(user);
-      const adminPhones = ['01072092468', '01012345678'];
-      if (adminPhones.includes(user.phone.replace(/[^0-9]/g, ''))) {
+      if (user.staffRole === 'admin') {
         setIsAdminLogged(true);
       }
       
       // Track visit
       import('@/lib/db').then(({ trackUserVisit }) => {
-        trackUserVisit(user.phone, user.nickname, user.photoURL, user.role, getDeviceType());
+        trackUserVisit(user.phone, user.nickname, user.photoURL, user.role, getDeviceType(), user.staffRole);
       });
     }
     if (pendingAction) {
@@ -173,7 +207,7 @@ const [showLucyEditor, setShowLucyEditor] = useState(false);
     const user = SafeStorage.getJson<any>('ft_user');
     const cleanPhone = user ? user.phone?.replace(/[^0-9]/g, '') : null;
 
-    const unsubscribe = cleanPhone ? subscribeRooms(cleanPhone, isAdminLogged, (rooms) => {
+    const unsubscribe = cleanPhone ? subscribeRooms(cleanPhone, isAdminLogged, user?.settings?.pinnedRooms || [], (rooms) => {
       const totalMessages = rooms.reduce((acc, room) => acc + (room.unreadCounts?.[cleanPhone] || 0), 0);
       setTotalUnreadCount(totalMessages);
     }) : () => {};
@@ -202,6 +236,21 @@ const [showLucyEditor, setShowLucyEditor] = useState(false);
     return () => unsubscribe();
   }, [isAdminLogged, currentUser]);
 
+  // Handle foreground chat notifications
+  useEffect(() => {
+    const handleChatNotification = (e: any) => {
+      const { roomId, senderName, text } = e.detail;
+      if (!roomId) return;
+
+      // Optional: If user is not in the chat room, show a small toast or ask to join
+      // For now, let's just log it or we could automatically navigate if user prefers
+      console.log(`[FOREGROUND CHAT] From: ${senderName}, Msg: ${text}, Room: ${roomId}`);
+    };
+
+    window.addEventListener('CHAT_NOTIFICATION', handleChatNotification);
+    return () => window.removeEventListener('CHAT_NOTIFICATION', handleChatNotification);
+  }, []);
+
   // Heartbeat for dwell time tracking
   useEffect(() => {
     if (!currentUser) return;
@@ -219,6 +268,40 @@ const [showLucyEditor, setShowLucyEditor] = useState(false);
     
     return () => clearInterval(interval);
   }, [currentUser]);
+
+  // Handle deep-linking to a specific chat room if roomId is present in URL
+  useEffect(() => {
+    if (!roomIdFromUrl) return;
+
+    const openDeepLinkedRoom = async () => {
+      // 1. Ensure user is identified first
+      if (!SafeStorage.get('ft_user')) {
+        setPendingAction(() => openDeepLinkedRoom);
+        setShowIdentityForm(true);
+        return;
+      }
+
+      try {
+        const room = await getChatRoom(roomIdFromUrl);
+        if (room) {
+          // 2. Set active tab to chat
+          setActiveTab('chat');
+          
+          // 3. Open the room modal
+          setSelectedChatRoomId(room.id);
+          setSelectedChatRoomName(room.name || (language === 'ko' ? '채팅방' : 'Chat Room'));
+          setSelectedParticipants(room.participants || []);
+          
+          // 4. Update history if needed (optional, depends on if we want to keep the URL clean)
+          // window.history.replaceState({ tab: 'chat', modal: 'chat_room' }, '', `/chatting?roomId=${room.id}`);
+        }
+      } catch (error) {
+        console.error('[DEEP LINK ERROR]', error);
+      }
+    };
+
+    openDeepLinkedRoom();
+  }, [roomIdFromUrl, language]);
 
   const handleTabChange = (id: string) => {
     if (activeTab === id) return;
@@ -314,8 +397,12 @@ const [showLucyEditor, setShowLucyEditor] = useState(false);
             requireIdentity={requireIdentity}
             setShowFullList={setShowFullList}
             setShowRegistrationModal={setShowRegistrationModal}
-            handleCardClick={(id) => { setModalView('detail'); setSelectedClassId(id); }}
+            handleCardClick={(id, view = 'detail') => { 
+              setModalView(view); 
+              setSelectedClassId(id); 
+            }}
             onSubTabChange={setHomeSubTab}
+            activeSubTab={homeSubTab}
           />
         )}
         {activeTab === 'info' && <InfoCenter />}
@@ -402,26 +489,32 @@ const [showLucyEditor, setShowLucyEditor] = useState(false);
       <FullscreenModal isOpen={!!selectedClassId} onClose={() => setSelectedClassId(null)} title={t.home.registration.classDetail}>
         {selectedClassId && (
           modalView === 'detail' ? (
-            <ClassDetail 
-              {...classes.find(c => c.id === selectedClassId)!}
-              registrations={registrations}
-              isApplied={appliedClassIds.has(selectedClassId)}
-              isRegistered={userRegistrations.some(r => r.classIds && r.classIds.includes(selectedClassId) && r.status === 'paid')}
-              isAdmin={isAdminLogged}
-              onRegister={(id) => { 
-                setAppliedClassIds(prev => new Set(prev).add(id)); 
-                setSelectedClassId(null); 
-                alert(t.home.registration.cartAdded);
-              }}
-              onEdit={() => setModalView('edit')}
-              onDelete={async (id) => { 
-                if(confirm(t.home.registration.deleteConfirm)) { 
-                  await (await import('@/lib/db')).deleteClass(id); 
-                  fetchClasses(); 
-                  setSelectedClassId(null); 
-                } 
-              }}
-            />
+            (() => {
+              const classData = classes.find(c => c.id === selectedClassId);
+              if (!classData) return <div>{t.common?.loading || 'Loading...'}</div>;
+              return (
+                <ClassDetail 
+                  {...classData}
+                  registrations={registrations}
+                  isApplied={appliedClassIds.has(selectedClassId)}
+                  isRegistered={userRegistrations.some(r => r.classIds && r.classIds.includes(selectedClassId) && r.status === 'paid')}
+                  isAdmin={isAdminLogged}
+                  onRegister={(id) => { 
+                    setAppliedClassIds(prev => new Set(prev).add(id)); 
+                    setSelectedClassId(null); 
+                    alert(t.home.registration.cartAdded);
+                  }}
+                  onEdit={() => setModalView('edit')}
+                  onDelete={async (id) => { 
+                    if(confirm(t.home.registration.deleteConfirm)) { 
+                      await (await import('@/lib/db')).deleteClass(id); 
+                      fetchClasses(); 
+                      setSelectedClassId(null); 
+                    } 
+                  }}
+                />
+              );
+            })()
           ) : (
             <ClassEditor 
               initialData={classes.find(c => c.id === selectedClassId)} 
@@ -543,6 +636,9 @@ const [showLucyEditor, setShowLucyEditor] = useState(false);
       )}
 
       {showExitToast && <div className={styles.exitToast}>{language === 'ko' ? '한번 더 누르면 종료됩니다' : 'Press again to exit'}</div>}
+      
+      {/* Global Image Viewer */}
+      <ImageViewer src={viewerImage} onClose={() => setViewerImage(null)} />
     </div>
   );
 }

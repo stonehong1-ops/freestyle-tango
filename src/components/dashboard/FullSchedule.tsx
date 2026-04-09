@@ -63,10 +63,11 @@ export default function FullSchedule({ isAdmin, requireIdentity }: FullScheduleP
   const month = currentDate.getMonth();
 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstDayOfMonth = new Date(year, month, 1).getDay();
+  // Monday start logic: (getDay() + 6) % 7 maps Sun(0)->6, Mon(1)->0, ..., Sat(6)->5
+  const firstDayOfMonth = (new Date(year, month, 1).getDay() + 6) % 7;
 
   const daysGrid = [];
-  // Padding for first day
+  // Padding for first day (Monday start)
   for (let i = 0; i < firstDayOfMonth; i++) {
     daysGrid.push(null);
   }
@@ -87,6 +88,33 @@ export default function FullSchedule({ isAdmin, requireIdentity }: FullScheduleP
     const m = String(date.getMonth() + 1).padStart(2, '0');
     const d = String(date.getDate()).padStart(2, '0');
     return `${y}-${m}-${d}`;
+  };
+
+  const isKoreanHoliday = (date: Date) => {
+    const dateStr = formatDate(date);
+    const holidays2026 = [
+      '2026-01-01', // 신정
+      '2026-02-16', '2026-02-17', '2026-02-18', // 설날
+      '2026-03-01', // 삼일절
+      '2026-03-02', // 삼일절 대체공휴일
+      '2026-05-05', // 어린이날
+      '2026-05-24', // 부처님오신날
+      '2026-05-25', // 부처님오신날 대체공휴일
+      '2026-06-06', // 현충일
+      '2026-08-15', // 광복절
+      '2026-08-17', // 광복절 대체공휴일
+      '2026-09-24', '2026-09-25', '2026-09-26', // 추석
+      '2026-09-28', // 추석 대체공휴일
+      '2026-10-03', // 개천절
+      '2026-10-05', // 개천절 대체공휴일
+      '2026-10-09', // 한글날
+      '2026-12-25', // 크리스마스
+    ];
+    // 고정 공휴일 (월-일 무관 매년 동일한 날짜들 중 일부)
+    const fixedHolidays = ['01-01', '03-01', '05-05', '06-06', '08-15', '10-03', '10-09', '12-25'];
+    const mmdd = dateStr.substring(5);
+    
+    return holidays2026.includes(dateStr) || fixedHolidays.includes(mmdd);
   };
 
   const selectedDateStr = formatDate(selectedDate);
@@ -132,9 +160,15 @@ export default function FullSchedule({ isAdmin, requireIdentity }: FullScheduleP
         </header>
 
         <div className={styles.weekdays}>
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
-            <div key={d}>{t.calendar[d as keyof typeof t.calendar]}</div>
-          ))}
+          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => {
+            const label = t.calendar[d as keyof typeof t.calendar];
+            const isWeekend = d === 'Sat' || d === 'Sun';
+            return (
+              <div key={d} className={isWeekend ? styles.weekendHeader : ''}>
+                {label}
+              </div>
+            );
+          })}
         </div>
 
         <div className={styles.daysGrid}>
@@ -145,16 +179,22 @@ export default function FullSchedule({ isAdmin, requireIdentity }: FullScheduleP
             const isSelected = dateStr === selectedDateStr;
             const isToday = dateStr === todayStr;
             const isPast = dateStr < todayStr;
+            const dayOfWeek = date.getDay(); // 0 is Sunday, 6 is Saturday
+            const isHoliday = isKoreanHoliday(date);
             
             const { dayClasses, dayMilongas, dayExtras } = getEventsForDate(dateStr);
             const hasClass = dayClasses.length > 0;
             const hasMilonga = dayMilongas.length > 0;
             const hasExtra = dayExtras.length > 0;
 
+            let dayTypeClass = '';
+            if (isHoliday || dayOfWeek === 0) dayTypeClass = styles.sunday;
+            else if (dayOfWeek === 6) dayTypeClass = styles.saturday;
+
             return (
               <div 
                 key={dateStr} 
-                className={`${styles.dayCell} ${isSelected ? styles.selected : ''} ${isToday ? styles.today : ''} ${isPast ? styles.past : ''}`}
+                className={`${styles.dayCell} ${isSelected ? styles.selected : ''} ${isToday ? styles.today : ''} ${isPast ? styles.past : ''} ${dayTypeClass}`}
                 onClick={() => setSelectedDate(date)}
               >
                 <div className={styles.dayNum}>{date.getDate()}</div>

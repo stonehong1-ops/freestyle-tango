@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { TangoClass, Registration } from '@/lib/db';
 import { useLanguage } from '@/contexts/LanguageContext';
 import styles from './RegistrationFullList.module.css';
@@ -17,8 +17,7 @@ interface Props {
 }
 
 const getRegTypeLabel = (type?: string) => {
-  if (!type) return '개별수강';
-  // If it's one of the specific payment options, return it as is
+  if (!type) return '미지정';
   return type;
 };
 
@@ -97,7 +96,34 @@ export default function RegistrationFullList({ classes, registrations, selectedM
           <div className={styles.infoGrid}>
             <div className={styles.infoItem}>
               <span className={styles.label}>구분:</span>
-              <span className={styles.value}>{getRegTypeLabel(selectedReg.type)}</span>
+              {isAdmin ? (
+                <select 
+                  className={styles.editSelect}
+                  value={selectedReg.type || ''} 
+                  onChange={(e) => handleTypeChange(e.target.value)}
+                >
+                  {(t.home.payment.options || []).map((opt: string) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              ) : (
+                <span className={styles.value}>{getRegTypeLabel(selectedReg.type)}</span>
+              )}
+            </div>
+            <div className={styles.infoItem}>
+              <span className={styles.label}>상태:</span>
+              {isAdmin ? (
+                <select 
+                  className={styles.editSelect}
+                  value={selectedReg.status || 'waiting'} 
+                  onChange={(e) => handleStatusChange(e.target.value as 'waiting' | 'paid')}
+                >
+                  <option value="waiting">대기중</option>
+                  <option value="paid">결제완료</option>
+                </select>
+              ) : (
+                <span className={styles.value}>{selectedReg.status === 'paid' ? '결제완료' : '대기중'}</span>
+              )}
             </div>
             <div className={styles.infoItem}>
               <span className={styles.label}>연락처:</span>
@@ -150,6 +176,33 @@ export default function RegistrationFullList({ classes, registrations, selectedM
     );
   };
 
+  const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setActiveMenuId(null);
+      }
+    };
+    if (activeMenuId) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [activeMenuId]);
+
+  const handleDeleteRegistration = async (regId: string) => {
+    if (!confirm(t.home?.registration?.deleteConfirm || '정말 삭제하시겠습니까?')) return;
+    try {
+      const { deleteRegistration } = await import('@/lib/db');
+      await deleteRegistration(regId);
+      alert(t.home?.admin?.saveSuccess || '삭제되었습니다.');
+      window.dispatchEvent(new Event('ft_registrations_updated'));
+    } catch (e) {
+      alert('삭제 중 오류가 발생했습니다.');
+    }
+  };
+
   const renderTable = (list: Registration[], title: string) => (
     <div className={styles.section}>
       <h3 className={styles.sectionTitle}>{title}</h3>
@@ -157,28 +210,72 @@ export default function RegistrationFullList({ classes, registrations, selectedM
         <table className={styles.adminTable}>
           <thead>
             <tr>
-              <th style={{ width: '25%' }}>{t.home.registration.nickname}</th>
-              <th style={{ width: '20%', textAlign: 'center' }}>{language === 'ko' ? '수업수' : 'Classes'}</th>
-              <th style={{ width: '55%' }}>{language === 'ko' ? '신청 유형' : 'Type'}</th>
+              <th style={{ width: '20%' }}>{t.home.registration.nickname}</th>
+              <th style={{ width: '45%' }}>{language === 'ko' ? '신청 수업' : 'Classes'}</th>
+              <th style={{ width: '25%' }}>{language === 'ko' ? '신청 유형' : 'Type'}</th>
+              {isAdmin && <th style={{ width: '10%' }}></th>}
             </tr>
           </thead>
           <tbody>
             {list.length > 0 ? (
-              list.map(reg => (
-                <tr key={reg.id}>
-                  <td 
-                    className={styles.clickableName} 
-                    onClick={() => setSelectedReg(reg)}
-                  >
-                    {reg.nickname}
-                  </td>
-                  <td style={{ textAlign: 'center' }}>{reg.classIds?.length || 0}</td>
-                  <td>{getRegTypeLabel(reg.type)}</td>
-                </tr>
-              ))
+              list.map(reg => {
+                const regClasses = getClassesForReg(reg);
+                const classTitles = regClasses.map(c => c.title).join(', ');
+                
+                return (
+                  <tr key={reg.id}>
+                    <td 
+                      className={styles.clickableName} 
+                      onClick={() => setSelectedReg(reg)}
+                    >
+                      {reg.nickname}
+                    </td>
+                    <td style={{ fontSize: '0.85rem', color: '#4e5968' }}>{classTitles}</td>
+                    <td>{getRegTypeLabel(reg.type)}</td>
+                    {isAdmin && (
+                      <td style={{ textAlign: 'right', position: 'relative' }}>
+                        <button 
+                          className={styles.menuBtn}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveMenuId(activeMenuId === reg.id ? null : reg.id);
+                          }}
+                        >
+                          ⋮
+                        </button>
+                        {activeMenuId === reg.id && (
+                          <div className={styles.dropdownMenu} ref={menuRef}>
+                            <div 
+                              className={styles.dropdownItem}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveMenuId(null);
+                                // For editing, we reuse the detail modal for now OR just open it
+                                setSelectedReg(reg);
+                              }}
+                            >
+                              {t.home.registration.edit}
+                            </div>
+                            <div 
+                              className={`${styles.dropdownItem} ${styles.danger}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveMenuId(null);
+                                handleDeleteRegistration(reg.id);
+                              }}
+                            >
+                              {t.home.registration.delete}
+                            </div>
+                          </div>
+                        )}
+                      </td>
+                    )}
+                  </tr>
+                );
+              })
             ) : (
               <tr>
-                <td colSpan={3} style={{ textAlign: 'center', padding: '20px' }}>
+                <td colSpan={isAdmin ? 4 : 3} style={{ textAlign: 'center', padding: '20px' }}>
                   {t.home.registration.noData || '신청 내역이 없습니다.'}
                 </td>
               </tr>

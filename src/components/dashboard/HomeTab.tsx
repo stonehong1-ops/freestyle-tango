@@ -19,8 +19,9 @@ interface HomeTabProps {
   requireIdentity: (action: () => void) => void;
   setShowFullList: (show: boolean) => void;
   setShowRegistrationModal: (show: boolean) => void;
-  handleCardClick: (id: string) => void;
+  handleCardClick: (id: string, view?: 'detail' | 'edit') => void;
   onSubTabChange?: (tab: 'guide' | 'schedule' | 'media') => void;
+  activeSubTab?: 'guide' | 'schedule' | 'media';
 }
 
 export default function HomeTab({
@@ -30,7 +31,8 @@ export default function HomeTab({
   setShowFullList,
   setShowRegistrationModal,
   handleCardClick,
-  onSubTabChange
+  onSubTabChange,
+  activeSubTab
 }: HomeTabProps) {
   const { t, language } = useLanguage();
   const { 
@@ -44,7 +46,13 @@ export default function HomeTab({
     appliedClassIds 
   } = useProjectData();
 
-  const [homeSubTab, setHomeSubTab] = useState<'guide' | 'schedule' | 'media'>('guide');
+  const [homeSubTab, setHomeSubTab] = useState<'guide' | 'schedule' | 'media'>(activeSubTab || 'guide');
+
+  useEffect(() => {
+    if (activeSubTab) {
+      setHomeSubTab(activeSubTab);
+    }
+  }, [activeSubTab]);
 
   useEffect(() => {
     onSubTabChange?.(homeSubTab);
@@ -322,7 +330,21 @@ export default function HomeTab({
                             followerCount={registrations.filter(r => r.classIds.includes(cls.id) && (r.role || '').replace(/"/g, '') === 'follower').length}
                             isApplied={appliedClassIds.has(cls.id)}
                             isRegistered={registrations.some(r => r.month === selectedMonth && r.phone === (currentUser?.phone || '').replace(/[^0-9]/g, '') && r.classIds.includes(cls.id))}
-                            onClick={handleCardClick}
+                            isAdmin={isAdminLogged}
+                            onEdit={(id, e) => {
+                              e.stopPropagation();
+                              handleCardClick(id, 'edit');
+                            }}
+                            onDelete={async (id, e) => {
+                              e.stopPropagation();
+                              if (confirm(t.home?.registration?.deleteConfirm || '정말 삭제하시겠습니까?')) {
+                                const { deleteClass } = await import('@/lib/db');
+                                await deleteClass(id);
+                                alert(t.home?.admin?.saveSuccess || '삭제되었습니다.');
+                                window.location.reload(); // Refresh to update list
+                              }
+                            }}
+                            onClick={(id) => handleCardClick(id, 'detail')}
                           />
                         ))}
                       </div>
