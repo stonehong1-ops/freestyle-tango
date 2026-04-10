@@ -53,12 +53,22 @@ const MediaTab: React.FC<MediaTabProps> = ({ t, isAdmin, user, requireIdentity }
   useModalHistory(!!selectedMedia, handleCloseDetail, 'mediaDetail');
 
   const fetchMedia = async (silent: boolean = false) => {
-    if (!silent) setLoading(true);
-    const data = await getMedia();
-    // 루씨 라이브 데이터(관련 일자 있는 것) 제외
-    const generalMedia = data.filter(m => !m.relatedMilongaDate);
-    setMediaList(generalMedia);
-    if (!silent) setLoading(false);
+    try {
+      if (!silent) setLoading(true);
+      console.log(`[MediaTab] Fetching media for month: ${targetMonth}`);
+      
+      const data = await getMedia();
+      console.log(`[MediaTab] Received all recent media: ${data.length} items`);
+      
+      const generalMedia = data.filter(m => !m.relatedMilongaDate);
+      console.log(`[MediaTab] Filtered general media: ${generalMedia.length} items`);
+      
+      setMediaList(generalMedia);
+    } catch (error) {
+      console.error("[MediaTab] Error fetching media:", error);
+    } finally {
+      if (!silent) setLoading(false);
+    }
   };
 
 
@@ -74,7 +84,7 @@ const MediaTab: React.FC<MediaTabProps> = ({ t, isAdmin, user, requireIdentity }
     const handleMediaUpdated = () => fetchMedia(true);
     window.addEventListener('ft_media_updated', handleMediaUpdated);
     return () => window.removeEventListener('ft_media_updated', handleMediaUpdated);
-  }, []);
+  }, [targetMonth]);
 
   const handleEdit = (item: MediaItem, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -95,7 +105,7 @@ const MediaTab: React.FC<MediaTabProps> = ({ t, isAdmin, user, requireIdentity }
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Filter classes shown in the dropdown (only selected month)
-  const displayClasses = classes.filter(cls => (cls.targetMonth || '').trim() === targetMonth.trim());
+  const displayClasses = classes.filter(cls => !cls.targetMonth || cls.targetMonth === targetMonth);
 
   const selectedClassName = selectedClassId === 'all' 
     ? t.media.filterAll 

@@ -17,6 +17,7 @@ import ChatRoom from '@/components/chat/ChatRoom';
 import RegistrationFullList from '@/components/registration/RegistrationFullList';
 import InfoCenter from '@/components/dashboard/InfoCenter';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { hasRole } from '@/utils/auth';
 import { useProjectData } from '@/hooks/useProjectData';
 import styles from './page.module.css';
 import ImageViewer from '@/components/common/ImageViewer';
@@ -108,6 +109,7 @@ export default function Home({
   }, [initialTab]);
   const [homeSubTab, setHomeSubTab] = useState<'guide' | 'schedule' | 'media'>(initialHomeSubTab);
   const [milongaSubTab, setMilongaSubTab] = useState<'poster' | 'reserve' | 'live'>(initialMilongaSubTab);
+  const [mypageSubTab, setMypageSubTab] = useState<string>('status');
   const [selectedMilongaDate, setSelectedMilongaDate] = useState<string>('');
   const [showMediaEditor, setShowMediaEditor] = useState(false);
 const [showLucyEditor, setShowLucyEditor] = useState(false);
@@ -148,7 +150,7 @@ const [showLucyEditor, setShowLucyEditor] = useState(false);
     const user = SafeStorage.getJson<any>('ft_user');
     if (user) {
       setCurrentUser(user);
-      if (user.staffRole === 'admin') {
+      if (hasRole(user, 'admin')) {
         setIsAdminLogged(true);
       }
       
@@ -420,10 +422,14 @@ const [showLucyEditor, setShowLucyEditor] = useState(false);
         )}
         {activeTab === 'mypage' && (
           <UserMyPage 
-            classes={classes} 
+            user={currentUser} 
             registrations={registrations} 
-            reservations={reservations} 
-            selectedMonth={selectedMonth} 
+            reservations={reservations}
+            selectedMonth={selectedMonth}
+            classes={classes}
+            onUpdate={() => fetchClasses()} 
+            onIdentityUpdate={() => fetchClasses()}
+            onSubTabChange={(tab) => setMypageSubTab(tab)}
             availableMonths={availableMonths}
             isAdmin={isAdminLogged}
             onMonthChange={setSelectedMonth}
@@ -466,6 +472,15 @@ const [showLucyEditor, setShowLucyEditor] = useState(false);
           } else if (milongaSubTab === 'live') {
             isVisible = true;
             action = () => requireIdentity(() => setShowLucyEditor(true));
+          }
+        } else if (activeTab === 'mypage' && mypageSubTab === 'coaching') {
+          // Check for coaching sub-tab in mypage
+          const user = SafeStorage.getJson<any>('ft_user');
+          if (user && (hasRole(user, 'admin') || user.isInstructor)) {
+            isVisible = true;
+            action = () => {
+              window.dispatchEvent(new Event('ft_open_new_coaching'));
+            };
           }
         }
 

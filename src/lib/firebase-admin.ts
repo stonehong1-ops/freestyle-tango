@@ -15,7 +15,7 @@ if (!admin.apps.length) {
         credential: admin.credential.cert(serviceAccount),
         databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`
       });
-      console.log('Firebase Admin initialized successfully');
+      console.log('Firebase Admin initialized for project:', serviceAccount.project_id);
     } else {
       console.warn('FIREBASE_SERVICE_ACCOUNT environment variable is missing');
     }

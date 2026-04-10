@@ -58,8 +58,21 @@ const MediaList: React.FC<MediaListProps> = ({
 
   if (loading) {
     return (
-      <div className={styles.noAccess}>
+      <div className={styles.noAccess} style={{ minHeight: '300px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div className={styles.spinner} style={{ 
+          width: '32px', 
+          height: '32px', 
+          border: '3px solid rgba(0,0,0,0.1)', 
+          borderTopColor: '#0070f3', 
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite'
+        }} />
         <div style={{ opacity: 0.5 }}>{t.registration?.loading || 'Loading...'}</div>
+        <style>{`
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     );
   }
@@ -86,6 +99,8 @@ const MediaList: React.FC<MediaListProps> = ({
                     src={getYTThumbnail(item.videoUrl)} 
                     alt={item.title} 
                     className={styles.thumbnail}
+                    loading="lazy"
+                    decoding="async"
                   />
                 );
               }
@@ -103,6 +118,8 @@ const MediaList: React.FC<MediaListProps> = ({
                     src={imageSrc} 
                     alt={item.title} 
                     className={styles.thumbnail}
+                    loading="lazy"
+                    decoding="async"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       if (target.src !== placeholderUrl) {

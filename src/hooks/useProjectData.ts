@@ -8,18 +8,20 @@ import {
   getStayReservationList,
   getUserByPhone,
   TangoClass, 
+  User,
   Registration, 
   FullStayReservation,
   CURRENT_REGISTRATION_MONTH 
 } from '@/lib/db';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { SafeStorage } from '@/lib/storage';
+import { hasRole } from '@/utils/auth';
 
 export function useProjectData() {
   const [classes, setClasses] = useState<TangoClass[]>([]);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [reservations, setReservations] = useState<FullStayReservation[]>([]);
-  const [currentUser, setCurrentUser] = useState<{ nickname: string, phone: string, role?: string, staffRole?: 'admin' | 'staff' | 'instructor' | 'none', photoURL?: string } | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [appliedClassIds, setAppliedClassIds] = useState<Set<string>>(new Set());
   const [selectedMonth, setSelectedMonth] = useState(CURRENT_REGISTRATION_MONTH);
   const [isLoading, setIsLoading] = useState(true);
@@ -28,8 +30,8 @@ export function useProjectData() {
   
   const { t } = useLanguage();
 
-  const checkAdminStatus = (user: { phone: string, role?: string, staffRole?: string } | null) => {
-    if (user && user.staffRole === 'admin') {
+  const checkAdminStatus = (user: User | null) => {
+    if (hasRole(user, 'admin')) {
       setIsAdminLogged(true);
     } else {
       setIsAdminLogged(false);
@@ -41,16 +43,17 @@ export function useProjectData() {
       const dbUser = await getUserByPhone(phone);
       if (dbUser) {
         const updatedUser = {
-          nickname: dbUser.nickname,
-          phone: dbUser.phone,
-          role: dbUser.role,
-          staffRole: dbUser.staffRole,
-          photoURL: dbUser.photoURL
+          ...dbUser,
+          // Support both staffRole and staffrole from DB for legacy compatibility
+          staffRole: dbUser.staffRole || (dbUser as any).staffrole
         };
         setCurrentUser(updatedUser);
         SafeStorage.setJson('ft_user', updatedUser);
         checkAdminStatus(updatedUser);
-        console.log('User profile synced from DB:', updatedUser.staffRole);
+        
+        // Notify other components (like UserMyPage) that user info has changed
+        window.dispatchEvent(new CustomEvent('ft_user_updated'));
+        console.log('User profile synced and event dispatched:', updatedUser.staffRole);
       }
     } catch (error) {
       console.error('Error syncing user from DB:', error);
@@ -60,43 +63,74 @@ export function useProjectData() {
   const fetchClasses = async () => {
     setIsLoading(true);
     try {
-      const [classData, regData, resData] = await Promise.all([
-        getClasses(), 
-        getRegistrations(),
-        getStayReservationList()
-      ]);
-      setClasses(classData);
-      setRegistrations(regData);
-      setReservations(resData);
-
-        const savedUser = SafeStorage.getJson<{ phone: string }>('ft_user');
-        if (savedUser) {
-          const { phone } = savedUser;
-          const normalizedPhone = phone.replace(/[^0-9]/g, '');
-          const userRegs = regData.filter(r => r.phone === normalizedPhone);
-          const dbClassIds = userRegs.flatMap(r => r.classIds || []);
+      // 1. Load Classes and process month selection
+      const loadClassesData = async () => {
+        try {
+          const classData = await getClasses();
+          setClasses(classData);
           
-          const localIds = SafeStorage.getJson<string[]>('my_tango_classes') || [];
-          setAppliedClassIds(new Set([...dbClassIds, ...localIds]));
-        }
-
-      if (classData.length > 0) {
-        const currentMonth = new Date().toISOString().substring(0, 7);
-        const monthsWithClasses = Array.from(new Set(classData.map(c => c.targetMonth).filter(Boolean) as string[])).sort();
-        const hasClassesInSelectedMonth = classData.some(c => c.targetMonth === selectedMonth);
-        
-        if (!hasClassesInSelectedMonth) {
-          const futureMonths = monthsWithClasses.filter(m => m >= currentMonth);
-          if (futureMonths.length > 0) {
-            setSelectedMonth(futureMonths[0]);
-          } else if (monthsWithClasses.length > 0) {
-            setSelectedMonth(monthsWithClasses[monthsWithClasses.length - 1]);
+          if (classData.length > 0) {
+            const currentMonth = new Date().toISOString().substring(0, 7);
+            const monthsWithClasses = Array.from(new Set(classData.map(c => c.targetMonth).filter(Boolean) as string[])).sort();
+            const hasClassesInSelectedMonth = classData.some(c => c.targetMonth === selectedMonth);
+            
+            if (!hasClassesInSelectedMonth) {
+              const futureMonths = monthsWithClasses.filter(m => m >= currentMonth);
+              if (futureMonths.length > 0) {
+                setSelectedMonth(futureMonths[0]);
+              } else if (monthsWithClasses.length > 0) {
+                setSelectedMonth(monthsWithClasses[monthsWithClasses.length - 1]);
+              }
+            }
           }
+          return classData;
+        } catch (e) {
+          console.error('Error loading classes:', e);
+          return [];
         }
-      }
+      };
+
+      // 2. Load Registrations and sync applied IDs
+      const loadRegData = async () => {
+        try {
+          const regData = await getRegistrations();
+          setRegistrations(regData);
+
+          const savedUser = SafeStorage.getJson<{ phone: string }>('ft_user');
+          if (savedUser) {
+            const { phone } = savedUser;
+            const normalizedPhone = phone.replace(/[^0-9]/g, '');
+            const userRegs = regData.filter(r => r.phone === normalizedPhone);
+            const dbClassIds = userRegs.flatMap(r => r.classIds || []);
+            const localIds = SafeStorage.getJson<string[]>('my_tango_classes') || [];
+            setAppliedClassIds(new Set([...dbClassIds, ...localIds]));
+          }
+          return regData;
+        } catch (e) {
+          console.error('Error loading registrations:', e);
+          return [];
+        }
+      };
+
+      // 3. Load Reservations (the likely bottleneck) in background
+      const loadResData = async () => {
+        try {
+          const resData = await getStayReservationList();
+          setReservations(resData);
+        } catch (e) {
+          console.error('Error loading stay reservations (likely missing index):', e);
+        }
+      };
+
+      // Wait for essential data first to unblock UI
+      await Promise.all([loadClassesData(), loadRegData()]);
+      setIsLoading(false);
+      
+      // Kick off reservations fetch in background
+      loadResData();
+
     } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
+      console.error('Critical error in fetchClasses:', error);
       setIsLoading(false);
     }
   };

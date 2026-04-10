@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import styles from './FullSchedule.module.css';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { 
-  getClasses, 
+  getClassesByMonth, 
   getAllMilongas, 
   getExtraSchedules, 
   TangoClass, 
@@ -34,13 +34,14 @@ export default function FullSchedule({ isAdmin, requireIdentity }: FullScheduleP
 
   useModalHistory(showExtraEditor, () => setShowExtraEditor(false), 'extraEditor');
 
-  const fetchData = async () => {
+  const fetchData = async (date: Date) => {
     setIsLoading(true);
+    const monthStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
     try {
       const [clsData, milData, extData] = await Promise.all([
-        getClasses(),
-        getAllMilongas(),
-        getExtraSchedules()
+        getClassesByMonth(monthStr),
+        getAllMilongas(monthStr),
+        getExtraSchedules(monthStr)
       ]);
       setClasses(clsData);
       setMilongas(milData);
@@ -53,11 +54,11 @@ export default function FullSchedule({ isAdmin, requireIdentity }: FullScheduleP
   };
 
   useEffect(() => {
-    fetchData();
-    const handleUpdate = () => fetchData();
+    fetchData(currentDate);
+    const handleUpdate = () => fetchData(currentDate);
     window.addEventListener('ft_extra_updated', handleUpdate);
     return () => window.removeEventListener('ft_extra_updated', handleUpdate);
-  }, []);
+  }, [currentDate.getFullYear(), currentDate.getMonth()]);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -132,7 +133,7 @@ export default function FullSchedule({ isAdmin, requireIdentity }: FullScheduleP
   const handleDeleteExtra = async (id: string) => {
     if (window.confirm(language === 'ko' ? '정말 삭제하시겠습니까?' : 'Are you sure you want to delete?')) {
       await deleteExtraSchedule(id);
-      fetchData();
+      fetchData(currentDate);
     }
   };
 
@@ -275,7 +276,7 @@ export default function FullSchedule({ isAdmin, requireIdentity }: FullScheduleP
           onClose={() => setShowExtraEditor(false)}
           onSave={() => {
             setShowExtraEditor(false);
-            fetchData();
+            fetchData(currentDate);
           }}
         />
       </FullscreenModal>

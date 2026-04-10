@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { TangoClass, Registration, getUserByPhone, updateUserSettings } from '@/lib/db';
+import { TangoClass, Registration, getUserByPhone, updateUserSettings, remapStorageUrl } from '@/lib/db';
 import AdminChecklist from '../admin/AdminChecklist';
 import MemberManagement from '../admin/MemberManagement';
 import StayTemplateEditor from '../admin/StayTemplateEditor';
@@ -15,8 +15,10 @@ import { Timestamp } from 'firebase/firestore';
 import { requestNotificationPermission, registerFCMToken } from '@/lib/messaging';
 import CoachingList from './CoachingList';
 import CoachingDetail from './CoachingDetail';
+import Skeleton from '../common/Skeleton';
 import { CoachingItem, User } from '@/lib/db';
 import { getEffectiveRole, hasPermission, UserRole } from '@/utils/auth';
+import { SafeStorage } from '@/lib/storage';
 
 interface Props {
   classes: TangoClass[];
@@ -29,6 +31,10 @@ interface Props {
   onOpenCouponEditor?: () => void;
   onHome: () => void;
   requireIdentity?: (action: () => void) => void;
+  user?: User | null;
+  onUpdate?: () => void;
+  onIdentityUpdate?: () => void;
+  onSubTabChange?: (tab: string) => void;
 }
 
 export default function UserMyPage({ 
@@ -41,16 +47,27 @@ export default function UserMyPage({
   onMonthChange, 
   onOpenCouponEditor,
   onHome, 
-  requireIdentity 
+  requireIdentity,
+  user,
+  onUpdate,
+  onIdentityUpdate,
+  onSubTabChange
 }: Props) {
   const { t, language } = useLanguage();
-  const [activeSubTab, setActiveSubTab] = useState<'history' | 'profile' | 'wallet' | 'coaching' | 'admin'>('coaching');
+  const [activeSubTab, setActiveSubTab] = useState<'history' | 'profile' | 'wallet' | 'coaching' | 'admin'>('history');
+
+  useEffect(() => {
+    onSubTabChange?.(activeSubTab);
+  }, [activeSubTab, onSubTabChange]);
   const [selectedCoachingItem, setSelectedCoachingItem] = useState<CoachingItem | null>(null);
   const [showMemberManagement, setShowMemberManagement] = useState(false);
   const [showStayChecklist, setShowStayChecklist] = useState(false);
   const [showStaySMS, setShowStaySMS] = useState(false);
 
   useModalHistory(showMemberManagement, () => setShowMemberManagement(false), 'memberManagement');
+  const [showGlobalCoaching, setShowGlobalCoaching] = useState(false);
+  
+  useModalHistory(showGlobalCoaching, () => setShowGlobalCoaching(false), 'globalCoaching');
   useModalHistory(showStayChecklist, () => setShowStayChecklist(false), 'stayChecklist');
   useModalHistory(showStaySMS, () => setShowStaySMS(false), 'staySMS');
   const [identity, setIdentity] = useState<User | null>(null);
@@ -74,18 +91,27 @@ export default function UserMyPage({
   const [isSyncingPush, setIsSyncingPush] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem('ft_user');
-    if (stored) {
-      const user = JSON.parse(stored);
+    const loadUser = () => {
+      const user = SafeStorage.getJson('ft_user') as User | null;
+      if (user && user.photoURL) {
+        user.photoURL = remapStorageUrl(user.photoURL);
+      }
       setIdentity(user);
-    }
+    };
+    
+    loadUser();
+    window.addEventListener('ft_user_updated', loadUser);
+    return () => window.removeEventListener('ft_user_updated', loadUser);
   }, []);
 
   const [allIssuances, setAllIssuances] = useState<Record<string, UserCoupon[]>>({});
 
   const fetchCoupons = async () => {
     if (!identity?.nickname) return;
-    setIsLoadingCoupons(true);
+    // Only show full loading state if we have no coupons yet to prevent flickering
+    if (activeCoupons.length === 0) {
+      setIsLoadingCoupons(true);
+    }
     try {
       const [uCoupons, aCoupons] = await Promise.all([
         getUserCoupons(identity.phone),
@@ -118,8 +144,15 @@ export default function UserMyPage({
     }
     if (activeSubTab === 'profile' && identity?.phone) {
       getUserByPhone(identity.phone).then(user => {
-        if (user?.settings?.pushEnabled !== undefined) {
-          setPushEnabled(user.settings.pushEnabled);
+        if (user) {
+          // Sync local settings and profile for rendering
+          if (user.settings?.pushEnabled !== undefined) {
+            setPushEnabled(user.settings.pushEnabled);
+          }
+          // Also sync photoURL if different (server is source of truth after migration)
+          if (user.photoURL && user.photoURL !== identity.photoURL) {
+            setIdentity(prev => prev ? { ...prev, photoURL: user.photoURL } : user);
+          }
         }
       });
     }
@@ -335,41 +368,39 @@ export default function UserMyPage({
           )}
       </div>
 
-      {activeSubTab === 'history' && (
-        <div className={styles.selectorRow}>
-          <button 
-            className="nav-btn-standard" 
-            onClick={() => {
-              const idx = availableMonths?.indexOf(selectedMonth) ?? -1;
-              if (idx > 0) onMonthChange?.(availableMonths[idx - 1]);
-            }}
-            disabled={!availableMonths || availableMonths.indexOf(selectedMonth) <= 0}
-          >
-            <span className="nav-btn-icon">←</span>
-            <span style={{ marginLeft: '4px' }}>{language === 'ko' ? '이전' : 'Prev'}</span>
-          </button>
+      <div className={`${styles.selectorRow} ${activeSubTab !== 'history' ? styles.hidden : ''}`}>
+        <button 
+          className="nav-btn-standard" 
+          onClick={() => {
+            const idx = availableMonths?.indexOf(selectedMonth) ?? -1;
+            if (idx > 0) onMonthChange?.(availableMonths[idx - 1]);
+          }}
+          disabled={!availableMonths || availableMonths.indexOf(selectedMonth) <= 0}
+        >
+          <span className="nav-btn-icon">←</span>
+          <span style={{ marginLeft: '4px' }}>{language === 'ko' ? '이전' : 'Prev'}</span>
+        </button>
 
-          <div className={styles.monthTitle}>
-            {selectedMonth?.split('-')?.[0] || ''}년 {parseInt(selectedMonth?.split('-')?.[1] || '0')}월
-          </div>
-
-          <button 
-            className="nav-btn-standard" 
-            onClick={() => {
-              const idx = availableMonths?.indexOf(selectedMonth) ?? -1;
-              if (idx !== -1 && idx < (availableMonths?.length ?? 0) - 1) onMonthChange?.(availableMonths[idx + 1]);
-            }}
-            disabled={!availableMonths || availableMonths.indexOf(selectedMonth) >= (availableMonths?.length ?? 0) - 1}
-          >
-            <span style={{ marginRight: '4px' }}>{language === 'ko' ? '다음' : 'Next'}</span>
-            <span className="nav-btn-icon">→</span>
-          </button>
+        <div className={styles.monthTitle}>
+          {selectedMonth?.split('-')?.[0] || ''}년 {parseInt(selectedMonth?.split('-')?.[1] || '0')}월
         </div>
-      )}
+
+        <button 
+          className="nav-btn-standard" 
+          onClick={() => {
+            const idx = availableMonths?.indexOf(selectedMonth) ?? -1;
+            if (idx !== -1 && idx < (availableMonths?.length ?? 0) - 1) onMonthChange?.(availableMonths[idx + 1]);
+          }}
+          disabled={!availableMonths || availableMonths.indexOf(selectedMonth) >= (availableMonths?.length ?? 0) - 1}
+        >
+          <span style={{ marginRight: '4px' }}>{language === 'ko' ? '다음' : 'Next'}</span>
+          <span className="nav-btn-icon">→</span>
+        </button>
+      </div>
 
       <div className={styles.content}>
-        {activeSubTab === 'history' && (
-          <section className={styles.section}>
+        <div className={styles.sectionContainer}>
+          <section className={`${styles.section} ${activeSubTab !== 'history' ? styles.hidden : ''}`}>
             <div className={styles.historyCardList}>
               {(() => {
                 const myRegistrations = registrations?.filter(reg => 
@@ -421,10 +452,8 @@ export default function UserMyPage({
               })()}
             </div>
           </section>
-        )}
 
-        {activeSubTab === 'wallet' && (
-          <section className={styles.section}>
+          <section className={`${styles.section} ${activeSubTab !== 'wallet' ? styles.hidden : ''}`}>
             {/* Issuance Rules Notice */}
             <div className={styles.noticeBox}>
               <div className={styles.noticeTitle}>
@@ -438,9 +467,11 @@ export default function UserMyPage({
               </ul>
             </div>
 
-            {isLoadingCoupons ? (
-              <div className={styles.loadingContainer}>
-                <div className={styles.spinner}></div>
+            {isLoadingCoupons && activeCoupons.length === 0 ? (
+              <div className={styles.skeletonList}>
+                <div className={styles.skeletonItem}>
+                  <Skeleton height={120} borderRadius={16} count={3} />
+                </div>
               </div>
             ) : activeCoupons.length === 0 ? (
               <div className={styles.emptyState}>
@@ -584,129 +615,142 @@ export default function UserMyPage({
               </div>
             )}
           </section>
-        )}
 
-        {activeSubTab === 'coaching' && identity && (
-          <section className={styles.section} style={{ padding: 0 }}>
+          <section className={`${styles.section} ${activeSubTab !== 'coaching' ? styles.hidden : ''}`} style={{ padding: 0 }}>
+            {identity && (
               <CoachingList 
-                isAdmin={isAdmin}
+                isAdmin={false}
                 onClose={() => setActiveSubTab('history')} 
                 onSelectItem={(item) => setSelectedCoachingItem(item)} 
               />
+            )}
           </section>
-        )}
 
-        {activeSubTab === 'profile' && identity && (
-          <section className={styles.section}>
-            <div className={styles.profileHeader}>
-              <div className={styles.avatarWrapper}>
-                <div className={styles.avatarCircle} style={{ 
-                  background: identity.photoURL ? `url(${identity.photoURL}) center/cover no-repeat` : '#f2f4f6'
-                }}>
-                  {!identity.photoURL && (
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#8b95a1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                  )}
-                </div>
-              </div>
-              <div className={styles.userNameGroup}>
-                <h2 className={styles.userNickname}>{identity.nickname}</h2>
-                <div style={{ display: 'flex', gap: '4px' }}>
-                  <div className={styles.userRoleBadge}>
-                    {identity.role === 'leader' ? (language === 'ko' ? '리더' : 'Leader') : (language === 'ko' ? '팔로어' : 'Follower')}
-                  </div>
-                  {identity.isInstructor && (
-                    <div className={styles.instructorBadge} style={{ background: '#0070f3', color: 'white', fontSize: '10px', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>
-                      INSTRUCTOR
+          <section className={`${styles.section} ${activeSubTab !== 'profile' ? styles.hidden : ''}`}>
+            {identity && (
+              <>
+                <div className={styles.profileHeader}>
+                  <div className={styles.avatarWrapper}>
+                    <div className={styles.avatarCircle} style={{ 
+                      background: identity.photoURL ? `url(${remapStorageUrl(identity.photoURL)}) center/cover no-repeat` : '#f2f4f6'
+                    }}>
+                      {!identity.photoURL && (
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#8b95a1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                          <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.infoCardList}>
-              <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>{language === 'ko' ? '전화번호' : 'Phone'}</span>
-                <span className={styles.infoValue}>{identity.phone}</span>
-              </div>
-              
-              <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>{language === 'ko' ? '푸시 알림' : 'Push Notification'}</span>
-                <div className={styles.toggleSwitch}>
-                  <input 
-                    type="checkbox" 
-                    id="pushToggle"
-                    checked={pushEnabled}
-                    onChange={handlePushToggle}
-                    disabled={isSyncingPush}
-                  />
-                  <label htmlFor="pushToggle" className={styles.toggleSlider}></label>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.actionButtons}>
-              <button className={styles.editBtn} onClick={handleEditInfo}>
-                {language === 'ko' ? '내 정보 수정' : 'Edit Profile'}
-              </button>
-              <button className={styles.logoutBtn} onClick={handleLogout}>
-                {t.mypage.logoutBtn}
-              </button>
-            </div>
-          </section>
-        )}
-
-        {canAccessAdmin && (
-          <section className={styles.adminSection}>
-            <div className={styles.adminMenuList}>
-              {hasPermission(userRole, 'manage_members') && (
-                <button className={styles.adminMenuItem} onClick={() => setShowMemberManagement(true)}>
-                  <div className={styles.adminMenuIcon}>👥</div>
-                  <div className={styles.adminMenuContent}>
-                    <span className={styles.adminMenuLabel}>{language === 'ko' ? '회원 관리' : 'Members'}</span>
-                    <span className={styles.adminMenuSubLabel}>{language === 'ko' ? '전체 회원 목록 및 정보 관리' : 'Manage all members and info'}</span>
                   </div>
-                  <div className={styles.adminMenuArrow}>›</div>
-                </button>
-              )}
-              
-              {hasPermission(userRole, 'manage_stays') && (
-                <>
-                  <button className={styles.adminMenuItem} onClick={() => setShowStayChecklist(true)}>
+                  <div className={styles.userNameGroup}>
+                    <h2 className={styles.userNickname}>{identity.nickname}</h2>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      <div className={styles.userRoleBadge}>
+                        {identity.role === 'leader' ? (language === 'ko' ? '리더' : 'Leader') : (language === 'ko' ? '팔로어' : 'Follower')}
+                      </div>
+                      {identity.isInstructor && (
+                        <div className={styles.instructorBadge} style={{ background: '#0070f3', color: 'white', fontSize: '10px', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>
+                          INSTRUCTOR
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.infoCardList}>
+                  <div className={styles.infoItem}>
+                    <span className={styles.infoLabel}>{language === 'ko' ? '전화번호' : 'Phone'}</span>
+                    <span className={styles.infoValue}>{identity.phone}</span>
+                  </div>
+                  
+                  <div className={styles.infoItem}>
+                    <span className={styles.infoLabel}>{language === 'ko' ? '푸시 알림' : 'Push Notification'}</span>
+                    <div className={styles.toggleSwitch}>
+                      <input 
+                        type="checkbox" 
+                        id="pushToggle"
+                        checked={pushEnabled}
+                        onChange={handlePushToggle}
+                        disabled={isSyncingPush}
+                      />
+                      <label htmlFor="pushToggle" className={styles.toggleSlider}></label>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.actionButtons}>
+                  <button className={styles.editBtn} onClick={handleEditInfo}>
+                    {language === 'ko' ? '내 정보 수정' : 'Edit Profile'}
+                  </button>
+                  <button className={styles.logoutBtn} onClick={handleLogout}>
+                    {t.mypage.logoutBtn}
+                  </button>
+                </div>
+              </>
+            )}
+          </section>
+
+          <section className={`${styles.adminSection} ${activeSubTab !== 'admin' ? styles.hidden : ''}`}>
+            {identity && canAccessAdmin && (
+              <div className={styles.adminMenuList}>
+                {hasPermission(userRole, 'manage_members') && (
+                  <button className={styles.adminMenuItem} onClick={() => setShowMemberManagement(true)}>
+                    <div className={styles.adminMenuIcon}>👥</div>
+                    <div className={styles.adminMenuContent}>
+                      <span className={styles.adminMenuLabel}>{language === 'ko' ? '회원 관리' : 'Members'}</span>
+                      <span className={styles.adminMenuSubLabel}>{language === 'ko' ? '전체 회원 목록 및 정보 관리' : 'Manage all members and info'}</span>
+                    </div>
+                    <div className={styles.adminMenuArrow}>›</div>
+                  </button>
+                )}
+
+                {(userRole === 'admin' || userRole === 'staff') && (
+                  <button className={styles.adminMenuItem} onClick={() => setShowGlobalCoaching(true)}>
                     <div className={styles.adminMenuIcon}>📋</div>
                     <div className={styles.adminMenuContent}>
-                      <span className={styles.adminMenuLabel}>{language === 'ko' ? '스테이 체크리스트' : 'Stay Checklist'}</span>
-                      <span className={styles.adminMenuSubLabel}>{language === 'ko' ? '숙소 예약 평면도 및 체크리스트' : 'Stay reservations and checklist'}</span>
+                      <span className={styles.adminMenuLabel}>{language === 'ko' ? '전체 코칭 관리' : 'Coaching Management'}</span>
+                      <span className={styles.adminMenuSubLabel}>{language === 'ko' ? '전체 코칭 신청 현황 조회 및 관리' : 'View and manage all coaching applications'}</span>
                     </div>
                     <div className={styles.adminMenuArrow}>›</div>
                   </button>
-                  
-                  <button className={styles.adminMenuItem} onClick={() => setShowStaySMS(true)}>
-                    <div className={styles.adminMenuIcon}>💬</div>
+                )}
+                
+                {hasPermission(userRole, 'manage_stays') && (
+                  <>
+                    <button className={styles.adminMenuItem} onClick={() => setShowStayChecklist(true)}>
+                      <div className={styles.adminMenuIcon}>📋</div>
+                      <div className={styles.adminMenuContent}>
+                        <span className={styles.adminMenuLabel}>{language === 'ko' ? '스테이 체크리스트' : 'Stay Checklist'}</span>
+                        <span className={styles.adminMenuSubLabel}>{language === 'ko' ? '숙소 예약 평면도 및 체크리스트' : 'Stay reservations and checklist'}</span>
+                      </div>
+                      <div className={styles.adminMenuArrow}>›</div>
+                    </button>
+                    
+                    <button className={styles.adminMenuItem} onClick={() => setShowStaySMS(true)}>
+                      <div className={styles.adminMenuIcon}>💬</div>
+                      <div className={styles.adminMenuContent}>
+                        <span className={styles.adminMenuLabel}>{language === 'ko' ? '스테이 문자설정' : 'Stay SMS'}</span>
+                        <span className={styles.adminMenuSubLabel}>{language === 'ko' ? '예약 확정 및 안내 메시지 관리' : 'Manage confirmation messages'}</span>
+                      </div>
+                      <div className={styles.adminMenuArrow}>›</div>
+                    </button>
+                  </>
+                )}
+                
+                {userRole === 'admin' && (
+                  <button className={styles.adminMenuItem} onClick={onOpenCouponEditor}>
+                    <div className={styles.adminMenuIcon}>🎫</div>
                     <div className={styles.adminMenuContent}>
-                      <span className={styles.adminMenuLabel}>{language === 'ko' ? '스테이 문자설정' : 'Stay SMS'}</span>
-                      <span className={styles.adminMenuSubLabel}>{language === 'ko' ? '예약 확정 및 안내 메시지 관리' : 'Manage confirmation messages'}</span>
+                      <span className={styles.adminMenuLabel}>{language === 'ko' ? '쿠폰 발행 및 관리' : 'Coupons'}</span>
+                      <span className={styles.adminMenuSubLabel}>{language === 'ko' ? '신규 쿠폰 발행 및 사용 현황' : 'Issue and manage coupons'}</span>
                     </div>
                     <div className={styles.adminMenuArrow}>›</div>
                   </button>
-                </>
-              )}
-              
-              {userRole === 'admin' && (
-                <button className={styles.adminMenuItem} onClick={onOpenCouponEditor}>
-                  <div className={styles.adminMenuIcon}>🎫</div>
-                  <div className={styles.adminMenuContent}>
-                    <span className={styles.adminMenuLabel}>{language === 'ko' ? '쿠폰 발행 및 관리' : 'Coupons'}</span>
-                    <span className={styles.adminMenuSubLabel}>{language === 'ko' ? '신규 쿠폰 발행 및 사용 현황' : 'Issue and manage coupons'}</span>
-                  </div>
-                  <div className={styles.adminMenuArrow}>›</div>
-                </button>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </section>
-        )}
+        </div>
       </div>
 
       <FullscreenModal
@@ -731,6 +775,22 @@ export default function UserMyPage({
           registrations={registrations || []}
           onClose={() => setShowMemberManagement(false)} 
         />
+      </FullscreenModal>
+
+      <FullscreenModal
+        isOpen={showGlobalCoaching}
+        onClose={() => setShowGlobalCoaching(false)}
+        title={language === 'ko' ? '전체 코칭 관리' : 'Coaching Management'}
+      >
+        <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <CoachingList 
+            isAdmin={true}
+            onClose={() => setShowGlobalCoaching(false)} 
+            onSelectItem={(item) => {
+              setSelectedCoachingItem(item);
+            }} 
+          />
+        </div>
       </FullscreenModal>
 
       <FullscreenModal
@@ -777,7 +837,7 @@ export default function UserMyPage({
                   (r.nickname === (iss.userName || iss.userId))
                 );
 
-                const displayPhotoURL = (isCurrentUser && identity?.photoURL) ? identity.photoURL : reg?.photoURL;
+                const displayPhotoURL = (isCurrentUser && identity?.photoURL) ? remapStorageUrl(identity.photoURL) : (reg?.photoURL ? remapStorageUrl(reg.photoURL) : undefined);
                 const displayName = iss.userName || reg?.nickname || '알 수 없음';
                 
                 return (

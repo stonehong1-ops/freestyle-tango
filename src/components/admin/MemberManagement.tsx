@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { User, Registration, getUsers } from '@/lib/db';
+import { User, Registration, getUsers, remapStorageUrl } from '@/lib/db';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { hasRole } from '@/utils/auth';
 
 interface Props {
   registrations: Registration[];
@@ -256,7 +257,7 @@ export default function MemberManagement({ registrations, onClose }: Props) {
                 <div key={user.phone} style={{ background: 'white', padding: '1.25rem', borderRadius: '20px', boxShadow: '0 2px 10px rgba(0,0,0,0.03)', border: '1px solid #f2f4f6' }}>
                   <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
                     {user.photoURL ? (
-                      <img src={user.photoURL} alt={user.nickname} style={{ width: '44px', height: '44px', borderRadius: '15px', marginRight: '12px', background: '#f2f4f6', objectFit: 'cover' }} />
+                      <img src={remapStorageUrl(user.photoURL)} alt={user.nickname} style={{ width: '44px', height: '44px', borderRadius: '15px', marginRight: '12px', background: '#f2f4f6', objectFit: 'cover' }} />
                     ) : (
                       <div style={{ width: '44px', height: '44px', borderRadius: '15px', background: user.role === 'leader' ? '#3182f6' : '#f04452', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '12px', fontWeight: 800, fontSize: '1.1rem' }}>
                         {(user.nickname || '?').charAt(0)}
@@ -311,6 +312,17 @@ export default function MemberManagement({ registrations, onClose }: Props) {
                           {user.role === 'leader' ? t.admin.member.leader : t.admin.member.follower}
                         </div>
                       </div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px' }}>
+                        {hasRole(user, 'admin') && (
+                          <span style={{ padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem', background: '#fee500', color: '#191f28', fontWeight: 800 }}>ADMIN</span>
+                        )}
+                        {hasRole(user, 'staff') && (
+                          <span style={{ padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem', background: '#3182f6', color: 'white', fontWeight: 800 }}>STAFF</span>
+                        )}
+                        {hasRole(user, 'instructor') && (
+                          <span style={{ padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem', background: '#00c73c', color: 'white', fontWeight: 800 }}>INSTRUCTOR</span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -342,7 +354,7 @@ export default function MemberManagement({ registrations, onClose }: Props) {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px dashed #eee', paddingTop: '10px', gridColumn: 'span 2' }}>
                       <span style={{ fontSize: '0.75rem', color: '#8b95a1', marginBottom: '2px' }}>회원 역할 설정</span>
                       <select 
-                        value={user.staffRole || (user.isInstructor ? 'instructor' : 'none')}
+                        value={Array.isArray(user.staffRole) ? user.staffRole[0] : (user.staffRole?.includes(',') ? user.staffRole.split(',')[0].trim() : (user.staffRole || 'none'))}
                         onChange={async (e) => {
                           const newRole = e.target.value as any;
                           try {

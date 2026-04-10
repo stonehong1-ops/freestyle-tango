@@ -14,6 +14,7 @@ import {
   incMediaView,
   deleteMedia
 } from '@/lib/db';
+import { hasRole } from '@/utils/auth';
 
 interface MediaDetailProps {
   item: MediaItem;
@@ -24,8 +25,6 @@ interface MediaDetailProps {
   onUpdate: (silent?: boolean) => void;
   customTitle?: string;
 }
-
-
 
 const MediaDetail: React.FC<MediaDetailProps> = ({ item, onClose, t, user, isAdmin, onUpdate, customTitle }) => {
   const [hasAccess, setHasAccess] = useState(item.type !== 'demonstration');
@@ -39,7 +38,7 @@ const MediaDetail: React.FC<MediaDetailProps> = ({ item, onClose, t, user, isAdm
   const checkAccess = async () => {
     if (item.type === 'demonstration' && user?.phone) {
       // Admin/Instructor/Staff bypass check
-      const isStaff = user.staffRole === 'admin' || user.staffRole === 'instructor' || user.staffRole === 'staff';
+      const isStaff = hasRole(user, 'admin') || hasRole(user, 'instructor') || hasRole(user, 'staff');
       if (isStaff) {
         setHasAccess(true);
         return;
@@ -102,7 +101,6 @@ const MediaDetail: React.FC<MediaDetailProps> = ({ item, onClose, t, user, isAdm
     onUpdate(true);
   };
 
-
   const handleCommentSubmit = async () => {
     if (!user) return alert(t.mypage.loginPrompt);
     if (!newComment.trim()) return;
@@ -119,7 +117,6 @@ const MediaDetail: React.FC<MediaDetailProps> = ({ item, onClose, t, user, isAdm
     onUpdate(true);
   };
 
-
   const handleDelete = async () => {
     if (confirm(t.media?.deleteConfirm || 'Delete?')) {
       await deleteMedia(item.id!);
@@ -129,136 +126,138 @@ const MediaDetail: React.FC<MediaDetailProps> = ({ item, onClose, t, user, isAdm
   };
 
   const renderMedia = () => {
+    const finalUrl = remapStorageUrl(item.videoUrl);
+    
     if (item.type === 'youtube') {
       let id = item.videoUrl;
       const ytId = id.includes('v=') ? id.split('v=')[1].split('&')[0] : (id.includes('youtu.be/') ? id.split('youtu.be/')[1].split('?')[0] : id);
 
       return (
         <div className={styles.videoWrapper}>
-          <iframe 
-            src={`https://www.youtube.com/embed/${ytId}`} 
-            frameBorder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          <iframe
+            width="100%"
+            height="100%"
+            src={`https://www.youtube.com/embed/${ytId}?autoplay=1`}
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           ></iframe>
         </div>
       );
     }
-    
+
     if (item.type === 'image') {
       return (
         <div className={styles.imageWrapper}>
-          <img src={item.videoUrl} alt={item.title} className={styles.detailImage} />
+          <img 
+            src={finalUrl} 
+            alt={item.title} 
+            className={styles.detailImage}
+            crossOrigin="anonymous"
+          />
         </div>
       );
     }
 
     return (
       <div className={styles.videoWrapper}>
-        <video src={item.videoUrl} controls poster={item.thumbnailUrl}></video>
+        <video 
+          src={finalUrl} 
+          controls 
+          autoPlay 
+          playsInline
+          className={styles.video}
+        />
       </div>
     );
   };
 
-  return (
-    <div className={styles.fullPopup}>
-      <div className={styles.popupHeader}>
-        <button className={styles.backBtn} onClick={onClose}>
-          <span style={{ fontSize: '20px' }}>←</span>
-        </button>
-        <span style={{ fontWeight: 600 }}>{customTitle || t.media?.title || 'Media'}</span>
-        {isAdmin ? (
-          <button className={styles.backBtn} onClick={handleDelete} style={{ color: '#ff4d4f' }}>
-            🗑️
-          </button>
-        ) : <div style={{ width: 40 }} />}
+  if (loading) {
+    return (
+      <div className={styles.detailOverlay}>
+        <div className={styles.detailContent}>
+          <div className={styles.loading}>{t.common?.loading || 'Loading...'}</div>
+        </div>
       </div>
+    );
+  }
 
-      <div className={styles.popupContent}>
-        {loading ? (
-          <div className={styles.noAccess}>{t.registration?.loading || 'Loading...'}</div>
-        ) : !hasAccess ? (
-          <div className={styles.noAccess}>
-            <div className={styles.lockIcon}>🔒</div>
-            <p>{t.media?.noAccess || 'Restricted Access'}</p>
-            {!user && (
+  return (
+    <div className={styles.detailOverlay} onClick={onClose}>
+      <div className={styles.detailContent} onClick={e => e.stopPropagation()}>
+        <button className={styles.closeBtn} onClick={onClose}>×</button>
+        
+        <div className={styles.mediaSection}>
+          {hasAccess ? (
+            renderMedia()
+          ) : (
+            <div className={styles.lockOverlay}>
+              <div className={styles.lockIcon}>🔒</div>
+              <p>{t.media.onlyForStudents || "이 영상은 수업 신청자만 볼 수 있습니다."}</p>
+            </div>
+          )}
+        </div>
+
+        <div className={styles.infoSection}>
+          <div className={styles.header}>
+            <h2 className={styles.detailTitle}>{customTitle || item.title}</h2>
+            <div className={styles.stats}>
+              <span>👁 {viewCount || 0}</span>
               <button 
-                className={styles.filterBtn} 
-                style={{ background: '#3182f6', color: '#fff', marginTop: '16px' }}
-                onClick={() => window.location.href = '/?tab=status'}
+                className={`${styles.likeBtn} ${isLiked ? styles.active : ''}`}
+                onClick={handleLike}
               >
-                {t.header?.login || 'Login'}
+                ❤️ {likeCount || 0}
               </button>
-            )}
-          </div>
-        ) : (
-          <>
-            <div className={styles.videoSection}>
-              {renderMedia()}
-            </div>
-            
-            <div className={styles.details}>
-              {item.title && item.title !== `${item.uploaderNickname}의 루씨 Live` && (
-                <h2 className={styles.mainTitle}>{item.title}</h2>
+              {isAdmin && (
+                <button className={styles.deleteBtn} onClick={handleDelete}>
+                  {t.common?.delete || '삭제'}
+                </button>
               )}
-              <div className={styles.uploaderInfo}>
-                <span>{item.uploaderNickname}</span>
-                <span>•</span>
-                <span>{item.createdAt ? `${item.createdAt.split('T')[0].replace(/-/g, '.')} ${item.createdAt.split('T')[1].substring(0, 5)}` : ''}</span>
-                <span>•</span>
-                <span>👁️ {viewCount}</span>
-              </div>
-              <p className={styles.description}>{item.description}</p>
-              
-              <div className={styles.actions}>
-                <button 
-                  className={`${styles.actionBtn} ${isLiked ? styles.liked : ''}`} 
-                  onClick={handleLike}
-                >
-                  {isLiked ? '❤️' : '🤍'} {likeCount}
-                </button>
-                <div className={styles.actionBtn}>
-                  💬 {comments.length}
-                </div>
-              </div>
+            </div>
+          </div>
+          
+          <p className={styles.description}>{item.description}</p>
+
+          <div className={styles.commentsSection}>
+            <h3>{t.media.comments || 'Comments'} ({comments.length})</h3>
+            
+            <div className={styles.commentInputWrapper}>
+              <input
+                type="text"
+                value={newComment}
+                onChange={e => setNewComment(e.target.value)}
+                placeholder={t.media.commentPlaceholder || 'Add a comment...'}
+                onKeyPress={e => e.key === 'Enter' && handleCommentSubmit()}
+              />
+              <button onClick={handleCommentSubmit}>{t.common?.send || 'Send'}</button>
             </div>
 
-            <div className={styles.commentsArea}>
-              <div className={styles.commentInputWrapper}>
-                <input 
-                  className={styles.commentInput} 
-                  placeholder={t.media?.placeholder?.comment || 'Comment...'}
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleCommentSubmit()}
-                />
-                <button className={styles.commentSubmit} onClick={handleCommentSubmit}>
-                  {t.reserve?.save || 'Save'}
-                </button>
-              </div>
-
-              <div className={styles.commentList}>
-                {comments.length === 0 ? (
-                  <div className={styles.noComments}>
-                    {t.media?.noComments || 'No comments yet.'}
+            <div className={styles.commentList}>
+              {comments.map((comment, idx) => (
+                <div key={idx} className={styles.commentItem}>
+                  <div className={styles.commentHeader}>
+                    <span className={styles.nickname}>{comment.nickname}</span>
+                    <span className={styles.date}>{new Date(comment.createdAt).toLocaleDateString()}</span>
                   </div>
-                ) : (
-                  comments.map((c) => (
-                    <div key={c.id} className={styles.commentItem}>
-                      <div className={styles.commentMeta}>
-                        <span className={styles.commentNick}>{c.nickname}</span>
-                        <span className={styles.commentDate}>
-                          {c.createdAt ? `${c.createdAt.split('T')[0].replace(/-/g, '.')} ${c.createdAt.split('T')[1].substring(0, 5)}` : ''}
-                        </span>
-                      </div>
-                      <p className={styles.commentText}>{c.content}</p>
-                    </div>
-                  ))
-                )}
-              </div>
+                  <p className={styles.commentText}>{comment.content}</p>
+                  {(isAdmin || (user && user.phone === comment.phone)) && (
+                    <button 
+                      className={styles.deleteCommentBtn}
+                      onClick={async () => {
+                        await deleteMediaComment(item.id!, comment.id!);
+                        fetchComments();
+                        onUpdate(true);
+                      }}
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              ))}
             </div>
-          </>
-        )}
+          </div>
+        </div>
       </div>
     </div>
   );

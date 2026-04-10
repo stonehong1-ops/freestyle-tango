@@ -62,7 +62,15 @@
 
 .section {
   padding: 1.5rem;
-  animation: fadeIn 0.4s ease-out;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.sectionContainer {
+  display: flex;
+  flex-direction: column;
 }
 
 .phoneValue {
@@ -231,7 +239,6 @@ input:disabled + .toggleSlider:before {
   flex-direction: column;
   align-items: center;
   padding: 1.5rem 0 2.5rem;
-  animation: scaleIn 0.5s ease-out;
 }
 
 .avatarWrapper {
@@ -1170,4 +1177,37 @@ input:disabled + .toggleSlider:before {
 @keyframes modalFadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.skeletonList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 0;
+}
+
+.skeletonItem {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 0;
+}
+
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(82, 108, 255, 0.1);
+  border-radius: 50%;
+  border-top-color: #526cff;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

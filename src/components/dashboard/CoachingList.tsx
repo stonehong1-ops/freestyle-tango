@@ -99,6 +99,14 @@ export default function CoachingList({ onClose, onSelectItem, isAdmin }: Props) 
     }
   };
 
+  useEffect(() => {
+    const handleOpenExternal = () => {
+      if (canAdd) handleOpenNewModal();
+    };
+    window.addEventListener('ft_open_new_coaching', handleOpenExternal);
+    return () => window.removeEventListener('ft_open_new_coaching', handleOpenExternal);
+  }, [canAdd]);
+
   const handleOpenNewModal = () => {
     setSearchTerm('');
     setSelectedStudent(null);
@@ -153,11 +161,6 @@ export default function CoachingList({ onClose, onSelectItem, isAdmin }: Props) 
     <div className={styles.container}>
       <div className={styles.header}>
         <h3>{t.coaching.title}</h3>
-        {canAdd && (
-          <button className={styles.addButton} onClick={handleOpenNewModal}>
-            {t.coaching.newCoaching}
-          </button>
-        )}
       </div>
 
       <div className={styles.list}>

@@ -144,7 +144,7 @@ export default function ChatList({ userPhone, isAdmin, onSelectRoom, selectedRoo
       }
     });
     return () => unsubscribe();
-  }, [cleanUserPhone, isAdmin, participantCache]);
+  }, [cleanUserPhone, isAdmin, pinnedRoomIds]);
 
   useEffect(() => {
     if (isAdmin) {

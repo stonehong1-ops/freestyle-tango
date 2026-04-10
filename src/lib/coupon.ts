@@ -58,13 +58,29 @@ export const createCoupon = async (data: Omit<Coupon, 'id' | 'issuedCount' | 'cr
  * Admin/User: List all available coupons for issuance
  */
 export const getActiveCoupons = async () => {
-  const q = query(
-    collection(db, 'coupons'), 
-    where('status', '==', 'ACTIVE'),
-    orderBy('createdAt', 'desc')
-  );
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Coupon));
+  try {
+    const q = query(
+      collection(db, 'coupons'), 
+      where('status', '==', 'ACTIVE'),
+      orderBy('createdAt', 'desc')
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Coupon));
+  } catch (error: any) {
+    if (error.code === 'failed-precondition') {
+      console.warn('[COUPON WARNING] Missing Index for getActiveCoupons. Falling back.');
+      // Fallback: Fetch all active without sorting by createdAt
+      const qFallback = query(
+        collection(db, 'coupons'),
+        where('status', '==', 'ACTIVE')
+      );
+      const snapshot = await getDocs(qFallback);
+      const results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Coupon));
+      return results.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+    }
+    console.error("Error fetching active coupons:", error);
+    return [];
+  }
 };
 
 /**

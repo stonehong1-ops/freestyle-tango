@@ -225,8 +225,8 @@ export default function RegistrationFullList({ classes, registrations, selectedM
                 return (
                   <tr key={reg.id}>
                     <td 
-                      className={styles.clickableName} 
-                      onClick={() => setSelectedReg(reg)}
+                      className={isAdmin ? styles.clickableName : ''} 
+                      onClick={() => isAdmin && setSelectedReg(reg)}
                     >
                       {reg.nickname}
                     </td>

@@ -1,0 +1,12 @@
+- [x] Firestore 복합 인덱스 배포 (tango_classes, media, registrations 등)
+- [x] `src/lib/db.ts` 쿼리 최적화 및 Fallback 제거
+    - [x] `getClassesByMonth`, `getExtraSchedules` 서버 측 필터링 적용
+    - [x] `getMedia`, `getStayReservationList` Limit 및 최적화
+    - [x] `getRegistrations`, `getAllMilongaReservations` 대량 데이터 조회 제안
+- [x] `chat.ts` 및 채팅 로딩 성능 개선
+    - [x] `initializeSystemRooms` 로컬 캐싱 적용 (중복 Write 차단)
+    - [x] `ChatList.tsx` useEffect 의존성 최적화
+- [x] 빌드 검증 및 최종 배포
+    - [x] 인덱스 배포 완료
+    - [x] `npm run build` 성공
+- [ ] 완료 보고서(Walkthrough) 작성

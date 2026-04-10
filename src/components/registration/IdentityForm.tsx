@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { signInAnonymously } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { uploadFile } from '@/lib/storage';
-import { updateRegistrationPhoto, getUserByPhone, trackUserVisit, updateUserProfile } from '@/lib/db';
+import { updateRegistrationPhoto, getUserByPhone, trackUserVisit, updateUserProfile, remapStorageUrl } from '@/lib/db';
 import styles from './RegistrationForm.module.css';
 
 const getDeviceType = () => {
@@ -206,7 +206,7 @@ export default function IdentityForm({ onClose, onComplete, isEdit = false }: Id
                 width: '90px', 
                 height: '90px', 
                 borderRadius: '50%', 
-                background: photoURL ? `url(${photoURL}) center/cover no-repeat` : '#f2f4f6', 
+                background: photoURL ? `url(${remapStorageUrl(photoURL)}) center/cover no-repeat` : '#f2f4f6', 
                 cursor: isUploading ? 'default' : 'pointer',
                 display: 'flex',
                 alignItems: 'center',

@@ -91,13 +91,15 @@ export default function MilongaLucy({
   useEffect(() => {
     if (selectedDate) {
       fetchReservations();
-      fetchMedia();
     } else {
       setReservations([]);
-      setMilongaMedia([]);
     }
-    fetchMilongaInfo();
+
+    // Fetch media and Lucy Live count regardless of selectedDate
+    // This ensures 'live' tab works even when no milonga is scheduled
+    fetchMedia();
     fetchLucyLiveCount();
+    fetchMilongaInfo();
 
     const handleUpdate = () => fetchMilongaInfo();
     window.addEventListener('ft_milonga_updated', handleUpdate);
@@ -496,7 +498,7 @@ export default function MilongaLucy({
                   <div className={styles.emptyMsg}>{t.home.milonga.noReservations}</div>
                 ) : (
                   reservations.map((res, i) => {
-                    const isMyRes = res.phone === myPhone || isAdmin || ['01072092468', '01012345678'].includes(myPhone);
+                    const isMyRes = res.phone === myPhone || !!isAdmin;
                     return (
                       <div key={res.id} className={styles.resWrapper}>
                         <div className={res.option === '3+1 이벤트' ? styles.resItemVip : styles.resItem}>
@@ -661,7 +663,7 @@ export default function MilongaLucy({
           </div>
 
           <div className={styles.formField}>
-            <label>{t.home.registration.nickname}</label>
+            <label>{t.home.registration.nickname}<span style={{ color: '#ff4d4f', marginLeft: '4px' }}>*</span></label>
             <input 
               type="text" 
               placeholder={t.home.milonga.nicknamePlaceholder} 
@@ -672,7 +674,7 @@ export default function MilongaLucy({
           </div>
 
           <div className={styles.formField}>
-            <label>{t.home.milonga.phoneLabel}</label>
+            <label>{t.home.milonga.phoneLabel}<span style={{ color: '#ff4d4f', marginLeft: '4px' }}>*</span></label>
             <input 
               type="tel" 
               placeholder="010-0000-0000" 
@@ -684,22 +686,16 @@ export default function MilongaLucy({
 
           <div className={styles.formField}>
             <label>{t.home.milonga.requestsLabel}</label>
-            <textarea 
+            <input 
+              type="text"
               placeholder={t.home.milonga.requestsPlaceholder} 
               value={requests}
               onChange={(e) => setRequests(e.target.value)}
-              className={styles.textarea}
-              rows={3}
+              className={styles.input}
             />
           </div>
 
-          <div className={styles.priceDisplay}>
-            <span className={styles.priceLabel}>{language === 'ko' ? '최종 결제 금액' : 'Total Amount'}</span>
-            <span className={styles.priceValue}>
-              {selectedOption === '테이블 예약' ? '10,000' : 
-               selectedOption === '2+1 이벤트' ? '20,000' : '30,000'}원
-            </span>
-          </div>
+
 
           <button 
             className={styles.submitBtn} 

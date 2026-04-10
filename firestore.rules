@@ -1,0 +1,24 @@
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // [Rules] Allow public read for essential data
+    match /milonga_info/{docId} { allow read: if true; }
+    match /media/{docId} { allow read: if true; }
+    match /tango_classes/{docId} { allow read: if true; }
+    match /extra_schedules/{docId} { allow read: if true; }
+    match /monthly_notices/{docId} { allow read: if true; }
+    
+    // [Rules] More strict for reservations and users
+    match /milonga_reservations/{docId} {
+      allow read, write: if true; // Temporarily allow for smooth migration, can tighten later
+    }
+    match /users/{userId} {
+      allow read, write: if true; 
+    }
+    
+    // Default fallback
+    match /{document=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+  }
+}

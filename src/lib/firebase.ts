@@ -6,24 +6,21 @@ import { getMessaging, isSupported } from "firebase/messaging";
 
 // Public Firebase Configuration (Used as fallbacks if environment variables are missing)
 const DEFAULT_CONFIG = {
-  apiKey: "AIzaSyAtxlSfk4vVLPZjj5E1Ibw1Mfu5tIr6Few",
-  authDomain: "tangostay-7355e.firebaseapp.com",
-  projectId: "tangostay-7355e",
-  storageBucket: "tangostay-7355e.firebasestorage.app",
-  messagingSenderId: "537832909151",
-  appId: "1:537832909151:web:e0502f6e4bf4702e2eeeea"
+  apiKey: "AIzaSyCrtzGtNMc_gNC_rqROj52qVOLQ6vVQwgc",
+  authDomain: "freestyle-tango-seoul.firebaseapp.com",
+  projectId: "freestyle-tango-seoul",
+  storageBucket: "freestyle-tango-seoul.firebasestorage.app",
+  messagingSenderId: "87031621234",
+  appId: "1:87031621234:web:53c87298461b95cce2c4eb"
 };
 
-const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || DEFAULT_CONFIG.projectId;
-
 const firebaseConfig = {
-  // Hardcoding the CORRECT case-sensitive API Key (39 chars) directly to bypass ANY environment variable or truncated key issues
-  apiKey: "AIzaSyAtxlSfk4vVLPZjj5E1Ibw1Mfu5tIr6Few",
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "tangostay-7355e.firebaseapp.com",
-  projectId: projectId,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "tangostay-7355e.firebasestorage.app",
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "537832909151",
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:537832909151:web:e0502f6e4bf4702e2eeeea",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || DEFAULT_CONFIG.apiKey,
+  authDomain: "freestyle-tango-seoul.firebaseapp.com", // Strictly force Seoul domain to fix auth/configuration-not-found
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || DEFAULT_CONFIG.projectId,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || DEFAULT_CONFIG.storageBucket,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || DEFAULT_CONFIG.messagingSenderId,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || DEFAULT_CONFIG.appId,
 };
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();

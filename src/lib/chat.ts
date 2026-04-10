@@ -16,6 +16,7 @@ import {
   setDoc
 } from 'firebase/firestore';
 import { db } from './firebase';
+import { remapStorageUrl } from './db';
 import { ChatRoom, ChatMessage } from '@/types/chat';
 
 const ROOMS_COLLECTION = 'chat_rooms';
@@ -30,13 +31,9 @@ export const subscribeRooms = (userPhone: string, isAdmin: boolean, pinnedRoomId
   const roomsRef = collection(db, ROOMS_COLLECTION);
   const cleanPhone = userPhone.replace(/[^0-9]/g, '');
   
-  // 1. Fetch public (community & notice) rooms
-  const publicQ = query(roomsRef, where('type', 'in', ['public', 'notice']));
-  
-  // 2. Fetch private rooms where user is participant
-  const privateQ = query(roomsRef, where('participants', 'array-contains', cleanPhone));
-
-  const handleSnapshot = (allRooms: ChatRoom[]) => {
+  // Combine all results and sort
+  const handleSnapshot = (publicR: ChatRoom[], privateR: ChatRoom[]) => {
+    const allRooms = [...publicR, ...privateR];
     // Sort logic: Notice > Community > Pinned > Time
     const sorted = allRooms.sort((a, b) => {
       // 1. Notice Room (공지사항)
@@ -64,18 +61,40 @@ export const subscribeRooms = (userPhone: string, isAdmin: boolean, pinnedRoomId
     callback(unique);
   };
 
-  // Combining both snapshots
   let publicRooms: ChatRoom[] = [];
   let privateRooms: ChatRoom[] = [];
 
+  const publicQ = query(roomsRef, where('type', 'in', ['public', 'notice']));
+  const privateQ = query(roomsRef, where('participants', 'array-contains', cleanPhone));
+
   const unsubPublic = onSnapshot(publicQ, (snap) => {
-    publicRooms = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChatRoom));
-    handleSnapshot([...publicRooms, ...privateRooms]);
+    publicRooms = snap.docs.map(doc => {
+      const data = doc.data();
+      return { 
+        id: doc.id, 
+        ...data,
+        thumbnail: remapStorageUrl(data.thumbnail),
+        imageUrl: remapStorageUrl(data.imageUrl)
+      } as ChatRoom;
+    });
+    handleSnapshot(publicRooms, privateRooms);
+  }, (err) => {
+    console.error("Public rooms subscription error:", err);
   });
 
   const unsubPrivate = onSnapshot(privateQ, (snap) => {
-    privateRooms = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChatRoom));
-    handleSnapshot([...publicRooms, ...privateRooms]);
+    privateRooms = snap.docs.map(doc => {
+      const data = doc.data();
+      return { 
+        id: doc.id, 
+        ...data,
+        thumbnail: remapStorageUrl(data.thumbnail),
+        imageUrl: remapStorageUrl(data.imageUrl)
+      } as ChatRoom;
+    });
+    handleSnapshot(publicRooms, privateRooms);
+  }, (err) => {
+    console.error("Private rooms subscription error:", err);
   });
 
   return () => {
@@ -110,7 +129,14 @@ export const subscribeMessages = (roomId: string, callback: (messages: ChatMessa
   );
   
   return onSnapshot(q, (snapshot) => {
-    const messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChatMessage));
+    const messages = snapshot.docs.map(doc => {
+      const data = doc.data();
+      return { 
+        id: doc.id, 
+        ...data,
+        mediaUrl: remapStorageUrl(data.mediaUrl)
+      } as ChatMessage;
+    });
     callback(messages);
   });
 };
@@ -124,6 +150,7 @@ export const sendMessage = async (message: Omit<ChatMessage, 'id' | 'timestamp' 
 
     const docRef = await addDoc(collection(db, MESSAGES_COLLECTION), {
       ...sanitizedMessage,
+      mediaUrl: remapStorageUrl(message.mediaUrl),
       readBy: [message.senderId.replace(/[^0-9]/g, '')], 
       timestamp: serverTimestamp()
     });
@@ -314,7 +341,12 @@ export const searchUsers = async (searchTerm: string = '') => {
                     nickname.toLowerCase().includes(cleanSearch) || 
                     cleanPhone.includes(cleanSearch);
       if (match) {
-        users.push({ nickname, phone: cleanPhone, photoURL: data.photoURL, role: data.role });
+        users.push({ 
+          nickname, 
+          phone: cleanPhone, 
+          photoURL: remapStorageUrl(data.photoURL), 
+          role: data.role 
+        });
       }
     }
   });
@@ -337,7 +369,11 @@ export const getParticipantsInfo = async (phones: string[]) => {
     const data = doc.data();
     const phone = data.phone?.replace(/[^0-9]/g, '');
     if (phone) {
-      results[phone] = { nickname: data.nickname, photoURL: data.photoURL, ...data } as any;
+      results[phone] = { 
+        ...data,
+        nickname: data.nickname, 
+        photoURL: remapStorageUrl(data.photoURL) 
+      } as any;
     }
   });
 
@@ -362,7 +398,11 @@ export const subscribeParticipantsInfo = (phones: string[], callback: (info: Rec
       const data = doc.data();
       const phone = data.phone?.replace(/[^0-9]/g, '');
       if (phone) {
-        results[phone] = { nickname: data.nickname, photoURL: data.photoURL, ...data } as any;
+        results[phone] = { 
+          ...data,
+          nickname: data.nickname, 
+          photoURL: remapStorageUrl(data.photoURL) 
+        } as any;
       }
     });
     callback(results);
@@ -444,10 +484,16 @@ export const inviteUserToChatRoom = async (roomId: string, user: { nickname: str
   }
 };
 
+let isSystemInitialized = false;
+
 export const initializeSystemRooms = async () => {
-  // Notice Room
-  const noticeRef = doc(db, ROOMS_COLLECTION, NOTICE_ROOM_ID);
-  const noticeSnap = await getDoc(noticeRef);
+  if (isSystemInitialized) return;
+  isSystemInitialized = true;
+
+  try {
+    // Notice Room
+    const noticeRef = doc(db, ROOMS_COLLECTION, NOTICE_ROOM_ID);
+    const noticeSnap = await getDoc(noticeRef);
   if (!noticeSnap.exists()) {
     await setDoc(noticeRef, {
       name: '공지사항',
@@ -473,5 +519,9 @@ export const initializeSystemRooms = async () => {
     });
   } else if (roomSnap.data().name !== '프리스타일 수다방') {
     await updateDoc(roomRef, { name: '프리스타일 수다방' });
+  }
+    } catch (error) {
+    console.error('[CHAT ERROR] System initialization failed:', error);
+    isSystemInitialized = false; 
   }
 };

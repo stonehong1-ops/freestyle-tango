@@ -26,6 +26,49 @@ import {
   or
 } from 'firebase/firestore';
 
+/**
+ * Firestore 쿼리에 타임아웃을 적용하는 헬퍼 함수
+ * 인덱스가 없을 때 12초 이상 대기하는 현상을 방지합니다.
+ */
+const withTimeout = <T>(promise: Promise<T>, timeoutMs: number = 6000): Promise<T> => {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => 
+      setTimeout(() => reject(new Error('FIRESTORE_TIMEOUT')), timeoutMs)
+    )
+  ]);
+};
+
+// --- Storage URL Remapping Utility ---
+const OLD_BUCKETS = ['tangostay-7355e.appspot.com', 'tangostay-7355e.firebasestorage.app', 'tangostay-7355e'];
+const NEW_BUCKET_DOMAIN = 'freestyle-tango-seoul.firebasestorage.app';
+
+export const remapStorageUrl = (url: any): any => {
+  if (!url || typeof url !== 'string' || !url.includes('firebasestorage.googleapis.com')) return url;
+  
+  let remapped = url;
+  
+  // 1. Replace legacy bucket domains/ids with the new Seoul bucket domain
+  OLD_BUCKETS.forEach(bucket => {
+    if (remapped.includes(bucket)) {
+      remapped = remapped.replace(new RegExp(bucket, 'g'), NEW_BUCKET_DOMAIN);
+    }
+  });
+  
+  // 2. STRIP LEGACY TOKENS: The old tokens are invalid in the new project.
+  // We keep essential params like alt=media but strip &token=... or ?token=...
+  if (remapped.includes('token=')) {
+    // Standard case: ?alt=media&token=xyz -> ?alt=media
+    // Edge case: ?token=xyz -> (remove params entirely)
+    const urlObj = new URL(remapped);
+    urlObj.searchParams.delete('token');
+    remapped = urlObj.toString();
+  }
+  
+  return remapped;
+};
+
+
 export interface TangoClass {
   id: string;
   teacher1: string;
@@ -96,6 +139,7 @@ export interface ExtraSchedule {
   startTime?: string; // HH:mm
   endTime?: string;   // HH:mm
   memo: string;
+  imageUrl?: string;
 }
 
 export interface MediaItem {
@@ -164,7 +208,7 @@ export interface User {
   photoURL?: string;
   role?: string;
   isInstructor?: boolean;
-  staffRole?: 'admin' | 'staff' | 'instructor' | 'none';
+  staffRole?: string | string[];
   lastVisit: any; // Firestore Timestamp
   createdAt?: any;
   device?: 'ios' | 'android' | 'pc' | 'unknown';
@@ -209,12 +253,36 @@ export interface CoachingUpdate {
 const COLLECTION_NAME = 'tango_classes';
 
 export const getClasses = async (): Promise<TangoClass[]> => {
-  const q = query(collection(db, COLLECTION_NAME), orderBy('time', 'asc'));
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map(docSnap => ({
-    id: docSnap.id,
-    ...docSnap.data()
-  } as TangoClass));
+  try {
+    const q = query(collection(db, COLLECTION_NAME), orderBy('time', 'asc'));
+    // 3초 이내에 응답이 없으면 인덱스 누락으로 간주하고 폴백 실행
+    const querySnapshot = await withTimeout(getDocs(q));
+    return querySnapshot.docs.map(docSnap => {
+      const data = docSnap.data();
+      return {
+        id: docSnap.id,
+        ...data,
+        imageUrl: remapStorageUrl(data.imageUrl)
+      } as TangoClass;
+    });
+  } catch (error: any) {
+    if (error.message === 'FIRESTORE_TIMEOUT') {
+      console.warn("getClasses query timed out (likely missing index), using fallback sorting.");
+    } else {
+      console.warn("Error fetching classes with orderBy:", error);
+    }
+    const qSimple = query(collection(db, COLLECTION_NAME));
+    const querySnapshot = await getDocs(qSimple);
+    const results = querySnapshot.docs.map(docSnap => {
+      const data = docSnap.data();
+      return {
+        id: docSnap.id,
+        ...data,
+        imageUrl: remapStorageUrl(data.imageUrl)
+      } as TangoClass;
+    });
+    return results.sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+  }
 };
 
 export const addClass = async (classData: Omit<TangoClass, 'id'>) => {
@@ -275,44 +343,58 @@ export const deleteRegistration = async (id: string) => {
 
 export const updateRegistration = async (id: string, updates: Partial<Registration>) => {
   const docRef = doc(db, REG_COLLECTION, id);
-  return await updateDoc(docRef, updates);
+  return await withTimeout(updateDoc(docRef, updates));
 };
 
 export const getRegistrations = async (): Promise<Registration[]> => {
-  const q = query(collection(db, REG_COLLECTION), orderBy('date', 'desc'));
-  const querySnapshot = await getDocs(q);
+  const q = query(collection(db, REG_COLLECTION), orderBy('date', 'desc'), limit(500));
+  const querySnapshot = await withTimeout(getDocs(q));
   return querySnapshot.docs.map(docSnap => ({
     id: docSnap.id,
     ...docSnap.data()
   } as Registration));
 };
 
-// Counts are now calculated on the fly from registrations in the UI components
-
-export const getRegistrationByPhone = async (phone: string): Promise<Registration | null> => {
-  const q = query(
-    collection(db, REG_COLLECTION), 
-    where('phone', '==', phone), 
-    orderBy('date', 'desc'),
-    limit(1)
-  );
-  const querySnapshot = await getDocs(q);
-  if (querySnapshot.empty) return null;
-  const docSnap = querySnapshot.docs[0];
-  return { id: docSnap.id, ...docSnap.data() } as Registration;
+export const getRegistrationByPhone = async (phone: string, classId: string): Promise<Registration | null> => {
+  try {
+    const q = query(
+      collection(db, 'registrations'),
+      where('phone', '==', phone),
+      where('classIds', 'array-contains', classId)
+    );
+    const querySnapshot = await withTimeout(getDocs(q));
+    if (querySnapshot.empty) return null;
+    return { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() } as Registration;
+  } catch (error) {
+    console.error("Error fetching registration: ", error);
+    // Fallback: search all registrations for this phone (without class index)
+    try {
+      const qFallback = query(collection(db, 'registrations'), where('phone', '==', phone));
+      const querySnapshot = await withTimeout(getDocs(qFallback));
+      const found = querySnapshot.docs.find(d => {
+        const data = d.data();
+        return data.classIds && data.classIds.includes(classId);
+      });
+      if (found) return { id: found.id, ...found.data() } as Registration;
+    } catch (fallbackError) {
+      console.error("Fallback registration fetch failed:", fallbackError);
+    }
+    return null;
+  }
 };
 
 export const getAllRegistrationsByPhone = async (phone: string): Promise<Registration[]> => {
-  const q = query(
-    collection(db, REG_COLLECTION), 
-    where('phone', '==', phone), 
-    orderBy('date', 'desc')
-  );
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map(docSnap => ({
-    id: docSnap.id,
-    ...docSnap.data()
-  } as Registration));
+  try {
+    const q = query(collection(db, 'registrations'), where('phone', '==', phone));
+    const querySnapshot = await withTimeout(getDocs(q));
+    return querySnapshot.docs.map(docSnap => ({
+      id: docSnap.id,
+      ...docSnap.data()
+    } as Registration));
+  } catch (error) {
+    console.error("Error fetching all registrations: ", error);
+    return [];
+  }
 };
 
 export const updateRegistrationPhoto = async (phone: string, photoURL: string) => {
@@ -325,7 +407,7 @@ export const updateRegistrationPhoto = async (phone: string, photoURL: string) =
     orderBy('date', 'desc'),
     limit(5)
   );
-  const snap = await getDocs(q);
+  const snap = await withTimeout(getDocs(q));
   const regPromises = snap.docs.map(docSnap => 
     updateDoc(doc(db, REG_COLLECTION, docSnap.id), { photoURL })
   );
@@ -369,7 +451,7 @@ export const updateUserProfile = async (phone: string, data: Partial<User>) => {
     orderBy('date', 'desc'),
     limit(10)
   );
-  const snap = await getDocs(q);
+  const snap = await withTimeout(getDocs(q));
   const regData: any = { ...data };
   delete regData.isInstructor; // Don't propagate isInstructor to registrations as it doesn't exist there
   delete regData.staffRole;    // Don't propagate staffRole to registrations as it doesn't exist there
@@ -385,59 +467,74 @@ export const updateUserProfile = async (phone: string, data: Partial<User>) => {
   return await Promise.all([...regPromises, userPromise]);
 };
 
-export const getClassesByMonth = async (month: string): Promise<TangoClass[]> => {
-  const q = query(
-    collection(db, COLLECTION_NAME), 
-    where('targetMonth', '==', month),
-    orderBy('time', 'asc')
-  );
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map(docSnap => ({
-    id: docSnap.id,
-    ...docSnap.data()
-  } as TangoClass));
-};
 
 const MILONGA_RES_COLLECTION = 'milonga_reservations';
 
 export const addMilongaReservation = async (data: Omit<MilongaReservation, 'id'>) => {
-  return await addDoc(collection(db, MILONGA_RES_COLLECTION), data);
+  return await withTimeout(addDoc(collection(db, MILONGA_RES_COLLECTION), data));
 };
 
-export const getMilongaReservations = async (date: string): Promise<MilongaReservation[]> => {
-  const q = query(
-    collection(db, MILONGA_RES_COLLECTION),
-    where('milongaDate', '==', date),
-    orderBy('timestamp', 'asc')
-  );
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map(docSnap => ({
-    id: docSnap.id,
-    ...docSnap.data()
-  } as MilongaReservation));
+export const getMilongaReservations = async (milongaDate: string): Promise<MilongaReservation[]> => {
+  try {
+    const q = query(
+      collection(db, MILONGA_RES_COLLECTION),
+      where('milongaDate', '==', milongaDate)
+    );
+    const querySnapshot = await withTimeout(getDocs(q));
+    return querySnapshot.docs.map(docSnap => ({
+      id: docSnap.id,
+      ...docSnap.data()
+    } as MilongaReservation));
+  } catch (error) {
+    console.error("Error fetching milonga reservations: ", error);
+    return [];
+  }
 };
 
-export const getAllMilongaReservations = async (): Promise<MilongaReservation[]> => {
-  const q = query(
-    collection(db, MILONGA_RES_COLLECTION),
-    orderBy('milongaDate', 'asc'),
-    orderBy('timestamp', 'asc')
-  );
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map(docSnap => ({
-    id: docSnap.id,
-    ...docSnap.data()
-  } as MilongaReservation));
+export const getAllMilongaReservations = async (month?: string): Promise<MilongaReservation[]> => {
+  try {
+    let q;
+    if (month) {
+      const start = `${month}-01`;
+      const end = `${month}-31`;
+      q = query(
+        collection(db, MILONGA_RES_COLLECTION),
+        where('milongaDate', '>=', start),
+        where('milongaDate', '<=', end),
+        orderBy('milongaDate', 'desc')
+      );
+    } else {
+      q = query(collection(db, MILONGA_RES_COLLECTION), orderBy('milongaDate', 'desc'), limit(500));
+    }
+    const querySnapshot = await withTimeout(getDocs(q));
+    return querySnapshot.docs.map(docSnap => ({
+      id: docSnap.id,
+      ...docSnap.data()
+    } as MilongaReservation));
+  } catch (error) {
+    console.warn("getAllMilongaReservations failed, falling back to simple query:", error);
+    try {
+      const qSimple = query(collection(db, MILONGA_RES_COLLECTION), limit(500));
+      const querySnapshot = await withTimeout(getDocs(qSimple));
+      let results = querySnapshot.docs.map(d => ({ id: d.id, ...d.data() } as MilongaReservation));
+      if (month) {
+        results = results.filter(r => r.milongaDate && r.milongaDate.startsWith(month));
+      }
+      return results.sort((a,b) => (b.milongaDate || '').localeCompare(a.milongaDate || ''));
+    } catch (err) {
+      return [];
+    }
+  }
 };
 
 export const updateMilongaReservation = async (id: string, data: Partial<MilongaReservation>) => {
   const docRef = doc(db, MILONGA_RES_COLLECTION, id);
-  return await updateDoc(docRef, data);
+  return await withTimeout(updateDoc(docRef, data));
 };
 
 export const deleteMilongaReservation = async (id: string) => {
   const docRef = doc(db, MILONGA_RES_COLLECTION, id);
-  return await deleteDoc(docRef);
+  return await withTimeout(deleteDoc(docRef));
 };
 
 const MILONGA_INFO_COLLECTION = 'milonga_info';
@@ -445,9 +542,16 @@ const MILONGA_INFO_COLLECTION = 'milonga_info';
 export const getMilongaInfo = async (date?: string): Promise<MilongaInfo | null> => {
   if (date) {
     const q = query(collection(db, MILONGA_INFO_COLLECTION), where('activeDate', '==', date), limit(1));
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await withTimeout(getDocs(q));
     if (!querySnapshot.empty) {
-      return { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() } as MilongaInfo;
+      const docSnap = querySnapshot.docs[0];
+      const data = docSnap.data();
+      return { 
+        ...data,
+        id: docSnap.id, 
+        posterUrl: remapStorageUrl(data.posterUrl),
+        sourcePhotoUrl: remapStorageUrl(data.sourcePhotoUrl)
+      } as unknown as MilongaInfo;
     }
     return null;
   }
@@ -460,9 +564,16 @@ export const getMilongaInfo = async (date?: string): Promise<MilongaInfo | null>
     orderBy('activeDate', 'asc'),
     limit(1)
   );
-  const querySnapshot = await getDocs(q);
+  const querySnapshot = await withTimeout(getDocs(q));
   if (!querySnapshot.empty) {
-    return { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() } as MilongaInfo;
+    const docSnap = querySnapshot.docs[0];
+    const data = docSnap.data();
+    return {
+      ...data,
+      id: docSnap.id,
+      posterUrl: remapStorageUrl(data.posterUrl),
+      sourcePhotoUrl: remapStorageUrl(data.sourcePhotoUrl)
+    } as unknown as MilongaInfo;
   }
 
   // If no future milonga, get the absolute latest one
@@ -471,41 +582,43 @@ export const getMilongaInfo = async (date?: string): Promise<MilongaInfo | null>
     orderBy('activeDate', 'desc'),
     limit(1)
   );
-  const latestSnapshot = await getDocs(qLatest);
+  const latestSnapshot = await withTimeout(getDocs(qLatest));
   if (!latestSnapshot.empty) {
-    return { id: latestSnapshot.docs[0].id, ...latestSnapshot.docs[0].data() } as MilongaInfo;
+    const docSnap = latestSnapshot.docs[0];
+    const data = docSnap.data();
+    return {
+      ...data,
+      id: docSnap.id,
+      posterUrl: remapStorageUrl(data.posterUrl),
+      sourcePhotoUrl: remapStorageUrl(data.sourcePhotoUrl)
+    } as unknown as MilongaInfo;
   }
 
   return null;
 };
 
-export const getAllMilongas = async (): Promise<MilongaInfo[]> => {
-  const q = query(collection(db, MILONGA_INFO_COLLECTION), orderBy('activeDate', 'desc'));
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() } as MilongaInfo));
-};
 
 export const updateMilongaInfo = async (info: MilongaInfo) => {
   if (!info.activeDate) throw new Error("Milonga date is required");
   
   // Try to find existing doc for this date
   const q = query(collection(db, MILONGA_INFO_COLLECTION), where('activeDate', '==', info.activeDate), limit(1));
-  const querySnapshot = await getDocs(q);
+  const querySnapshot = await withTimeout(getDocs(q));
   
   const dataToSave = { ...info };
   delete dataToSave.id;
   
   if (!querySnapshot.empty) {
     const docRef = doc(db, MILONGA_INFO_COLLECTION, querySnapshot.docs[0].id);
-    return await updateDoc(docRef, dataToSave);
+    return await withTimeout(updateDoc(docRef, dataToSave));
   } else {
-    return await addDoc(collection(db, MILONGA_INFO_COLLECTION), dataToSave);
+    return await withTimeout(addDoc(collection(db, MILONGA_INFO_COLLECTION), dataToSave));
   }
 };
 
 export const deleteMilongaInfo = async (id: string) => {
   const docRef = doc(db, MILONGA_INFO_COLLECTION, id);
-  return await deleteDoc(docRef);
+  return await withTimeout(deleteDoc(docRef));
 };
 
 // --- Stay Reservation Functions ---
@@ -519,33 +632,28 @@ const maskName = (name: string) => {
 
 export const getStayReservationList = async (stayId?: string): Promise<FullStayReservation[]> => {
   try {
-    const snapshot = await getDocs(collection(db, STAY_RES_COLLECTION));
-    const list: FullStayReservation[] = [];
-    snapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-      if (data.status === 'cancelled') return;
+    let q;
+    if (stayId) {
+      const stayIds = [stayId];
+      if (stayId === 'hapjeong') stayIds.push('stayhapjeoung');
+      if (stayId === 'deokeun') stayIds.push('staydeokeun', '덕은', 'deogeun');
       
-      let docStayId = data.stayId || 'hapjeong';
-      if (docStayId === 'stayhapjeoung') docStayId = 'hapjeong';
-      if (docStayId === 'staydeokeun' || docStayId === 'deokeun' || docStayId === '덕은' || docStayId === 'deogeun') docStayId = 'deokeun';
-      if (stayId && docStayId !== stayId) return;
-      list.push({
-        ...data,
-        id: docSnap.id,
-        stayId: docStayId
-      } as FullStayReservation);
-    });
-    return list.sort((a, b) => (a.checkIn || "").localeCompare(b.checkIn || ""));
-  } catch (error) {
-    console.error("Error fetching stay reservation list: ", error);
-    return [];
-  }
-};
-
-export const getStayReservedDates = async (stayId?: string): Promise<BlockedDateInfo[]> => {
-  try {
-    const snapshot = await getDocs(collection(db, STAY_RES_COLLECTION));
-    const blockedDates: BlockedDateInfo[] = [];
+      q = query(
+        collection(db, STAY_RES_COLLECTION),
+        where('stayId', 'in', stayIds),
+        orderBy('checkIn', 'desc'),
+        limit(150)
+      );
+    } else {
+      q = query(
+        collection(db, STAY_RES_COLLECTION),
+        orderBy('checkIn', 'desc'),
+        limit(200)
+      );
+    }
+    
+    const snapshot = await withTimeout(getDocs(q), 8000);
+    const list: FullStayReservation[] = [];
     
     snapshot.forEach((docSnap) => {
       const data = docSnap.data();
@@ -554,39 +662,80 @@ export const getStayReservedDates = async (stayId?: string): Promise<BlockedDate
       let docStayId = data.stayId || 'hapjeong';
       if (docStayId === 'stayhapjeoung') docStayId = 'hapjeong';
       if (docStayId === 'staydeokeun' || docStayId === 'deokeun' || docStayId === '덕은' || docStayId === 'deogeun') docStayId = 'deokeun';
-      if (stayId && docStayId !== stayId) return;
       
-      const start = new Date(data.checkIn);
-      const end = new Date(data.checkOut);
-      
-      if (isNaN(start.getTime()) || isNaN(end.getTime())) return;
-
-      const current = new Date(start);
-      while (current < end) {
-        blockedDates.push({
-          date: current.toISOString().split('T')[0],
-          maskedName: maskName(data.name || ""),
-          checkIn: data.checkIn,
-          checkOut: data.checkOut
-        });
-        current.setDate(current.getDate() + 1);
-        if (blockedDates.length > 2000) break;
-      }
+      list.push({
+        ...data,
+        id: docSnap.id,
+        stayId: docStayId,
+        guestName: maskName(data.guestName)
+      } as unknown as FullStayReservation);
     });
-    return blockedDates;
+    
+    return list.sort((a, b) => (b.checkIn || "").localeCompare(a.checkIn || ""));
+  } catch (error: any) {
+    if (error.message === 'FIRESTORE_TIMEOUT') {
+      console.error("STAY_RESERVATION_LIST_TIMEOUT: Please create Firestore index for stay_reservations collection. Link usually looks like: https://console.firebase.google.com/project/freestyle-tango-seoul/firestore/indexes");
+    }
+    console.warn("getStayReservationList failed, falling back:", error);
+    // Fallback significantly limited to prevent 10s+ scan
+    const qFallback = query(collection(db, STAY_RES_COLLECTION), limit(250));
+    const snapshot = await withTimeout(getDocs(qFallback));
+    const list: FullStayReservation[] = [];
+    
+    const targetIds = stayId ? [stayId] : [];
+    if (stayId === 'hapjeong') targetIds.push('stayhapjeoung');
+    if (stayId === 'deokeun') targetIds.push('staydeokeun', '덕은', 'deogeun');
+
+    snapshot.forEach(d => {
+      const data = d.data();
+      if (data.status === 'cancelled') return;
+      
+      let docStayId = data.stayId || 'hapjeong';
+      if (docStayId === 'stayhapjeoung') docStayId = 'hapjeong';
+      if (['staydeokeun', 'deokeun', '덕은', 'deogeun'].includes(docStayId)) docStayId = 'deokeun';
+
+      if (stayId && !targetIds.includes(data.stayId || 'hapjeong')) return;
+      
+      list.push({ 
+        ...data,
+        id: d.id, 
+        stayId: docStayId, 
+        guestName: maskName(data.guestName) 
+      } as unknown as FullStayReservation);
+    });
+    return list.sort((a, b) => (b.checkIn || "").localeCompare(a.checkIn || ""));
+  }
+};
+
+export const getStayReservedDates = async (month: string): Promise<string[]> => {
+  try {
+    const start = `${month}-01`;
+    const end = `${month}-31`;
+    const q = query(
+      collection(db, STAY_RES_COLLECTION),
+      where('checkIn', '>=', start),
+      where('checkIn', '<=', end)
+    );
+    const querySnapshot = await withTimeout(getDocs(q));
+    const dates: string[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      if (data.reservedDates) dates.push(...data.reservedDates);
+    });
+    return Array.from(new Set(dates));
   } catch (error) {
-    console.error("Error fetching stay reservations: ", error);
+    console.error("Error fetching stay dates: ", error);
     return [];
   }
 };
 
 export const submitStayReservation = async (data: StayReservationRequest) => {
   try {
-    const docRef = await addDoc(collection(db, STAY_RES_COLLECTION), {
+    const docRef = await withTimeout(addDoc(collection(db, STAY_RES_COLLECTION), {
       ...data,
       status: "requested",
       createdAt: serverTimestamp(),
-    });
+    }));
     return { success: true, id: docRef.id };
   } catch (error) {
     console.error("Error adding stay reservation: ", error);
@@ -597,7 +746,7 @@ export const submitStayReservation = async (data: StayReservationRequest) => {
 export const cancelStayReservation = async (id: string) => {
   try {
     const docRef = doc(db, STAY_RES_COLLECTION, id);
-    await updateDoc(docRef, { status: "cancelled" });
+    await withTimeout(updateDoc(docRef, { status: "cancelled" }));
     return { success: true };
   } catch (error) {
     console.error("Error cancelling stay reservation: ", error);
@@ -608,10 +757,10 @@ export const cancelStayReservation = async (id: string) => {
 export const updateStayReservation = async (id: string, data: Partial<StayReservationRequest>) => {
   try {
     const docRef = doc(db, STAY_RES_COLLECTION, id);
-    await updateDoc(docRef, {
+    await withTimeout(updateDoc(docRef, {
       ...data,
       updatedAt: serverTimestamp(),
-    });
+    }));
     return { success: true };
   } catch (error) {
     console.error("Error updating stay reservation: ", error);
@@ -628,8 +777,8 @@ export interface MonthlyNotice {
 
 export const getMonthlyNotice = async (month: string): Promise<string> => {
   try {
-    const q = query(collection(db, MONTHLY_NOTICE_COLLECTION), where('month', '==', month), limit(1));
-    const querySnapshot = await getDocs(q);
+    const q = query(collection(db, MONTHLY_NOTICE_COLLECTION), where('month', '==', month));
+    const querySnapshot = await withTimeout(getDocs(q));
     if (querySnapshot.empty) return "";
     return querySnapshot.docs[0].data().content || "";
   } catch (error) {
@@ -641,13 +790,13 @@ export const getMonthlyNotice = async (month: string): Promise<string> => {
 export const updateMonthlyNotice = async (month: string, content: string) => {
   try {
     const q = query(collection(db, MONTHLY_NOTICE_COLLECTION), where('month', '==', month), limit(1));
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await withTimeout(getDocs(q));
     
     if (!querySnapshot.empty) {
       const docRef = doc(db, MONTHLY_NOTICE_COLLECTION, querySnapshot.docs[0].id);
-      await updateDoc(docRef, { content });
+      await withTimeout(updateDoc(docRef, { content }));
     } else {
-      await addDoc(collection(db, MONTHLY_NOTICE_COLLECTION), { month, content });
+      await withTimeout(addDoc(collection(db, MONTHLY_NOTICE_COLLECTION), { month, content }));
     }
 
     // [Trigger Notification] 
@@ -670,7 +819,7 @@ export const updateMonthlyNotice = async (month: string, content: string) => {
   }
 };
 
-// --- Extra Schedule Functions ---
+// --- Calendar & Schedule Functions ---
 const EXTRA_SCHEDULES_COLLECTION = 'extra_schedules';
 
 export const getExtraSchedules = async (month?: string): Promise<ExtraSchedule[]> => {
@@ -682,24 +831,44 @@ export const getExtraSchedules = async (month?: string): Promise<ExtraSchedule[]
       q = query(
         collection(db, EXTRA_SCHEDULES_COLLECTION),
         where('date', '>=', start),
-        where('date', '<=', end)
+        where('date', '<=', end),
+        orderBy('date', 'asc')
       );
     } else {
-      q = query(collection(db, EXTRA_SCHEDULES_COLLECTION));
+      q = query(collection(db, EXTRA_SCHEDULES_COLLECTION), orderBy('date', 'asc'), limit(300));
     }
-    const querySnapshot = await getDocs(q);
-    const results = querySnapshot.docs.map(docSnap => ({
-      id: docSnap.id,
-      ...docSnap.data()
-    } as ExtraSchedule));
-    // Sort in-memory to avoid needing a composite index
-    return results.sort((a, b) => {
-      if (a.date !== b.date) return a.date.localeCompare(b.date);
-      return (a.time || '').localeCompare(b.time || '');
+
+    const querySnapshot = await withTimeout(getDocs(q));
+    return querySnapshot.docs.map(docSnap => {
+      const data = docSnap.data();
+      return {
+        ...data,
+        id: docSnap.id,
+        imageUrl: remapStorageUrl(data.imageUrl)
+      } as unknown as ExtraSchedule;
     });
-  } catch (error) {
-    console.error("Error fetching extra schedules: ", error);
-    return [];
+  } catch (error: any) {
+    console.error("[DB ERROR] getExtraSchedules failed, falling back:", error);
+    // Fallback: Fetch latest 200 without filtering and filter in-memory
+    try {
+      const qFallback = query(collection(db, EXTRA_SCHEDULES_COLLECTION), limit(200));
+      const querySnapshot = await withTimeout(getDocs(qFallback));
+      let results = querySnapshot.docs.map(docSnap => {
+        const data = docSnap.data();
+        return {
+          ...data,
+          id: docSnap.id,
+          imageUrl: remapStorageUrl(data.imageUrl)
+        } as unknown as ExtraSchedule;
+      });
+      
+      if (month) {
+        results = results.filter(s => s.date && s.date.startsWith(month));
+      }
+      return results.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+    } catch (fallbackError) {
+      return [];
+    }
   }
 };
 
@@ -722,31 +891,154 @@ const MEDIA_COLLECTION = 'media';
 const COMMENTS_COLLECTION = 'media_comments';
 const LIKES_COLLECTION = 'media_likes';
 
-export const getMedia = async (type?: string, classId?: string, milongaDate?: string): Promise<MediaItem[]> => {
+export const getClassesByMonth = async (month: string): Promise<TangoClass[]> => {
   try {
-    let q = query(collection(db, MEDIA_COLLECTION));
+    const q = query(
+      collection(db, COLLECTION_NAME), 
+      where('targetMonth', '==', month),
+      orderBy('time', 'asc')
+    );
+    const querySnapshot = await withTimeout(getDocs(q));
+    return querySnapshot.docs.map(docSnap => {
+      const data = docSnap.data();
+      return {
+        ...data,
+        id: docSnap.id,
+        imageUrl: remapStorageUrl(data.imageUrl || data.posterUrl)
+      } as unknown as TangoClass;
+    });
+  } catch (error: any) {
+    console.error("[DB ERROR] getClassesByMonth failed, falling back:", error);
+    // Fallback: Fetch all classes (usually small collection) and filter
+    try {
+      const qFallback = query(collection(db, COLLECTION_NAME), limit(300));
+      const querySnapshot = await withTimeout(getDocs(qFallback));
+      const results = querySnapshot.docs.map(docSnap => {
+        const data = docSnap.data();
+        return {
+          ...data,
+          id: docSnap.id,
+          imageUrl: remapStorageUrl(data.imageUrl || data.posterUrl)
+        } as unknown as TangoClass;
+      });
+      return results
+        .filter(c => c.targetMonth === month)
+        .sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+    } catch (fallbackError) {
+      return [];
+    }
+  }
+};
+
+export const getAllMilongas = async (month?: string): Promise<MilongaInfo[]> => {
+  try {
+    const colName = MILONGA_INFO_COLLECTION || 'milonga_info';
+    let q;
+    
+    if (month) {
+      const start = `${month}-01`;
+      const end = `${month}-31`;
+      q = query(
+        collection(db, colName),
+        where('activeDate', '>=', start),
+        where('activeDate', '<=', end),
+        orderBy('activeDate', 'asc')
+      );
+    } else {
+      q = query(collection(db, colName), orderBy('activeDate', 'desc'), limit(100));
+    }
+
+    const querySnapshot = await withTimeout(getDocs(q));
+    return querySnapshot.docs.map(docSnap => {
+      const data = docSnap.data();
+      return {
+        ...data,
+        id: docSnap.id,
+        posterUrl: remapStorageUrl(data.posterUrl),
+        sourcePhotoUrl: remapStorageUrl(data.sourcePhotoUrl)
+      } as unknown as MilongaInfo;
+    });
+  } catch (error: any) {
+    console.warn("[DB ERROR] getAllMilongas failed, falling back:", error);
+    try {
+      const colName = MILONGA_INFO_COLLECTION || 'milonga_info';
+      const qFallback = query(collection(db, colName), limit(100));
+      const querySnapshot = await withTimeout(getDocs(qFallback));
+      let results = querySnapshot.docs.map(docSnap => {
+        const data = docSnap.data();
+        return {
+          ...data,
+          id: docSnap.id,
+          posterUrl: remapStorageUrl(data.posterUrl),
+          sourcePhotoUrl: remapStorageUrl(data.sourcePhotoUrl)
+        } as unknown as MilongaInfo;
+      });
+      if (month) {
+        results = results.filter(m => m.activeDate && m.activeDate.startsWith(month));
+      }
+      return results.sort((a, b) => (a.activeDate || '').localeCompare(b.activeDate || ''));
+    } catch (fallbackError) {
+      return [];
+    }
+  }
+};
+
+export const getMedia = async (type?: string, classId?: string, milongaDate?: string, month?: string): Promise<MediaItem[]> => {
+  try {
+    let q;
+    // Always use some limit and reliable ordering
     if (type) {
-      q = query(collection(db, MEDIA_COLLECTION), where('type', '==', type));
+      q = query(collection(db, MEDIA_COLLECTION), where('type', '==', type), orderBy('createdAt', 'desc'), limit(100));
+    } else if (classId) {
+      q = query(collection(db, MEDIA_COLLECTION), where('relatedClassId', '==', classId), orderBy('createdAt', 'desc'), limit(100));
+    } else if (milongaDate) {
+      q = query(collection(db, MEDIA_COLLECTION), where('relatedMilongaDate', '==', milongaDate), orderBy('createdAt', 'desc'), limit(100));
+    } else {
+      q = query(collection(db, MEDIA_COLLECTION), orderBy('createdAt', 'desc'), limit(200));
     }
-    const querySnapshot = await getDocs(q);
-    let results = querySnapshot.docs.map(docSnap => ({
-      id: docSnap.id,
-      ...docSnap.data()
-    } as MediaItem));
 
-    // Manual sort by createdAt desc to avoid index
-    results.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+    const querySnapshot = await withTimeout(getDocs(q));
+    let results = querySnapshot.docs.map(docSnap => {
+      const data = docSnap.data();
+      return {
+        ...data,
+        id: docSnap.id,
+        thumbnailUrl: remapStorageUrl(data.thumbnailUrl),
+        videoUrl: remapStorageUrl(data.videoUrl) 
+      } as unknown as MediaItem;
+    });
 
-    if (classId) {
-      results = results.filter(m => m.relatedClassId === classId);
+    // Simple month filtering can remain in-memory if query was broad, 
+    // or we could add more specific indexes if needed.
+    if (month) {
+      results = results.filter(m => m.createdAt?.startsWith(month));
     }
-    if (milongaDate) {
-      results = results.filter(m => m.relatedMilongaDate === milongaDate);
-    }
+
     return results;
-  } catch (error) {
-    console.error("Error fetching media: ", error);
-    return [];
+  } catch (error: any) {
+    if (error.code === 'failed-precondition') {
+      console.warn("Missing Index for getMedia. Defaulting to simple query.");
+    }
+    
+    // Fallback: query without order by if index missing
+    const qSimple = query(collection(db, MEDIA_COLLECTION), limit(200));
+    const querySnapshot = await withTimeout(getDocs(qSimple));
+    let results = querySnapshot.docs.map(docSnap => {
+      const data = docSnap.data();
+      return {
+        ...data,
+        id: docSnap.id,
+        thumbnailUrl: remapStorageUrl(data.thumbnailUrl),
+        videoUrl: remapStorageUrl(data.videoUrl) 
+      } as unknown as MediaItem;
+    });
+
+    if (month) results = results.filter(m => m.createdAt?.startsWith(month));
+    if (classId) results = results.filter(m => m.relatedClassId === classId);
+    if (milongaDate) results = results.filter(m => m.relatedMilongaDate === milongaDate);
+    if (type) results = results.filter(m => m.type === type);
+
+    return results.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
   }
 };
 
@@ -804,7 +1096,7 @@ export const incMediaView = async (id: string) => {
 export const getMediaComments = async (mediaId: string): Promise<MediaComment[]> => {
   try {
     const q = query(collection(db, COMMENTS_COLLECTION), where('mediaId', '==', mediaId), orderBy('createdAt', 'asc'));
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await withTimeout(getDocs(q));
     return querySnapshot.docs.map(docSnap => ({
       id: docSnap.id,
       ...docSnap.data()
@@ -813,7 +1105,7 @@ export const getMediaComments = async (mediaId: string): Promise<MediaComment[]>
     console.warn("Could not fetch comments with orderBy (index might be missing):", error);
     // Fallback: Fetch without orderBy and sort manually in-memory
     const qSimple = query(collection(db, COMMENTS_COLLECTION), where('mediaId', '==', mediaId));
-    const querySnapshot = await getDocs(qSimple);
+    const querySnapshot = await withTimeout(getDocs(qSimple));
     const results = querySnapshot.docs.map(docSnap => ({
       id: docSnap.id,
       ...docSnap.data()
@@ -839,7 +1131,7 @@ export const deleteMediaComment = async (id: string, mediaId: string) => {
 
 export const toggleMediaLike = async (mediaId: string, phone: string) => {
   const q = query(collection(db, LIKES_COLLECTION), where('mediaId', '==', mediaId), where('phone', '==', phone));
-  const querySnapshot = await getDocs(q);
+  const querySnapshot = await withTimeout(getDocs(q));
   
   const mediaRef = doc(db, MEDIA_COLLECTION, mediaId);
   
@@ -858,7 +1150,7 @@ export const toggleMediaLike = async (mediaId: string, phone: string) => {
 
 export const checkIfLiked = async (mediaId: string, phone: string): Promise<boolean> => {
   const q = query(collection(db, LIKES_COLLECTION), where('mediaId', '==', mediaId), where('phone', '==', phone));
-  const querySnapshot = await getDocs(q);
+  const querySnapshot = await withTimeout(getDocs(q));
   return !querySnapshot.empty;
 };
 
@@ -877,7 +1169,7 @@ export const getUserCouponUsage = async (phone: string): Promise<UserCouponUsage
       collection(db, COUPON_COLLECTION),
       where('phone', '==', phone)
     );
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await withTimeout(getDocs(q));
     return querySnapshot.docs.map(docSnap => ({
       id: docSnap.id,
       ...docSnap.data()
@@ -901,7 +1193,7 @@ export const useUserCoupon = async (phone: string, couponType: string, month: st
 // --- User Table Functions ---
 const USERS_COLLECTION = 'users';
 
-export const trackUserVisit = async (phone: string, nickname: string, photoURL?: string, role?: string, device?: string, staffRole?: string) => {
+export const trackUserVisit = async (phone: string, nickname: string, photoURL?: string, role?: string, device?: string, staffRole?: string | string[]) => {
   if (!phone) return;
   const cleanPhone = phone.replace(/[^0-9]/g, '');
   const docRef = doc(db, USERS_COLLECTION, cleanPhone);
@@ -913,12 +1205,12 @@ export const trackUserVisit = async (phone: string, nickname: string, photoURL?:
     visitCount: increment(1),
   };
   if (device) data.device = device;
-  if (photoURL) data.photoURL = photoURL;
+  if (photoURL) data.photoURL = remapStorageUrl(photoURL);
   if (role) data.role = role;
   if (staffRole) data.staffRole = staffRole;
   
   // Create if not exists, merge for visits
-  const docSnap = await getDoc(docRef);
+  const docSnap = await withTimeout(getDoc(docRef));
   if (!docSnap.exists()) {
     data.createdAt = serverTimestamp();
   }
@@ -941,10 +1233,11 @@ export const getUserByPhone = async (phone: string): Promise<User | null> => {
   const cleanPhone = phone.replace(/[^0-9]/g, '');
   try {
     const docRef = doc(db, USERS_COLLECTION, cleanPhone);
-    const docSnap = await getDoc(docRef);
+    const docSnap = await withTimeout(getDoc(docRef));
     
     if (!docSnap.exists()) return null;
-    return { ...docSnap.data() } as User;
+    const data = docSnap.data();
+    return { ...data, photoURL: remapStorageUrl(data.photoURL) } as User;
   } catch (error) {
     console.error("Error fetching user: ", error);
     return null;
@@ -956,10 +1249,14 @@ export const getUsers = async (search?: string): Promise<User[]> => {
     // Note: ordering by lastVisit will exclude users WHO DO NOT HAVE the field.
     // For admin search, we should probably order by nickname or just fetch all and filter.
     const q = query(collection(db, USERS_COLLECTION), limit(500));
-    const querySnapshot = await getDocs(q);
-    let results = querySnapshot.docs.map(docSnap => ({
-      ...docSnap.data()
-    } as User));
+    const querySnapshot = await withTimeout(getDocs(q));
+    let results = querySnapshot.docs.map(docSnap => {
+      const data = docSnap.data();
+      return {
+        ...data,
+        photoURL: remapStorageUrl(data.photoURL)
+      } as User;
+    });
 
     if (search) {
       const lowerSearch = search.toLowerCase();
@@ -1022,8 +1319,19 @@ export const getCoachingItems = async (params: { studentPhone?: string, instruct
       }
     }
 
-    const snap = await getDocs(q);
-    const results = snap.docs.map(d => ({ id: d.id, ...d.data() } as CoachingItem));
+    const snap = await withTimeout(getDocs(q));
+    const results = snap.docs.map(d => {
+      const data = d.data();
+      return { 
+        id: d.id, 
+        ...data,
+        studentPhotoURL: remapStorageUrl(data.studentPhotoURL),
+        instructorPhotoURL: remapStorageUrl(data.instructorPhotoURL),
+        // Handle both singular and plural (legacy compatibility)
+        mediaUrl: remapStorageUrl(data.mediaUrl),
+        mediaUrls: Array.isArray(data.mediaUrls) ? data.mediaUrls.map(remapStorageUrl) : []
+      } as CoachingItem;
+    });
     
     // Final filter and sort
     results.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
@@ -1061,13 +1369,29 @@ export const getCoachingUpdates = async (coachingItemId: string): Promise<Coachi
       where('coachingItemId', '==', coachingItemId),
       orderBy('createdAt', 'asc')
     );
-    const snap = await getDocs(q);
-    return snap.docs.map(d => ({ id: d.id, ...d.data() } as CoachingUpdate));
+    const snap = await withTimeout(getDocs(q));
+    return snap.docs.map(d => {
+      const data = d.data();
+      return { 
+        id: d.id, 
+        ...data,
+        mediaUrl: remapStorageUrl(data.mediaUrl),
+        mediaUrls: Array.isArray(data.mediaUrls) ? data.mediaUrls.map(remapStorageUrl) : []
+      } as CoachingUpdate;
+    });
   } catch (error) {
     console.warn("Could not fetch coaching updates with index:", error);
     const qSimple = query(collection(db, COACHING_UPDATES_COLLECTION), where('coachingItemId', '==', coachingItemId));
-    const snap = await getDocs(qSimple);
-    const results = snap.docs.map(d => ({ id: d.id, ...d.data() } as CoachingUpdate));
+    const snap = await withTimeout(getDocs(qSimple));
+    const results = snap.docs.map(d => {
+      const data = d.data();
+      return { 
+        id: d.id, 
+        ...data,
+        mediaUrl: remapStorageUrl(data.mediaUrl),
+        mediaUrls: Array.isArray(data.mediaUrls) ? data.mediaUrls.map(remapStorageUrl) : []
+      } as CoachingUpdate;
+    });
     return results.sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
   }
 };

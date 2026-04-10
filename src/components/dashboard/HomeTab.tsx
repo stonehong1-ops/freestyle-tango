@@ -156,7 +156,7 @@ export default function HomeTab({
     ...classes.map(c => c.targetMonth).filter(Boolean) as string[]
   ])).sort().reverse();
 
-  const filteredClasses = classes.filter(cls => (cls.targetMonth || '2026-04') === selectedMonth);
+  const filteredClasses = classes.filter(cls => !cls.targetMonth || cls.targetMonth === selectedMonth);
 
   const groupedClasses = filteredClasses.reduce((acc, cls) => {
     const dayName = cls.time.match(/([월화수목금토일]요일)/)?.[1] || '기타';

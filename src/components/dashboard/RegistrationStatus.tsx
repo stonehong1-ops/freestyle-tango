@@ -215,9 +215,9 @@ export default function RegistrationStatus({ classes, selectedMonth, onClose, re
   };
 
   // Filter classes for the current selection month
-  const activeMonthClasses = classes.filter(c => (c.targetMonth || '2026-04') === selectedMonth);
+  const filteredClasses = classes.filter(cls => !cls.targetMonth || cls.targetMonth === selectedMonth);
 
-  const grouped = activeMonthClasses.reduce((acc, cls) => {
+  const grouped = filteredClasses.reduce((acc, cls) => {
     const dayName = cls.time.match(/([월화수목금토일]요일)/)?.[1] || '기타';
     if (!acc[dayName]) acc[dayName] = [];
     acc[dayName].push(cls);
