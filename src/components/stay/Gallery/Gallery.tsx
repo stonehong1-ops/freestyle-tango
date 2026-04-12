@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useModalHistory } from '@/hooks/useModalHistory';
+import { SafeStorage } from '@/lib/storage';
+import { hasRole } from '@/utils/auth';
+import { getStayGalleryMetadata, updateStayGalleryMetadata } from '@/lib/db';
 import styles from './Gallery.module.css';
 
 const baseCategories = ['전체', '거실', '침실', '키친', '화장실', '뷰'];
@@ -67,12 +70,34 @@ const galleryDataMap: Record<string, any[]> = {
   hongdae: hapjeongImages
 };
 
-export default function Gallery({ stayId = 'hapjeong' }: { stayId?: string }) {
-  const { t } = useLanguage();
+export default function Gallery({ stayId: propsStayId }: { stayId: string }) {
+  const stayId = propsStayId === 'hapjeong' ? 'hapjeong' : propsStayId;
+  const { t, language } = useLanguage();
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [currentMainIdx, setCurrentMainIdx] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  
+  const [dynamicDescriptions, setDynamicDescriptions] = useState<Record<string, string[]>>({});
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showEditor, setShowEditor] = useState(false);
+  const [editValue, setEditValue] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    const user = SafeStorage.getJson<any>('ft_user');
+    if (user && hasRole(user, 'admin')) {
+      setIsAdmin(true);
+    }
+
+    const fetchMetadata = async () => {
+      const meta = await getStayGalleryMetadata(stayId);
+      if (meta && meta.descriptions) {
+        setDynamicDescriptions(meta.descriptions);
+      }
+    };
+    fetchMetadata();
+  }, [stayId]);
 
   // Swipe logic
   const minSwipeDistance = 50;
@@ -114,13 +139,45 @@ export default function Gallery({ stayId = 'hapjeong' }: { stayId?: string }) {
 
   const currentImages = galleryDataMap[stayId] || galleryDataMap['hapjeong'];
 
-  const imageData = currentImages.map((img, idx) => ({
-    ...img,
-    category: stayGallery?.categories?.[img.categoryId] || baseCategories[img.categoryId] || 'Stay',
-    desc: stayGallery?.descriptions?.[idx] || ''
-  }));
+  const imageData = currentImages.map((img, idx) => {
+    const dbDesc = dynamicDescriptions[language]?.[idx];
+    return {
+      ...img,
+      category: stayGallery?.categories?.[img.categoryId] || baseCategories[img.categoryId] || 'Stay',
+      desc: dbDesc || stayGallery?.descriptions?.[idx] || ''
+    };
+  });
 
   useModalHistory(lightboxIndex !== null, () => setLightboxIndex(null), 'gallery');
+  useModalHistory(showEditor, () => setShowEditor(false), 'gallery_editor');
+
+  const handleSaveDescription = async () => {
+    if (isSaving) return;
+    setIsSaving(true);
+    try {
+      const idx = showEditor && lightboxIndex !== null ? lightboxIndex : currentMainIdx;
+      const newDescArray = [...(dynamicDescriptions[language] || stayGallery?.descriptions || [])];
+      
+      // Pad array if needed
+      while (newDescArray.length <= idx) newDescArray.push('');
+      
+      newDescArray[idx] = editValue;
+      
+      const newMeta = {
+        ...dynamicDescriptions,
+        [language]: newDescArray
+      };
+      
+      await updateStayGalleryMetadata(stayId, newMeta);
+      setDynamicDescriptions(newMeta);
+      setShowEditor(false);
+    } catch (err) {
+      console.error("Save failed:", err);
+      alert("저장에 실패했습니다.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -186,9 +243,26 @@ export default function Gallery({ stayId = 'hapjeong' }: { stayId?: string }) {
         <div className={styles.imageCounter}>
           {currentMainIdx + 1} / {imageData.length}
         </div>
+      </div>
 
-        <div className={styles.captionOverlay}>
-          <p className={styles.captionText}>{imageData[currentMainIdx].desc}</p>
+      {/* Caption Content BELOW the image */}
+      <div className={styles.captionBlock}>
+        <div className={styles.captionHeader}>
+          <span className={styles.captionCategory}>
+            "{imageData[currentMainIdx].desc || imageData[currentMainIdx].category}"
+          </span>
+          {isAdmin && (
+            <button 
+              className={styles.adminEditBtn}
+              onClick={(e) => {
+                e.stopPropagation();
+                setEditValue(imageData[currentMainIdx].desc);
+                setShowEditor(true);
+              }}
+            >
+              ✏️ 편집
+            </button>
+          )}
         </div>
       </div>
 
@@ -221,22 +295,67 @@ export default function Gallery({ stayId = 'hapjeong' }: { stayId?: string }) {
             className={styles.lightboxImageContainer} 
             onClick={(e) => e.stopPropagation()}
           >
-            <Image 
-              src={imageData[lightboxIndex].src} 
-              alt={imageData[lightboxIndex].category} 
-              fill 
-              className={styles.lightboxImage}
-              sizes="100vw"
-              priority
-            />
+            <div className={styles.lightboxImageWrapper}>
+              <Image 
+                src={imageData[lightboxIndex].src} 
+                alt={imageData[lightboxIndex].category} 
+                fill 
+                className={styles.lightboxImage}
+                sizes="100vw"
+                priority
+              />
+            </div>
             
-            <div className={styles.captionOverlay}>
-               <h3 className={styles.captionTitle}>{imageData[lightboxIndex].desc}</h3>
-               <p className={styles.captionCategory}>{imageData[lightboxIndex].category} - {lightboxIndex + 1} / {imageData.length}</p>
+            <div className={styles.lightboxCaptionBlock}>
+               <div className={styles.captionHeader}>
+                 <span className={styles.captionCategory}>
+                   "{imageData[lightboxIndex].desc || imageData[lightboxIndex].category}"
+                 </span>
+               </div>
+               <div className={styles.lightboxCounter}>
+                 {lightboxIndex + 1} / {imageData.length}
+               </div>
             </div>
           </div>
           
           <button className={styles.lightboxNext} onClick={nextImage}>&#10095;</button>
+        </div>
+      )}
+
+      {/* Admin Editor Bottom Sheet */}
+      {showEditor && (
+        <div className={styles.editorOverlay} onClick={() => setShowEditor(false)}>
+          <div className={styles.bottomSheet} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.sheetHeader}>
+              <h3>설명 편집</h3>
+              <button className={styles.closeBtn} onClick={() => setShowEditor(false)}>&times;</button>
+            </div>
+            <div className={styles.sheetContent}>
+              <p className={styles.langHint}>현재 언어: {language.toUpperCase()}</p>
+              <textarea 
+                className={styles.editArea}
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                placeholder="이미지 설명을 입력하세요..."
+                autoFocus
+              />
+              <div className={styles.sheetActions}>
+                <button 
+                  className={styles.cancelBtn} 
+                  onClick={() => setShowEditor(false)}
+                >
+                  취소
+                </button>
+                <button 
+                  className={styles.saveBtn} 
+                  onClick={handleSaveDescription}
+                  disabled={isSaving}
+                >
+                  {isSaving ? '저장 중...' : '저장하기'}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -1606,3 +1606,29 @@ export const deleteCoachingUpdate = async (updateId: string, coachingItemId: str
     milestones: newMilestones
   });
 };
+
+// --- Stay Gallery Metadata ---
+export interface StayGalleryMetadata {
+  descriptions: Record<string, string[]>; // { ko: ["desc1", "desc2"], en: [...] }
+}
+
+const STAY_METADATA_COLLECTION = 'stay_metadata';
+
+export const getStayGalleryMetadata = async (stayId: string): Promise<StayGalleryMetadata | null> => {
+  try {
+    const docRef = doc(db, STAY_METADATA_COLLECTION, stayId);
+    const snap = await getDoc(docRef);
+    if (snap.exists()) {
+      return snap.data() as StayGalleryMetadata;
+    }
+    return null;
+  } catch (err) {
+    console.warn("Error fetching gallery metadata:", err);
+    return null;
+  }
+};
+
+export const updateStayGalleryMetadata = async (stayId: string, descriptions: Record<string, string[]>) => {
+  const docRef = doc(db, STAY_METADATA_COLLECTION, stayId);
+  return await setDoc(docRef, { descriptions }, { merge: true });
+};

@@ -114,7 +114,9 @@ export default {
     },
     "stay": {
       "viewMonthly": "Ver Estado Mensual",
-      "monthlyTitle": "Estado Global de Reservas"
+      "monthlyTitle": "Estado Global de Reservas",
+      "legendReserved": "Reserved",
+      "legendAvailable": "Available"
     },
     "registration": {
       "title": "Registro de Clases",

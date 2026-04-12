@@ -1,13 +1,9 @@
-- [/] i18n 구조 완전 동기화 (ko.ts 기준 9개 언어)
-    - [ ] vi.ts 구조 수정
 - [x] i18n 구조 완전 동기화 (ko.ts 기준 9개 언어)
-    - [x] vi.ts 구조 수정
-    - [x] zh-CN.ts 구조 수정
-    - [x] zh-TW.ts 구조 수정
-    - [x] es.ts 구조 수정
-    - [x] fr.ts 구조 수정
-    - [x] it.ts 구조 수정
-    - [x] tr.ts 구조 수정
+    - [x] 수정 사항 구현
+    - [x] `Gallery.tsx` 수정 (메인 뷰 설명 표시 및 라이트박스 편집 버튼 제거)
+    - [x] `Gallery.module.css` 수정 (폰트 강조 및 레이아웃 조정)
+- [x] 로컬 확인
+- [x] 배포 및 알림 (`/deploy` 워크플로우 실행)
 - [x] Firestore 복합 인덱스 생성 확인 (chat_rooms: participants array-contains + type ascending)
 - [x] 프로덕션 빌드 및 배포
     - [x] `npm run test:locales` 검증

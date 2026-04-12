@@ -1,4 +1,4 @@
-﻿.container {
+.container {
   display: flex;
   flex-direction: column;
 }
@@ -797,6 +797,38 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   animation: bounceHint 2s infinite;
   pointer-events: none;
+}
+
+.inlineLegend {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin: 0.5rem 0 2rem;
+  font-size: 0.9rem;
+  color: #4e5968;
+  font-weight: 600;
+}
+
+.inlineLegendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.inlineLegendBox {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+.inlineLegendBox.booked {
+  background-color: #fff0f6;
+  border: 1px solid #ffdde8;
+}
+
+.inlineLegendBox.available {
+  background-color: #f9fafb;
+  border: 1px solid #e5e8eb;
 }
 
 .floatingHint::after {

@@ -6,6 +6,7 @@ import { MediaItem, addMedia, TangoClass, CURRENT_REGISTRATION_MONTH, getClasses
 import { ref, getDownloadURL } from 'firebase/storage';
 import { useAuth } from '@/contexts/AuthContext';
 import { uploadFile } from '@/lib/storage';
+import { generateVideoThumbnail } from '@/lib/image-utils';
 
 interface MediaEditorProps {
   initialData?: MediaItem | null;
@@ -33,7 +34,8 @@ const MediaEditor: React.FC<MediaEditorProps> = ({ initialData, onClose, onSave,
     (initialData?.type === 'image' ? initialData.videoUrl : null) ||
     null
   );
-  const [file, setFile] = useState<File | null>(null);
+   const [file, setFile] = useState<File | null>(null);
+  const [thumbnailBlob, setThumbnailBlob] = useState<Blob | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
   const [isClassDropdownOpen, setIsClassDropdownOpen] = useState(false);
@@ -74,15 +76,37 @@ const MediaEditor: React.FC<MediaEditorProps> = ({ initialData, onClose, onSave,
     }
   }, [formData.videoUrl, formData.type, file]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
     setFile(selectedFile);
+    setThumbnailBlob(null);
+
     if (selectedFile) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setThumbnailPreview(reader.result as string);
-      };
-      reader.readAsDataURL(selectedFile);
+      // 1. Image Preview
+      if (selectedFile.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setThumbnailPreview(reader.result as string);
+        };
+        reader.readAsDataURL(selectedFile);
+      } 
+      // 2. Video Thumbnail Generation
+      else if (selectedFile.type.startsWith('video/')) {
+        try {
+          const blob = await generateVideoThumbnail(selectedFile);
+          setThumbnailBlob(blob);
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setThumbnailPreview(reader.result as string);
+          };
+          reader.readAsDataURL(blob);
+        } catch (err) {
+          console.error("Thumbnail generation failed:", err);
+          setThumbnailPreview(null);
+        }
+      } else {
+        setThumbnailPreview(null);
+      }
     } else {
       setThumbnailPreview(null);
     }
@@ -117,23 +141,27 @@ const MediaEditor: React.FC<MediaEditorProps> = ({ initialData, onClose, onSave,
         });
       }
 
-      if (formData.type === 'youtube') {
+       if (formData.type === 'youtube') {
         let id = finalVideoUrl;
         if (id.includes('v=')) id = id.split('v=')[1].split('&')[0];
         else if (id.includes('youtu.be/')) id = id.split('youtu.be/')[1].split('?')[0];
         else if (id.includes('shorts/')) id = id.split('shorts/')[1].split('?')[0];
         finalVideoUrl = id;
         thumbnailUrl = `https://img.youtube.com/vi/${id}/mqdefault.jpg`;
-      } else {
-        // We no longer force class poster as thumbnail for demonstration/general
-        // These will now fallback to video frame (#t=0.5) in MediaList
+      } else if (thumbnailBlob) {
+        // Upload generated thumbnail
+        const uid = currentUser?.uid || 'temp';
+        const thumbPath = `thumbnails/${uid}/${Date.now()}_thumb.jpg`;
+        thumbnailUrl = await uploadFile(thumbnailBlob, thumbPath);
+      } else if (initialData?.thumbnailUrl) {
+        thumbnailUrl = initialData.thumbnailUrl;
       }
 
       const mediaData = {
         type: formData.type as any,
         title: formData.title || '',
         videoUrl: finalVideoUrl,
-        thumbnailUrl: (formData.type === 'youtube' ? (thumbnailUrl || formData.thumbnailUrl) : ''),
+        thumbnailUrl: thumbnailUrl,
         relatedClassId: formData.relatedClassId || '',
         uploaderNickname: formData.uploaderNickname || user?.nickname || 'Admin',
         uploaderPhone: formData.uploaderPhone || user?.phone || '',
@@ -217,10 +245,10 @@ const MediaEditor: React.FC<MediaEditorProps> = ({ initialData, onClose, onSave,
                 <div className={styles.thumbnailPreview}>
                    {formData.type === 'youtube' ? (
                      <img src={thumbnailPreview} alt="Youtube Preview" />
-                   ) : formData.type === 'image' ? (
-                     <img src={thumbnailPreview} alt="Image Preview" />
+                   ) : formData.type === 'image' || thumbnailBlob ? (
+                     <img src={thumbnailPreview} alt="Preview" />
                    ) : (
-                     <video src={thumbnailPreview.startsWith('data:') ? thumbnailPreview : `${thumbnailPreview}#t=0.5`} controls={thumbnailPreview.startsWith('data:')} />
+                     <video src={thumbnailPreview?.startsWith('data:') ? thumbnailPreview : `${thumbnailPreview}#t=0.5`} controls={thumbnailPreview?.startsWith('data:')} />
                    )}
                 </div>
               )}

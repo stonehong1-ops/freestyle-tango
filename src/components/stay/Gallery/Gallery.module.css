@@ -15,6 +15,7 @@
   cursor: pointer;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
+  margin-bottom: 0.5rem;
 }
 
 @media (min-width: 768px) {
@@ -191,6 +192,170 @@
   z-index: 3;
 }
 
+.captionHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+  width: 100%;
+}
+
+.captionCategory {
+  font-size: 1.15rem;
+  font-weight: 850;
+  color: #3182f6; /* Eye-catching primary blue */
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+.adminEditBtn {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #4b5563;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+}
+
+.adminEditBtn:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.editIcon {
+  width: 12px;
+  height: 12px;
+}
+
+/* Admin Editor Bottom Sheet */
+.editorOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 2000;
+  display: flex;
+  align-items: flex-end;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.bottomSheet {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  padding: 1.5rem;
+  box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.sheetHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.sheetHeader h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  color: #111827;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #9ca3af;
+  cursor: pointer;
+}
+
+.langHint {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-bottom: 0.5rem;
+}
+
+.editArea {
+  width: 100%;
+  min-height: 120px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 0.875rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  resize: none;
+  margin-bottom: 1.5rem;
+  font-family: inherit;
+}
+
+.editArea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.sheetActions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.cancelBtn, .saveBtn {
+  flex: 1;
+  padding: 0.875rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  font-size: 1rem;
+}
+
+.cancelBtn {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.saveBtn {
+  background: #111827;
+  color: #fff;
+}
+
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cancelBtn:hover {
+  background: #e5e7eb;
+}
+
+.saveBtn:not(:disabled):hover {
+  background: #000;
+}
+
 .captionText {
   font-size: 0.95rem;
   font-weight: 700;
@@ -211,4 +376,31 @@
   .captionOverlay {
     padding: 4rem 2rem 1.5rem;
   }
+}
+
+.lightboxCaptionBlock {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 3rem 1.5rem 1.5rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 70%, transparent 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.lightboxCaptionBlock .captionCategory {
+  color: #ffffff;
+  font-size: 1.15rem;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+
+.lightboxCounter {
+  color: #9ca3af;
+  font-size: 0.85rem;
+  font-weight: 500;
 }

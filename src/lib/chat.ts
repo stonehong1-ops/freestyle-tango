@@ -165,10 +165,21 @@ export const sendMessage = async (message: Omit<ChatMessage, 'id' | 'timestamp' 
     const roomRef = doc(db, ROOMS_COLLECTION, message.roomId);
     const roomSnap = await getDoc(roomRef);
     const roomDataFirestore = roomSnap.exists() ? roomSnap.data() as any : {};
-    const participants = roomDataFirestore.participants || roomData?.participants || [];
+    
+    // Get participants from Firestore, or fallback to passed roomData, or finally unreadCounts keys
+    let participants = roomDataFirestore.participants || roomData?.participants || [];
+    if (participants.length === 0 && roomDataFirestore.unreadCounts) {
+      participants = Object.keys(roomDataFirestore.unreadCounts);
+    }
     
     // Update unreadCounts for others
     const currentUnreadCounts = roomDataFirestore.unreadCounts || {};
+    
+    // Ensure sender is in unreadCounts for future tracking
+    if (currentUnreadCounts[cleanSenderId] === undefined) {
+      currentUnreadCounts[cleanSenderId] = 0;
+    }
+
     participants.forEach((p: string) => {
       // Use consistent cleaning for participant IDs too
       const cleanP = (p === 'admin' || p.length < 6) ? p : p.replace(/[^0-9]/g, '');
@@ -248,6 +259,39 @@ export const resetUnreadCount = async (roomId: string, userPhone: string) => {
     });
   } catch (err) {
     console.error("Error resetting unread count:", err);
+  }
+};
+
+export const ensureParticipant = async (roomId: string, userPhone: string) => {
+  try {
+    const cleanPhone = (userPhone === 'admin' || userPhone.length < 6) ? userPhone : userPhone.replace(/[^0-9]/g, '');
+    const roomRef = doc(db, ROOMS_COLLECTION, roomId);
+    const roomSnap = await getDoc(roomRef);
+    
+    if (roomSnap.exists()) {
+      const data = roomSnap.data();
+      const participants = data.participants || [];
+      const unreadCounts = data.unreadCounts || {};
+      
+      let needsUpdate = false;
+      const updateData: any = {};
+      
+      if (!participants.includes(cleanPhone)) {
+        updateData.participants = arrayUnion(cleanPhone);
+        needsUpdate = true;
+      }
+      
+      if (unreadCounts[cleanPhone] === undefined) {
+        updateData[`unreadCounts.${cleanPhone}`] = 0;
+        needsUpdate = true;
+      }
+      
+      if (needsUpdate) {
+        await updateDoc(roomRef, updateData);
+      }
+    }
+  } catch (err) {
+    console.error("Error ensuring participant:", err);
   }
 };
 

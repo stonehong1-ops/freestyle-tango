@@ -7,6 +7,7 @@ import {
   getMonthlyNotice, 
   getStayReservationList,
   getUserByPhone,
+  trackUserVisit,
   TangoClass, 
   User,
   Registration, 
@@ -40,19 +41,33 @@ export function useProjectData() {
 
   const syncUserFromDB = async (phone: string) => {
     try {
+      const user = SafeStorage.getJson<any>('ft_user');
       const dbUser = await getUserByPhone(phone);
+      
       if (dbUser) {
+        // Data Protection: Prioritize local identity if DB is sparse (e.g. background FCM update created a thin doc)
         const updatedUser = {
+          ...user,
           ...dbUser,
-          // Support both staffRole and staffrole from DB for legacy compatibility
-          staffRole: dbUser.staffRole || (dbUser as any).staffrole
+          // Only use DB value if it actually exists/has content to prevent overwriting local with null
+          nickname: dbUser.nickname || user?.nickname,
+          photoURL: dbUser.photoURL || user?.photoURL,
+          role: dbUser.role || user?.role,
+          staffRole: dbUser.staffRole || (dbUser as any).staffrole || user?.staffRole
         };
+
+        // If DB was missing identity info but we had it locally, restore it to DB (Self-healing)
+        if (!dbUser.nickname && user?.nickname) {
+          console.log('[Sync] Restoring missing DB identity info from local storage');
+          const cleanPhone = phone.replace(/[^0-9]/g, '');
+          // We don't wait for this to avoid blocking UI
+          trackUserVisit(cleanPhone, user.nickname, user.photoURL, user.role, 'unknown', user.staffRole);
+        }
+
         setCurrentUser(updatedUser);
         SafeStorage.setJson('ft_user', updatedUser);
         checkAdminStatus(updatedUser);
-        
-        // window.dispatchEvent(new CustomEvent('ft_user_updated')); // 순환 호출 방지를 위해 제거
-        console.log('User profile synced from DB:', updatedUser.staffRole);
+        console.log('User profile synced and protected:', updatedUser.nickname);
       }
     } catch (error) {
       console.error('Error syncing user from DB:', error);

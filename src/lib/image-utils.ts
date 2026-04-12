@@ -66,3 +66,53 @@ export const compressImage = async (
     reader.onerror = () => reject(new Error('File reader failed'));
   });
 };
+
+export const generateVideoThumbnail = async (
+  file: File,
+  time: number = 0.5
+): Promise<Blob> => {
+  return new Promise((resolve, reject) => {
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.muted = true;
+    video.playsInline = true;
+
+    const videoUrl = URL.createObjectURL(file);
+    video.src = videoUrl;
+
+    video.onloadedmetadata = () => {
+      // Ensure we don't seek beyond duration
+      const seekTime = Math.min(time, video.duration);
+      video.currentTime = seekTime;
+    };
+
+    video.onseeked = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        URL.revokeObjectURL(videoUrl);
+        reject(new Error('Canvas context not available'));
+        return;
+      }
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob((blob) => {
+        URL.revokeObjectURL(videoUrl);
+        if (blob) resolve(blob);
+        else reject(new Error('Canvas toBlob failed'));
+      }, 'image/jpeg', 0.8);
+    };
+
+    video.onerror = (e) => {
+      URL.revokeObjectURL(videoUrl);
+      reject(new Error('Video failed to load'));
+    };
+
+    // Timeout after 10 seconds
+    setTimeout(() => {
+      URL.revokeObjectURL(videoUrl);
+      reject(new Error('Thumbnail generation timed out'));
+    }, 10000);
+  });
+};

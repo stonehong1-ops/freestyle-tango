@@ -9,6 +9,7 @@ import {
   inviteUserToChatRoom,
   searchUsers,
   maskPhoneNumber,
+  ensureParticipant,
   COMMUNITY_ROOM_ID,
   NOTICE_ROOM_ID
 } from '@/lib/chat';
@@ -114,6 +115,13 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
       setCurrentParticipants(participants);
     }
   }, [participants]);
+
+  // Ensure user is in participants list for unread count tracking
+  useEffect(() => {
+    if (roomId && user.phone) {
+      ensureParticipant(roomId, user.phone);
+    }
+  }, [roomId, user.phone]);
 
   useEffect(() => {
     const unsubscribe = subscribeMessages(roomId, (newMessages) => {
@@ -440,8 +448,13 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
   const handleEdit = (msg: ChatMessage) => {
     setEditingMsgId(msg.id);
     setEditText(msg.text);
-    setShowEditModal(true);
+    // Hide menu first (triggers history.back() via useModalHistory)
     setMenuMsgId(null);
+    
+    // Slight delay to allow history pop to complete before pushing new state
+    setTimeout(() => {
+      setShowEditModal(true);
+    }, 100);
   };
 
   const handleSaveEdit = async () => {

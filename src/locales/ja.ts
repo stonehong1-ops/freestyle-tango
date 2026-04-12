@@ -114,7 +114,9 @@ export default {
     },
     "stay": {
       "viewMonthly": "View Monthly Status",
-      "monthlyTitle": "Monthly Reservation Status"
+      "monthlyTitle": "Monthly Reservation Status",
+      "legendReserved": "Reserved",
+      "legendAvailable": "Available"
     },
     "registration": {
       "title": "Class Registration",
@@ -308,7 +310,7 @@ export default {
     },
     "tabs": {
       "registration": "{month}月 申込み",
-      "history": "履歴",
+      "history": "受講状況",
       "wallet": "ウォレット",
       "coaching": "コーチング",
       "profile": "プロフィール",
@@ -437,8 +439,8 @@ export default {
   },
   "info": {
     "tabs": {
-      "location": "位置",
-      "membership": "メンバー",
+      "location": "施設案内",
+      "membership": "メンバーシップ",
       "story": "ストーリー"
     }
   },

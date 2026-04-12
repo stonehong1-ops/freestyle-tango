@@ -115,7 +115,9 @@ export default {
     },
     stay: {
       viewMonthly: 'View Monthly Status',
-      monthlyTitle: 'Monthly Reservation Status'
+      monthlyTitle: 'Monthly Reservation Status',
+      legendReserved: 'Reserved',
+      legendAvailable: 'Available'
     },
     registration: {
       title: 'Class Registration',
@@ -289,7 +291,7 @@ export default {
     },
     tabs: {
       registration: '{month} Apply',
-      history: 'History',
+      history: 'Class Status',
       wallet: 'Wallet',
       coaching: 'Coaching',
       profile: 'Profile',
@@ -418,8 +420,8 @@ export default {
   },
   info: {
     tabs: {
-      location: 'Location',
-      membership: 'Member',
+      location: 'Facilities',
+      membership: 'Membership',
       story: 'Story'
     }
   },

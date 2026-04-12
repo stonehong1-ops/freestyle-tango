@@ -114,7 +114,9 @@ export default {
     },
     "stay": {
       "viewMonthly": "查看月度总状态",
-      "monthlyTitle": "月度总预约状态"
+      "monthlyTitle": "月度总预约状态",
+      "legendReserved": "Reserved",
+      "legendAvailable": "Available"
     },
     "registration": {
       "title": "课程申请",
@@ -308,7 +310,7 @@ export default {
     },
     "tabs": {
       "registration": "{month}月申请",
-      "history": "现状",
+      "history": "上课情况",
       "wallet": "钱包",
       "coaching": "教练",
       "profile": "资料",
@@ -437,7 +439,7 @@ export default {
   },
   "info": {
     "tabs": {
-      "location": "位置",
+      "location": "设施指南",
       "membership": "会员",
       "story": "故事"
     }

@@ -747,6 +747,16 @@ export default function CalendarSection({
 
       {(showInlineGrid || forceListView) && (
         <section className={styles.inlineListSection}>
+          <div className={styles.inlineLegend}>
+            <div className={styles.inlineLegendItem}>
+              <span className={`${styles.inlineLegendBox} ${styles.booked}`} />
+              <span>{t.home.stay.legendReserved}</span>
+            </div>
+            <div className={styles.inlineLegendItem}>
+              <span className={`${styles.inlineLegendBox} ${styles.available}`} />
+              <span>{t.home.stay.legendAvailable}</span>
+            </div>
+          </div>
           
           <div className={styles.inlineMonthGrid}>
             {(() => {

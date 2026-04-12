@@ -37,16 +37,16 @@ interface Props {
   onSubTabChange?: (tab: string) => void;
 }
 
-export default function UserMyPage({ 
-  classes, 
+export default function UserMyPage({
+  classes,
   registrations,
   reservations,
-  selectedMonth, 
-  availableMonths, 
+  selectedMonth,
+  availableMonths,
   isAdmin,
-  onMonthChange, 
+  onMonthChange,
   onOpenCouponEditor,
-  onHome, 
+  onHome,
   requireIdentity,
   user,
   onUpdate,
@@ -54,7 +54,7 @@ export default function UserMyPage({
   onSubTabChange
 }: Props) {
   const { t, language } = useLanguage();
-  const [activeSubTab, setActiveSubTab] = useState<'history' | 'profile' | 'wallet' | 'coaching' | 'admin'>('history');
+  const [activeSubTab, setActiveSubTab] = useState<'history' | 'profile' | 'wallet' | 'coaching' | 'admin'>('wallet');
 
   useEffect(() => {
     onSubTabChange?.(activeSubTab);
@@ -66,7 +66,7 @@ export default function UserMyPage({
 
   useModalHistory(showMemberManagement, () => setShowMemberManagement(false), 'memberManagement');
   const [showGlobalCoaching, setShowGlobalCoaching] = useState(false);
-  
+
   useModalHistory(showGlobalCoaching, () => setShowGlobalCoaching(false), 'globalCoaching');
   useModalHistory(showStayChecklist, () => setShowStayChecklist(false), 'stayChecklist');
   useModalHistory(showStaySMS, () => setShowStaySMS(false), 'staySMS');
@@ -82,7 +82,7 @@ export default function UserMyPage({
   useModalHistory(showRecipientsModal, () => setShowRecipientsModal(false), 'couponRecipients');
   useModalHistory(!!selectedCoachingItem, () => setSelectedCoachingItem(null), 'coachingDetail');
 
-  const [selectedRecipients, setSelectedRecipients] = useState<{title: string, participants: any[]}>({ title: '', participants: [] });
+  const [selectedRecipients, setSelectedRecipients] = useState<{ title: string, participants: any[] }>({ title: '', participants: [] });
   const [userCoupons, setUserCoupons] = useState<UserCoupon[]>([]);
   const [activeCoupons, setActiveCoupons] = useState<Coupon[]>([]);
   const [isLoadingCoupons, setIsLoadingCoupons] = useState(false);
@@ -98,7 +98,7 @@ export default function UserMyPage({
       }
       setIdentity(user);
     };
-    
+
     loadUser();
     window.addEventListener('ft_user_updated', loadUser);
     return () => window.removeEventListener('ft_user_updated', loadUser);
@@ -160,10 +160,10 @@ export default function UserMyPage({
 
   const handlePushToggle = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!identity?.phone) return;
-    
+
     const newValue = e.target.checked;
     setIsSyncingPush(true);
-    
+
     try {
       if (newValue) {
         // Turning ON: Request permission and register token
@@ -178,17 +178,17 @@ export default function UserMyPage({
           } catch (regError: any) {
             console.error("FCM Reg Toggle Error:", regError);
             let detail = regError.message || 'UNKNOWN';
-            
+
             // Try to parse JSON if it's a detail object
             try {
               if (detail.startsWith('{')) {
                 const parsed = JSON.parse(detail);
                 detail = `[${parsed.name}] ${parsed.code}: ${parsed.message}`;
               }
-            } catch (pErr) {}
+            } catch (pErr) { }
 
-            const errorMsg = language === 'ko' 
-              ? `알림 등록에 실패했습니다.\n상세 정보: ${detail}\n\n브라우저 설정의 알림 허용 여부나 네트워크를 확인해주세요.` 
+            const errorMsg = language === 'ko'
+              ? `알림 등록에 실패했습니다.\n상세 정보: ${detail}\n\n브라우저 설정의 알림 허용 여부나 네트워크를 확인해주세요.`
               : `Token registration failed.\nDetails: ${detail}\n\nPlease check your browser's notification settings or network.`;
             alert(errorMsg);
             setPushEnabled(false);
@@ -205,8 +205,8 @@ export default function UserMyPage({
     } catch (err: any) {
       console.error("Push toggle error:", err);
       const detail = err?.message || err?.code || 'Unknown error';
-      alert(language === 'ko' 
-        ? `설정 업데이트 중 오류가 발생했습니다: ${detail}` 
+      alert(language === 'ko'
+        ? `설정 업데이트 중 오류가 발생했습니다: ${detail}`
         : `Error updating settings: ${detail}`);
     } finally {
       setIsSyncingPush(false);
@@ -237,7 +237,7 @@ export default function UserMyPage({
 
   const handleIssueCoupon = async (couponId: string) => {
     if (!identity?.nickname || !identity?.phone) return;
-    
+
     // 1. Eligibility Check (April Student)
     if (!isEligible) {
       alert(language === 'ko' ? '이번 달 수업진행중인 사용자만 받을 수 있습니다' : 'Only available for students this month.');
@@ -249,10 +249,10 @@ export default function UserMyPage({
       const now = Date.now();
       const lastIssuedAt = Math.max(...userCoupons.map(uc => uc.issuedAt?.toMillis() || 0));
       const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
-      
+
       if (now - lastIssuedAt < sevenDaysInMs) {
-        alert(language === 'ko' 
-          ? '마지막 쿠폰 받은 7일 이후에 다른 쿠폰을 받을 수 있습니다' 
+        alert(language === 'ko'
+          ? '마지막 쿠폰 받은 7일 이후에 다른 쿠폰을 받을 수 있습니다'
           : 'You can receive another coupon 7 days after your last claim.');
         return;
       }
@@ -261,12 +261,12 @@ export default function UserMyPage({
     // 3. Sold Out Check
     const targetCoupon = activeCoupons.find(c => c.id === couponId);
     if (targetCoupon && targetCoupon.issuedCount >= targetCoupon.totalQuantity) {
-      alert(language === 'ko' 
-        ? `정해진 쿠폰 ${targetCoupon.totalQuantity}매가 모두 발급되었습니다` 
+      alert(language === 'ko'
+        ? `정해진 쿠폰 ${targetCoupon.totalQuantity}매가 모두 발급되었습니다`
         : `All ${targetCoupon.totalQuantity} coupons have been issued.`);
       return;
     }
-    
+
     if (window.confirm(language === 'ko' ? '이 쿠폰을 받으시겠습니까?' : 'Would you like to get this coupon?')) {
       const res = await issueCoupon(couponId, identity.phone, identity.nickname);
       if (res.success) {
@@ -307,10 +307,10 @@ export default function UserMyPage({
   const handleUseCoupon = async (userCouponId: string) => {
     const target = userCoupons.find(uc => uc.id === userCouponId);
     if (!target) return;
-    
+
     const now = new Date();
     const isExpired = target.expiresAt && target.expiresAt.toDate() < now;
-    
+
     if (isExpired || target.status === 'EXPIRED') {
       alert(language === 'ko' ? '사용 기간이 만료되어 사용할 수 없는 쿠폰입니다' : 'This coupon has expired and cannot be used.');
       fetchCoupons();
@@ -325,8 +325,8 @@ export default function UserMyPage({
 
   // Eligibility check: current month (2026-04) classes
   const isEligible = registrations?.some(reg => {
-    const isThisUser = (identity?.phone && reg.phone?.replace(/[^0-9]/g, '') === identity.phone.replace(/[^0-9]/g, '')) || 
-                      (identity?.nickname && reg.nickname === identity.nickname);
+    const isThisUser = (identity?.phone && reg.phone?.replace(/[^0-9]/g, '') === identity.phone.replace(/[^0-9]/g, '')) ||
+      (identity?.nickname && reg.nickname === identity.nickname);
     const isThisMonth = reg.month === (selectedMonth || '2026-04');
     return isThisUser && isThisMonth;
   });
@@ -334,43 +334,43 @@ export default function UserMyPage({
   return (
     <div className={styles.container}>
       <div className={styles.subTabs}>
-        <button 
-          className={`${styles.subTabBtn} ${activeSubTab === 'coaching' ? styles.active : ''}`}
-          onClick={() => setActiveSubTab('coaching')}
-        >
-          {t.mypage.tabs.coaching}
-        </button>
-        <button 
+        <button
           className={`${styles.subTabBtn} ${activeSubTab === 'wallet' ? styles.active : ''}`}
           onClick={() => setActiveSubTab('wallet')}
         >
           {t.mypage.tabs.wallet}
         </button>
-        <button 
+        <button
           className={`${styles.subTabBtn} ${activeSubTab === 'history' ? styles.active : ''}`}
           onClick={() => setActiveSubTab('history')}
         >
           {t.mypage.tabs.history}
         </button>
-        <button 
+        <button
+          className={`${styles.subTabBtn} ${activeSubTab === 'coaching' ? styles.active : ''}`}
+          onClick={() => setActiveSubTab('coaching')}
+        >
+          {t.mypage.tabs.coaching}
+        </button>
+        <button
           className={`${styles.subTabBtn} ${activeSubTab === 'profile' ? styles.active : ''}`}
           onClick={() => setActiveSubTab('profile')}
         >
           {t.mypage.tabs.profile}
         </button>
-          {canAccessAdmin && (
-            <button 
-              className={`${styles.subTabBtn} ${activeSubTab === 'admin' ? styles.active : ''}`}
-              onClick={() => setActiveSubTab('admin')}
-            >
-              {t.mypage.tabs.admin}
-            </button>
-          )}
+        {canAccessAdmin && (
+          <button
+            className={`${styles.subTabBtn} ${activeSubTab === 'admin' ? styles.active : ''}`}
+            onClick={() => setActiveSubTab('admin')}
+          >
+            {t.mypage.tabs.admin}
+          </button>
+        )}
       </div>
 
       <div className={`${styles.selectorRow} ${activeSubTab !== 'history' ? styles.hidden : ''}`}>
-        <button 
-          className="nav-btn-standard" 
+        <button
+          className="nav-btn-standard"
           onClick={() => {
             const idx = availableMonths?.indexOf(selectedMonth) ?? -1;
             if (idx > 0) onMonthChange?.(availableMonths[idx - 1]);
@@ -385,8 +385,8 @@ export default function UserMyPage({
           {selectedMonth?.split('-')?.[0] || ''}년 {parseInt(selectedMonth?.split('-')?.[1] || '0')}월
         </div>
 
-        <button 
-          className="nav-btn-standard" 
+        <button
+          className="nav-btn-standard"
           onClick={() => {
             const idx = availableMonths?.indexOf(selectedMonth) ?? -1;
             if (idx !== -1 && idx < (availableMonths?.length ?? 0) - 1) onMonthChange?.(availableMonths[idx + 1]);
@@ -403,8 +403,8 @@ export default function UserMyPage({
           <section className={`${styles.section} ${activeSubTab !== 'history' ? styles.hidden : ''}`}>
             <div className={styles.historyCardList}>
               {(() => {
-                const myRegistrations = registrations?.filter(reg => 
-                  (identity?.phone && reg.phone?.replace(/[^0-9]/g, '') === identity.phone.replace(/[^0-9]/g, '')) || 
+                const myRegistrations = registrations?.filter(reg =>
+                  (identity?.phone && reg.phone?.replace(/[^0-9]/g, '') === identity.phone.replace(/[^0-9]/g, '')) ||
                   (identity?.nickname && reg.nickname === identity.nickname)
                 ) || [];
 
@@ -419,7 +419,7 @@ export default function UserMyPage({
                           {reg.status === 'paid' ? (language === 'ko' ? '결제완료' : 'Paid') : (language === 'ko' ? '입금확인중' : 'Pending')}
                         </div>
                       </div>
-                      
+
                       <div className={styles.premiumCardBody}>
                         <div className={styles.premiumClassList}>
                           {reg.classIds?.map(cid => {
@@ -481,16 +481,16 @@ export default function UserMyPage({
               <div className={styles.couponList}>
                 {(() => {
                   // Group coupons by creation date
-                  const sorted = [...activeCoupons].sort((a, b) => 
+                  const sorted = [...activeCoupons].sort((a, b) =>
                     (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0)
                   );
-                  
+
                   let lastDate = '';
                   return sorted.map((coupon, index) => {
                     const userCoupon = userCoupons.find(uc => uc.couponId === coupon.id);
                     const isSoldOut = coupon.issuedCount >= coupon.totalQuantity;
                     const issuancesForThis = allIssuances[coupon.id!] || [];
-                    
+
                     let buttonStatus: 'CLAIM' | 'USE' | 'USED' | 'SOLDOUT' = 'CLAIM';
                     let buttonText = language === 'ko' ? '쿠폰받기' : 'Get Coupon';
                     let userCouponId = '';
@@ -518,7 +518,7 @@ export default function UserMyPage({
                     const currentDate = coupon.createdAt?.toDate().toLocaleDateString('ko-KR', {
                       year: 'numeric', month: '2-digit', day: '2-digit'
                     }) || '';
-                    
+
                     const showSeparator = currentDate !== lastDate;
                     lastDate = currentDate;
 
@@ -535,20 +535,19 @@ export default function UserMyPage({
                               {coupon.type === 'FREE' ? (language === 'ko' ? '무료' : 'FREE') : (coupon.discountValue || '0')}
                             </div>
                             <div className={styles.discountUnit}>
-                              {coupon.type === 'FREE' 
-                                ? (language === 'ko' ? '입장권' : 'Pass') 
-                                : (language === 'ko' 
-                                    ? (Number(coupon.discountValue) >= 1000 ? '원 할인' : '만원 할인') 
-                                    : 'OFF')}
+                              {coupon.type === 'FREE'
+                                ? (language === 'ko' ? '입장권' : 'Pass')
+                                : (language === 'ko'
+                                  ? (Number(coupon.discountValue) >= 1000 ? '원 할인' : '만원 할인')
+                                  : 'OFF')}
                             </div>
                           </div>
 
                           <div className={styles.couponMiddle}>
                             <div className={styles.statusBadgeRow}>
-                              <span className={`${styles.statusBadge} ${
-                                buttonStatus === 'CLAIM' || buttonStatus === 'USE' ? styles.availableText : 
-                                buttonStatus === 'USED' ? styles.usedText : styles.expiredText
-                              }`}>
+                              <span className={`${styles.statusBadge} ${buttonStatus === 'CLAIM' || buttonStatus === 'USE' ? styles.availableText :
+                                  buttonStatus === 'USED' ? styles.usedText : styles.expiredText
+                                }`}>
                                 {buttonStatus === 'CLAIM' && (language === 'ko' ? '발급가능' : 'Available')}
                                 {buttonStatus === 'USE' && (language === 'ko' ? '사용가능' : 'Ready')}
                                 {buttonStatus === 'USED' && (language === 'ko' ? '사용완료' : 'Used')}
@@ -561,15 +560,15 @@ export default function UserMyPage({
                               {userCoupon?.expiresAt ? (
                                 `${language === 'ko' ? '만료' : 'Exp'}: ${userCoupon.expiresAt.toDate().toLocaleDateString()}`
                               ) : (
-                                language === 'ko' ? 
-                                  (coupon.duration > 0 ? `발급 후 ${coupon.duration}개월 이내 사용` : '기간 제한 없음') : 
+                                language === 'ko' ?
+                                  (coupon.duration > 0 ? `발급 후 ${coupon.duration}개월 이내 사용` : '기간 제한 없음') :
                                   (coupon.duration > 0 ? `Use within ${coupon.duration} months` : 'No expiry limit')
                               )}
                             </div>
 
                             {/* Recipient List moved to icon and bottom sheet */}
                             {issuancesForThis.length > 0 && (
-                              <button 
+                              <button
                                 className={styles.recipientCountBtn}
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -592,7 +591,7 @@ export default function UserMyPage({
                           </div>
 
                           <div className={styles.couponRight}>
-                            <button 
+                            <button
                               className={`${styles.couponBtn} ${buttonStatus === 'USE' ? styles.useBtn : ''}`}
                               disabled={buttonStatus === 'USED' || buttonStatus === 'SOLDOUT'}
                               onClick={() => {
@@ -618,10 +617,10 @@ export default function UserMyPage({
 
           <section className={`${styles.section} ${activeSubTab !== 'coaching' ? styles.hidden : ''}`} style={{ padding: 0 }}>
             {identity && (
-              <CoachingList 
+              <CoachingList
                 isAdmin={false}
-                onClose={() => setActiveSubTab('history')} 
-                onSelectItem={(item) => setSelectedCoachingItem(item)} 
+                onClose={() => setActiveSubTab('history')}
+                onSelectItem={(item) => setSelectedCoachingItem(item)}
               />
             )}
           </section>
@@ -631,7 +630,7 @@ export default function UserMyPage({
               <>
                 <div className={styles.profileHeader}>
                   <div className={styles.avatarWrapper}>
-                    <div className={styles.avatarCircle} style={{ 
+                    <div className={styles.avatarCircle} style={{
                       background: identity.photoURL ? `url(${remapStorageUrl(identity.photoURL)}) center/cover no-repeat` : '#f2f4f6'
                     }}>
                       {!identity.photoURL && (
@@ -662,12 +661,12 @@ export default function UserMyPage({
                     <span className={styles.infoLabel}>{language === 'ko' ? '전화번호' : 'Phone'}</span>
                     <span className={styles.infoValue}>{identity.phone}</span>
                   </div>
-                  
+
                   <div className={styles.infoItem}>
                     <span className={styles.infoLabel}>{language === 'ko' ? '푸시 알림' : 'Push Notification'}</span>
                     <div className={styles.toggleSwitch}>
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         id="pushToggle"
                         checked={pushEnabled}
                         onChange={handlePushToggle}
@@ -714,7 +713,7 @@ export default function UserMyPage({
                     <div className={styles.adminMenuArrow}>›</div>
                   </button>
                 )}
-                
+
                 {hasPermission(userRole, 'manage_stays') && (
                   <>
                     <button className={styles.adminMenuItem} onClick={() => setShowStayChecklist(true)}>
@@ -725,7 +724,7 @@ export default function UserMyPage({
                       </div>
                       <div className={styles.adminMenuArrow}>›</div>
                     </button>
-                    
+
                     <button className={styles.adminMenuItem} onClick={() => setShowStaySMS(true)}>
                       <div className={styles.adminMenuIcon}>💬</div>
                       <div className={styles.adminMenuContent}>
@@ -736,7 +735,7 @@ export default function UserMyPage({
                     </button>
                   </>
                 )}
-                
+
                 {userRole === 'admin' && (
                   <button className={styles.adminMenuItem} onClick={onOpenCouponEditor}>
                     <div className={styles.adminMenuIcon}>🎫</div>
@@ -759,7 +758,7 @@ export default function UserMyPage({
         title={language === 'ko' ? '내 정보 수정' : 'Edit My Info'}
         isBottomSheet={true}
       >
-        <IdentityForm 
+        <IdentityForm
           onClose={() => setShowEditModal(false)}
           onComplete={handleEditComplete}
           isEdit={true}
@@ -771,9 +770,9 @@ export default function UserMyPage({
         onClose={() => setShowMemberManagement(false)}
         title={language === 'ko' ? '회원 관리' : 'Member Management'}
       >
-        <MemberManagement 
+        <MemberManagement
           registrations={registrations || []}
-          onClose={() => setShowMemberManagement(false)} 
+          onClose={() => setShowMemberManagement(false)}
         />
       </FullscreenModal>
 
@@ -783,12 +782,12 @@ export default function UserMyPage({
         title={language === 'ko' ? '전체 코칭 관리' : 'Coaching Management'}
       >
         <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-          <CoachingList 
+          <CoachingList
             isAdmin={true}
-            onClose={() => setShowGlobalCoaching(false)} 
+            onClose={() => setShowGlobalCoaching(false)}
             onSelectItem={(item) => {
               setSelectedCoachingItem(item);
-            }} 
+            }}
           />
         </div>
       </FullscreenModal>
@@ -798,7 +797,7 @@ export default function UserMyPage({
         onClose={() => setShowStayChecklist(false)}
         title={language === 'ko' ? '스테이 체크리스트' : 'Stay Checklist'}
       >
-        <AdminChecklist 
+        <AdminChecklist
           classes={classes}
           registrations={registrations || []}
           reservations={reservations || []}
@@ -810,7 +809,7 @@ export default function UserMyPage({
         onClose={() => setShowStaySMS(false)}
         title={language === 'ko' ? '스테이 문자설정' : 'Stay SMS Settings'}
       >
-        <StayTemplateEditor 
+        <StayTemplateEditor
           onClose={() => setShowStaySMS(false)}
           language={language}
         />
@@ -832,20 +831,20 @@ export default function UserMyPage({
               selectedRecipients.participants.map((iss, i) => {
                 // Correctly match photo logic
                 const isCurrentUser = (iss.userId.replace(/[^0-9]/g, '') === identity?.phone.replace(/[^0-9]/g, ''));
-                const reg = registrations?.find(r => 
-                  (r.phone?.replace(/[^0-9]/g, '') === iss.userId.replace(/[^0-9]/g, '')) || 
+                const reg = registrations?.find(r =>
+                  (r.phone?.replace(/[^0-9]/g, '') === iss.userId.replace(/[^0-9]/g, '')) ||
                   (r.nickname === (iss.userName || iss.userId))
                 );
 
                 const displayPhotoURL = (isCurrentUser && identity?.photoURL) ? remapStorageUrl(identity.photoURL) : (reg?.photoURL ? remapStorageUrl(reg.photoURL) : undefined);
                 const displayName = iss.userName || reg?.nickname || '알 수 없음';
-                
+
                 return (
                   <div key={i} className={styles.modalRecipientRow}>
                     <div className={styles.recipientInfo}>
-                      <div 
+                      <div
                         className={styles.recipientAvatar}
-                        style={displayPhotoURL ? { 
+                        style={displayPhotoURL ? {
                           backgroundImage: `url(${displayPhotoURL})`,
                           backgroundSize: 'cover',
                           backgroundPosition: 'center',
@@ -869,7 +868,7 @@ export default function UserMyPage({
 
                     <div className={styles.recipientActions}>
                       {isCurrentUser && iss.status === 'UNUSED' && (
-                        <button 
+                        <button
                           className={styles.cancelIssuanceBtn}
                           onClick={() => handleCancelCoupon(iss.id!, iss.couponId)}
                         >
@@ -887,11 +886,11 @@ export default function UserMyPage({
       {selectedCoachingItem && (
         <div className={styles.fullModalOverlay}>
           <div className={styles.fullModalContent}>
-            <CoachingDetail 
-              item={selectedCoachingItem} 
-              currentUser={identity!} 
+            <CoachingDetail
+              item={selectedCoachingItem}
+              currentUser={identity!}
               isAdmin={isAdmin}
-              onBack={() => setSelectedCoachingItem(null)} 
+              onBack={() => setSelectedCoachingItem(null)}
             />
           </div>
         </div>

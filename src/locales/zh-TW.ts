@@ -114,7 +114,9 @@ export default {
     },
     "stay": {
       "viewMonthly": "查看月度總狀態",
-      "monthlyTitle": "月度總預約狀態"
+      "monthlyTitle": "月度總預約狀態",
+      "legendReserved": "Reserved",
+      "legendAvailable": "Available"
     },
     "registration": {
       "title": "課程申請",
@@ -308,7 +310,7 @@ export default {
     },
     "tabs": {
       "registration": "{month}月申請",
-      "history": "現狀",
+      "history": "上課情況",
       "wallet": "錢包",
       "coaching": "教練",
       "profile": "資料",
@@ -437,7 +439,7 @@ export default {
   },
   "info": {
     "tabs": {
-      "location": "位置",
+      "location": "設施指南",
       "membership": "會員",
       "story": "故事"
     }

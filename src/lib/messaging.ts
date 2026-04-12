@@ -1,6 +1,6 @@
 import { getMessaging, getToken, onMessage, isSupported, deleteToken } from "firebase/messaging";
 import { app, db } from "./firebase";
-import { collection, doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { collection, doc, setDoc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 
 function getVapidKey(): string {
   // Use environment variable from Vercel, fallback to the confirmed working key for freestyle-tango-seoul
@@ -91,13 +91,31 @@ export async function registerFCMToken(userPhone?: string): Promise<string | nul
 
       // 2. Force Enable Push Settings for this user (Self-healing)
       if (cleanPhone) {
-        await setDoc(doc(collection(db, "users"), cleanPhone), {
-          phone: cleanPhone, // Ensure phone field exists
-          settings: {
-            pushEnabled: true,
-            updatedAt: serverTimestamp()
-          }
-        }, { merge: true });
+        // We use merge: true, but better to be explicit or use updateDoc if document might exist
+        // To prevent creating "sparse" users that cause issues with local sync,
+        // we should ideally ensure identity fields are preserved.
+        const userRef = doc(db, "users", cleanPhone);
+        const userSnap = await getDoc(userRef);
+        
+        if (!userSnap.exists()) {
+          // If user doesn't exist in DB yet, but is registered locally, 
+          // we should let useProjectData's trackUserVisit handle the creation 
+          // with full info. Here we just ensure settings are initialized if we MUST.
+          await setDoc(userRef, {
+            phone: cleanPhone,
+            settings: {
+              pushEnabled: true,
+              updatedAt: serverTimestamp()
+            }
+          }, { merge: true });
+        } else {
+          // If user exists, only update settings to avoid touching other fields
+          await updateDoc(userRef, {
+            "settings.pushEnabled": true,
+            "settings.updatedAt": serverTimestamp(),
+            phone: cleanPhone // Ensure phone is there
+          });
+        }
         console.log(`[FCM] Push settings forced to ON for ${cleanPhone}`);
       }
       

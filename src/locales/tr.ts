@@ -114,7 +114,9 @@ export default {
     },
     "stay": {
       "viewMonthly": "Aylık Durumu Gör",
-      "monthlyTitle": "Genel Rezervasyon Durumu"
+      "monthlyTitle": "Genel Rezervasyon Durumu",
+      "legendReserved": "Reserved",
+      "legendAvailable": "Available"
     },
     "registration": {
       "title": "Ders Kaydı",

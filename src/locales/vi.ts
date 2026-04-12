@@ -114,7 +114,9 @@ export default {
     },
     "stay": {
       "viewMonthly": "Xem tình trạng tháng",
-      "monthlyTitle": "Tình trạng đặt phòng tổng quát"
+      "monthlyTitle": "Tình trạng đặt phòng tổng quát",
+      "legendReserved": "Reserved",
+      "legendAvailable": "Available"
     },
     "registration": {
       "title": "Đăng ký lớp học",

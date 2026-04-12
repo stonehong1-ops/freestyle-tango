@@ -115,7 +115,9 @@ export default {
     },
     stay: {
       viewMonthly: '월별 전체 현황 보기',
-      monthlyTitle: '월별 전체 예약 현황'
+      monthlyTitle: '월별 전체 예약 현황',
+      legendReserved: '예약됨',
+      legendAvailable: '예약가능'
     },
     registration: {
       title: '수업 신청',
@@ -309,7 +311,7 @@ export default {
     },
     tabs: {
       registration: '{month}월 신청',
-      history: '현황',
+      history: '수업현황',
       wallet: '지갑',
       coaching: '코칭',
       profile: '내정보',
@@ -438,8 +440,8 @@ export default {
   },
   info: {
     tabs: {
-      location: '위치',
-      membership: '멤버',
+      location: '시설안내',
+      membership: '멤버쉽',
       story: '스토리'
     }
   },

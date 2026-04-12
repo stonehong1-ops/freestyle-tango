@@ -114,7 +114,9 @@ export default {
     },
     "stay": {
       "viewMonthly": "Voir l'état mensuel",
-      "monthlyTitle": "État Global des Réservations"
+      "monthlyTitle": "État Global des Réservations",
+      "legendReserved": "Reserved",
+      "legendAvailable": "Available"
     },
     "registration": {
       "title": "Inscription aux Cours",
