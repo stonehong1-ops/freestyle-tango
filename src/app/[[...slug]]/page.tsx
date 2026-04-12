@@ -96,7 +96,7 @@ export default function Home({
     setAppliedClassIds
   } = projectData;
 
-  const userPhone = currentUser?.phone.replace(/[^0-9]/g, '');
+  const userPhone = currentUser?.phone?.replace(/[^0-9]/g, '') || '';
   const userRegistrations = registrations.filter(r => r.phone === userPhone);
 
   // UI States
@@ -205,6 +205,17 @@ const [showLucyEditor, setShowLucyEditor] = useState(false);
     return () => window.removeEventListener('popstate', handlePopState);
   }, [lastBackPress, activeTab]);
 
+  // Centralized Scroll Reset Logic
+  useEffect(() => {
+    // 브라우저의 자동 스크롤 복원 기능을 끄고 우리가 수동으로 제어
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+    
+    // 탭이나 서브탭이 변경될 때마다 화면 최상단으로 스크롤 고정
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [activeTab, homeSubTab, milongaSubTab, mypageSubTab]);
+
   useEffect(() => {
     const user = SafeStorage.getJson<any>('ft_user');
     const cleanPhone = user ? user.phone?.replace(/[^0-9]/g, '') : null;
@@ -252,6 +263,22 @@ const [showLucyEditor, setShowLucyEditor] = useState(false);
     window.addEventListener('CHAT_NOTIFICATION', handleChatNotification);
     return () => window.removeEventListener('CHAT_NOTIFICATION', handleChatNotification);
   }, []);
+
+  // Handle manual chat room opening from other components
+  useEffect(() => {
+    const handleOpenChat = (e: any) => {
+      const { roomId, roomName, participants } = e.detail;
+      if (roomId) {
+        setSelectedChatRoomId(roomId);
+        setSelectedChatRoomName(roomName || (language === 'ko' ? '채팅방' : 'Chat Room'));
+        setSelectedParticipants(participants || []);
+        setActiveTab('chat');
+      }
+    };
+
+    window.addEventListener('ft_open_chat', handleOpenChat);
+    return () => window.removeEventListener('ft_open_chat', handleOpenChat);
+  }, [language]);
 
   // Heartbeat for dwell time tracking
   useEffect(() => {

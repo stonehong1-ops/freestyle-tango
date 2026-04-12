@@ -9,29 +9,42 @@ import { COMMUNITY_ROOM_ID } from '@/lib/chat';
  * GET /api/notifications/cron?type=morning | afternoon
  */
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const type = searchParams.get('type');
   const authHeader = req.headers.get('authorization');
-  
-  // [임시 진단용] 요청이 들어왔음을 Firestore에 즉시 기록
-  try {
-    await adminFirestore.collection('cron_logs').add({
-      type: `triggered_${type}`,
-      timestamp: FieldValue.serverTimestamp(),
-      authHeader: authHeader ? 'present' : 'missing',
-      envSecret: process.env.CRON_SECRET ? 'configured' : 'missing'
-    });
-  } catch (e) {
-    console.error('Failed to log trigger', e);
+  const { searchParams } = new URL(req.url);
+  const isForce = searchParams.get('force') === 'true';
+
+  // [임시 진단용] 요청이 들어왔음을 Firestore에 즉시 기록 시도
+  if (adminFirestore) {
+    try {
+      await adminFirestore.collection('cron_logs').add({
+        type: 'cron_trigger_attempt',
+        timestamp: FieldValue.serverTimestamp(),
+        authHeader: authHeader ? 'present' : 'missing',
+        isForce,
+        envSecret: process.env.CRON_SECRET ? 'present' : 'missing',
+        adminInit: !!adminFirestore ? 'ok' : 'failed'
+      });
+    } catch (e) {
+      console.error('Failed to log trigger', e);
+    }
   }
 
-  // 보안 검증
-  if (process.env.NODE_ENV === 'production' && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  // Security check: Vercel Cron Secret (force=true 파라미터로 우회 허용 - 긴급 조치용)
+  if (!isForce && process.env.NODE_ENV === 'production' && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-
   try {
+    const type = searchParams.get('type');
+    
+    if (!adminFirestore || !adminMessaging) {
+      return NextResponse.json({ 
+        error: 'Firebase Admin not initialized. Check FIREBASE_SERVICE_ACCOUNT environment variable.',
+        adminFirestore: !!adminFirestore,
+        adminMessaging: !!adminMessaging
+      }, { status: 500 });
+    }
+
     if (type === 'morning') {
       return await handleMorningSchedule();
     } else if (type === 'afternoon') {
@@ -205,7 +218,7 @@ async function handleAfternoonSummary() {
   let successCount = 0;
   let failureCount = 0;
 
-  if (tokens.length > 0) {
+    if (tokens.length > 0) {
     const response = await adminMessaging.sendEachForMulticast({
       tokens,
       notification: {
@@ -213,11 +226,11 @@ async function handleAfternoonSummary() {
         body: displayBody,
       },
       data: {
-        link: '/chatting',
+        link: `/chatting?roomId=${COMMUNITY_ROOM_ID}`,
         type: 'chat_summary'
       },
       webpush: {
-        fcmOptions: { link: '/chatting' }
+        fcmOptions: { link: `/chatting?roomId=${COMMUNITY_ROOM_ID}` }
       }
     });
     successCount = response.successCount;

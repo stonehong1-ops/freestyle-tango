@@ -6,6 +6,7 @@ import { db } from '@/lib/firebase';
 import { BlockedDateInfo, FullStayReservation, cancelStayReservation, updateStayReservation } from '@/lib/db';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useModalHistory } from '@/hooks/useModalHistory';
+import { calculateStayPrice } from '@/lib/stay-utils';
 import styles from './CalendarSection.module.css';
 
 const maskName = (name: string) => {
@@ -66,6 +67,14 @@ export default function CalendarSection({
   const [blockedDates, setBlockedDates] = useState<BlockedDateInfo[]>([]);
   const [reservations, setReservations] = useState<FullStayReservation[]>([]);
   const [guests, setGuests] = useState(1);
+  const [isHintVisible, setIsHintVisible] = useState(false);
+
+  useEffect(() => {
+    if (isHintVisible) {
+      const timer = setTimeout(() => setIsHintVisible(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [isHintVisible]);
 
   useEffect(() => {
     console.log(`Setting up real-time listener for ${stayId} reservations...`);
@@ -170,12 +179,23 @@ export default function CalendarSection({
       setCheckIn(dateStr);
       setCheckOut(null);
 
-      // 다음 날이 예약되어 있다면 자동으로 체크아웃으로 설정 (편의 기능)
       const nextDay = new Date(dateStr);
       nextDay.setDate(nextDay.getDate() + 1);
       const nextDayStr = nextDay.toISOString().split('T')[0];
+
       if (blockedDates.some(b => b.date === nextDayStr)) {
         setCheckOut(nextDayStr);
+        setIsHintVisible(false);
+        
+        // 다음 날 예약 차단으로 인한 자동 체크아웃 시 즉시 예약 트리거
+        if (onReserve) {
+          const pricing = calculateStayPrice(stayId, dateStr, nextDayStr, guests);
+          if (pricing) {
+            onReserve({ checkIn: dateStr, checkOut: nextDayStr, guests, pricing });
+          }
+        }
+      } else {
+        setIsHintVisible(true);
       }
     } else {
       const start = new Date(checkIn);
@@ -212,67 +232,20 @@ export default function CalendarSection({
         }
       } else {
         setCheckOut(dateStr);
+        setIsHintVisible(false);
+        
+        // 즉시 예약 트리거
+        if (onReserve) {
+          const pricing = calculateStayPrice(stayId, checkIn, dateStr, guests);
+          if (pricing) {
+            onReserve({ checkIn, checkOut: dateStr, guests, pricing });
+          }
+        }
       }
     }
   };
 
-  const calculateDetailedPrice = (ci?: string, co?: string, g?: number) => {
-    const startStr = ci || checkIn;
-    const endStr = co || checkOut;
-    const gCount = g || guests;
-    
-    if (!startStr || !endStr) return null;
-    
-    const start = new Date(startStr);
-    const end = new Date(endStr);
-    const nights = Math.max(1, Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
-    
-    let baseNightly = 0;
-    let guestSurcharge = 0;
-    let weekendSurcharge = 0;
-    
-    const holidays = [
-        "2024-01-01", "2024-02-09", "2024-02-12", "2024-03-01", "2024-04-10", "2024-05-05", "2024-05-06",
-        "2024-05-15", "2024-06-06", "2024-08-15", "2024-09-16", "2024-09-17", "2024-09-18", "2024-10-03",
-        "2024-10-09", "2024-12-25",
-        "2025-01-01", "2025-01-28", "2025-01-29", "2025-01-30", "2025-03-03", "2025-05-05", "2025-05-06",
-        "2025-06-06", "2025-08-15", "2025-10-03", "2025-10-06", "2025-10-07", "2025-10-08", "2025-10-09", "2025-12-25",
-        "2026-01-01", "2026-02-16", "2026-02-17", "2026-02-18", "2026-03-01", "2026-03-02", "2026-05-05",
-        "2026-05-24", "2026-05-25", "2026-06-06", "2026-08-15", "2026-08-17", "2026-09-24", "2026-09-25",
-        "2026-09-26", "2026-09-28", "2026-10-03", "2026-10-05", "2026-10-09", "2026-12-25"
-    ];
-
-    for (let i = 0; i < nights; i++) {
-        const currentDate = new Date(start);
-        currentDate.setDate(start.getDate() + i);
-        const day = currentDate.getDay();
-        
-        const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth()+1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
-        
-        const basePrice = stayId === 'deokeun' ? 60000 : 80000;
-        baseNightly += basePrice;
-        
-        if (gCount > 1) {
-            guestSurcharge += (gCount - 1) * 10000;
-        }
-        
-        const isWeekend = day === 5 || day === 6; // Friday/Saturday nights (weekend pricing)
-        if (isWeekend || holidays.includes(dateStr)) {
-            weekendSurcharge += 10000;
-        }
-    }
-
-    const cleaningFee = 30000;
-    let discount = 0;
-    if (nights >= 14) discount = 40000;
-    else if (nights >= 7) discount = 20000;
-
-    const total = baseNightly + guestSurcharge + weekendSurcharge + cleaningFee - discount;
-
-    return { nights, baseNightly, guestSurcharge, weekendSurcharge, cleaningFee, discount, total };
-  };
-
-  const pricing = calculateDetailedPrice();
+  const pricing = checkIn && checkOut ? calculateStayPrice(stayId, checkIn, checkOut, guests) : null;
 
   const handleReserveClick = () => {
     if (!checkIn || !checkOut || !pricing) return;
@@ -333,6 +306,11 @@ export default function CalendarSection({
               &times;
             </button>
           </header>
+          <div className={styles.legendInModal}>
+            <span className={styles.legItemInModal}>
+              <span className={`${styles.box} ${styles.booked}`} /> {language === 'ko' ? '예약됨' : 'Booked'}
+            </span>
+          </div>
           <div className={styles.listView}>
             {monthsToShow.map((mDate) => {
               const year = mDate.getFullYear();
@@ -375,7 +353,7 @@ export default function CalendarSection({
                 const isSpanning = rEnd.getMonth() !== month || rEnd.getFullYear() !== year;
 
                 if (endDayOfRes >= startDayOfRes) {
-                  const resPrice = calculateDetailedPrice(res.checkIn, res.checkOut, res.guests);
+                  const resPrice = calculateStayPrice(stayId, res.checkIn, res.checkOut, res.guests);
                   listItems.push({
                     type: 'booked',
                     start: startDayOfRes,
@@ -624,7 +602,6 @@ export default function CalendarSection({
                   className={styles.deleteBtn} 
                   onClick={(e) => {
                     e.stopPropagation();
-                    window.alert("기능 작동 확인용: 삭제 클릭됨 / DB ID: " + res.id);
                     handleCancel(res.id);
                   }} 
                   style={{ flex: 1 }}
@@ -718,15 +695,21 @@ export default function CalendarSection({
                   const dayNum = parseInt(dStr.split('-')[2]);
 
                   return (
-                    <button 
-                      key={dStr} 
-                      type="button" 
-                      disabled={isPast}
-                      className={classNames}
-                      onClick={() => handleDateClick(dStr)}
-                    >
-                      {dayNum}
-                    </button>
+                    <div key={dStr} className={styles.dayWrapper}>
+                      <button 
+                        type="button" 
+                        disabled={isPast}
+                        className={classNames}
+                        onClick={() => handleDateClick(dStr)}
+                      >
+                        {dayNum}
+                      </button>
+                      {isCheckIn && !checkOut && isHintVisible && (
+                        <div className={styles.floatingHint}>
+                          {t.calendar.hintSelectOut}
+                        </div>
+                      )}
+                    </div>
                   );
                 })}
               </div>
@@ -745,7 +728,7 @@ export default function CalendarSection({
             {selectedResForDetail && renderDetailModal()}
 
             <div className={styles.reserveAction}>
-              {(!checkIn || !checkOut) ? (
+              {(!checkIn || !checkOut) && (
                 <div className={styles.baseInfoList}>
                   <h3>{stayCal.feeGuideTitle}</h3>
                   <ul>
@@ -756,88 +739,6 @@ export default function CalendarSection({
                     ))}
                   </ul>
                 </div>
-              ) : (
-                <>
-                  {pricing && (
-                    <div className={styles.pricingDetails}>
-                      <div className={styles.stayInfoBox}>
-                        <div className={styles.stayDates}>
-                          {(() => {
-                            const d = new Date(checkOut);
-                            d.setDate(d.getDate() - 1);
-                            const lastNight = d.toISOString().split('T')[0];
-                            return checkIn === lastNight ? checkIn : `${checkIn} ~ ${lastNight}`;
-                          })()}
-                        </div>
-                        <div className={styles.stayNights} style={{ marginBottom: '1rem' }}>
-                          {pricing.nights}{t.calendar.days} {t.calendar.stay}
-                        </div>
-                        <div className={styles.detailRow} style={{ borderLeft: '4px solid var(--primary)', paddingLeft: '0.75rem', backgroundColor: 'rgba(59, 130, 246, 0.05)', padding: '0.5rem 0.75rem', borderRadius: '4px' }}>
-                          <span className={styles.detailLabel} style={{ color: 'var(--primary)', fontWeight: 'bold' }}>{language === 'ko' ? '퇴실' : 'Check-out'}</span>
-                          <span className={styles.detailValue} style={{ fontSize: '1.2rem', marginLeft: '1rem' }}>
-                            {checkOut}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className={styles.guestSelector}>
-                        <label htmlFor="guests">{t.calendar.guestSelectLabel}</label>
-                        <select 
-                          id="guests" 
-                          value={guests} 
-                          onChange={(e) => setGuests(parseInt(e.target.value))}
-                          className={styles.guestSelect}
-                        >
-                          <option value={1}>{t.calendar.guestOptions[0]}</option>
-                          <option value={2}>{t.calendar.guestOptions[1]}</option>
-                          <option value={3}>{t.calendar.guestOptions[2]}</option>
-                          <option value={4}>{t.calendar.guestOptions[3]}</option>
-                        </select>
-                      </div>
-
-                      <div className={styles.pricingCard}>
-                        <h3>{t.calendar.finalPriceTitle}</h3>
-                        <div className={styles.priceRow}>
-                          <span>{t.calendar.baseFee} ({pricing.nights}{t.calendar.days})</span>
-                          <span>{pricing.baseNightly.toLocaleString()}{t.calendar.won}</span>
-                        </div>
-                        {pricing.guestSurcharge > 0 && (
-                          <div className={styles.priceRow}>
-                            <span>{t.calendar.guestFee}</span>
-                            <span>{pricing.guestSurcharge.toLocaleString()}{t.calendar.won}</span>
-                          </div>
-                        )}
-                        {pricing.weekendSurcharge > 0 && (
-                          <div className={styles.priceRow}>
-                            <span>{t.calendar.weekendFee}</span>
-                            <span>{pricing.weekendSurcharge.toLocaleString()}{t.calendar.won}</span>
-                          </div>
-                        )}
-                        <div className={styles.priceRow}>
-                          <span>{t.calendar.cleaningFee}</span>
-                          <span>{pricing.cleaningFee.toLocaleString()}{t.calendar.won}</span>
-                        </div>
-                        {pricing.discount > 0 && (
-                          <div className={`${styles.priceRow} ${styles.discount}`}>
-                            <span>{t.calendar.longStayDiscount}</span>
-                            <span>-{pricing.discount.toLocaleString()}{t.calendar.won}</span>
-                          </div>
-                        )}
-                        <div className={styles.priceTotal}>
-                          <span>{t.calendar.finalPriceTitle}</span>
-                          <span>{pricing.total.toLocaleString()}{t.calendar.won}</span>
-                        </div>
-                      </div>
-                      
-                      <button 
-                        className={styles.primaryReserveBtn}
-                        onClick={handleReserveClick}
-                      >
-                        {t.calendar.proceedBtn}
-                      </button>
-                    </div>
-                  )}
-                </>
               )}
             </div>
           </div>

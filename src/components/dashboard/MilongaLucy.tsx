@@ -16,7 +16,8 @@ import {
   getMedia,
   getClasses,
   TangoClass,
-  deleteMedia
+  deleteMedia,
+  remapStorageUrl
 } from '@/lib/db';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -141,31 +142,48 @@ export default function MilongaLucy({
     setMediaLoading(true);
     let data: MediaItem[] = [];
     
-    if (activeTab === 'live') {
-      // Fetch all media and filter for Lucy Live (those with relatedMilongaDate)
-      const allMedia = await getMedia();
-      data = allMedia.filter(m => !!m.relatedMilongaDate);
-    } else {
-      if (!selectedDate) {
-        setMilongaMedia([]);
-        setMediaLoading(false);
-        return;
+    try {
+      if (activeTab === 'live') {
+        // Fetch Lucy Live (items with relatedMilongaDate)
+        // getMedia() is now cached in db.ts, so this is efficient
+        const allMedia = await getMedia();
+        data = allMedia.filter(m => !!m.relatedMilongaDate);
+      } else {
+        if (!selectedDate) {
+          setMilongaMedia([]);
+          setMediaLoading(false);
+          return;
+        }
+        data = await getMedia(undefined, undefined, selectedDate);
       }
-      data = await getMedia(undefined, undefined, selectedDate);
+      setMilongaMedia(data);
+    } catch (e) {
+      console.error("[MilongaLucy] fetchMedia error:", e);
+    } finally {
+      setMediaLoading(false);
     }
-    setMilongaMedia(data);
-    setMediaLoading(false);
   };
 
   const fetchLucyLiveCount = async () => {
-    const allMedia = await getMedia();
-    const lucyMedia = allMedia.filter(m => !!m.relatedMilongaDate);
-    
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-    
-    const recentCount = lucyMedia.filter(m => new Date(m.createdAt) > oneWeekAgo).length;
-    setLucyCountLast7Days(recentCount);
+    try {
+      // Use getMedia() which is now cached in db.ts
+      const allMedia = await getMedia();
+      const lucyMedia = allMedia.filter(m => !!m.relatedMilongaDate);
+      
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      
+      const recentCount = lucyMedia.filter(m => {
+        try {
+          return m.createdAt && new Date(m.createdAt) > oneWeekAgo;
+        } catch {
+          return false;
+        }
+      }).length;
+      setLucyCountLast7Days(recentCount);
+    } catch (e) {
+      console.error("[MilongaLucy] fetchLucyLiveCount error:", e);
+    }
   };
 
   const fetchClasses = async () => {
@@ -419,7 +437,7 @@ export default function MilongaLucy({
                   onClick={() => setShowPosterFullscreen(true)}
                 >
                   <img 
-                    src={milongaInfo.posterUrl} 
+                    src={remapStorageUrl(milongaInfo.posterUrl)} 
                     alt="Milonga Lucy" 
                     className={styles.heroImage} 
                     crossOrigin="anonymous"

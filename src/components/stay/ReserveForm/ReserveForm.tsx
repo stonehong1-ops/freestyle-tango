@@ -1,8 +1,7 @@
-'use client';
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { submitStayReservation } from '@/lib/db';
+import { calculateStayPrice, PricingResult } from '@/lib/stay-utils';
 import styles from './ReserveForm.module.css';
 
 interface ReserveFormProps {
@@ -19,17 +18,24 @@ export default function ReserveForm({
   stayId,
   checkIn,
   checkOut,
-  guests,
-  totalAmount,
+  guests: initialGuests,
   onBack,
   onComplete
 }: ReserveFormProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState('');
   const [countryCode, setCountryCode] = useState('+82');
   const [phone, setPhone] = useState('');
   const [message, setMessage] = useState('');
+  
+  const [currentGuests, setCurrentGuests] = useState(initialGuests);
+  const [pricing, setPricing] = useState<PricingResult | null>(null);
+
+  useEffect(() => {
+    const result = calculateStayPrice(stayId, checkIn, checkOut, currentGuests);
+    setPricing(result);
+  }, [stayId, checkIn, checkOut, currentGuests]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,8 +46,9 @@ export default function ReserveForm({
 
     setIsSubmitting(true);
     
-    const cleanPhone = phone.replace(/-/g, '').trim();
-    const fullPhone = countryCode + cleanPhone;
+    const cleanPhone = phone.replace(/[^\d+]/g, '').trim();
+    // Prepend country code if phone doesn't start with '+'
+    const fullPhone = phone.startsWith('+') ? phone : countryCode + cleanPhone;
 
     const formData = {
       stayId,
@@ -49,19 +56,16 @@ export default function ReserveForm({
       phone: fullPhone, 
       checkIn, 
       checkOut, 
-      guests, 
+      guests: currentGuests, 
       message
     };
 
     const result = await submitStayReservation(formData);
     
     if (result.success) {
-      // No longer auto-triggering SMS to avoid "pop-up" confusion.
-      // SMS is now handled via a localized button on the CompleteView.
-
       onComplete({
         ...formData,
-        totalAmount
+        totalAmount: pricing?.total || 0
       });
     } else {
       alert(t.reserve.errorFail);
@@ -72,26 +76,91 @@ export default function ReserveForm({
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <button onClick={onBack} className={styles.backBtn}>
-          &larr; {t.calendar.clearBtn}
+        <button onClick={onBack} className={styles.backBtn} aria-label="Go back">
+          &larr; {language === 'ko' ? '뒤로가기' : 'Back'}
         </button>
         <h1 className={styles.title}>{t.reserve.title}</h1>
-        <p className={styles.routeDesc}>
-          {checkIn} ~ {checkOut} / {guests}{t.reserve.guests} / {totalAmount.toLocaleString()}{t.calendar.won}
-        </p>
       </header>
 
       <div className={styles.content}>
-        <div className={styles.formSection}>
-          <div className={styles.paymentGuide}>
-            <h3>💳 {t.calendar.feeGuideTitle} (Deposit)</h3>
-            <div className={styles.accountList}>
-              <p className={styles.account}><strong>1. KR (한국계좌):</strong> KakaoBank 3333-03-7249602 (홍병석)</p>
-              <p className={styles.account}><strong>2. US (미국 Wise):</strong> Acc 352665336763211 / Routing 084009519 (ACH Free)</p>
-              <p className={styles.account}><strong>3. International:</strong> SWIFT/BIC TRWIUS35XXX (Byong Seok Hong)</p>
+        {/* Left/Top: Pricing & Info Summary */}
+        <aside className={styles.summarySidebar}>
+          <div className={styles.summaryCard}>
+            <h3 className={styles.summaryTitle}>{language === 'ko' ? '예약 내역 확인' : 'Reservation Summary'}</h3>
+            
+            <div className={styles.infoRow}>
+              <span className={styles.infoLabel}>{language === 'ko' ? '일정' : 'Dates'}</span>
+              <div className={styles.infoValue}>
+                {checkIn} ~ {checkOut}
+                <span className={styles.nightBadge}>{pricing?.nights}{t.calendar.days}</span>
+              </div>
             </div>
+
+            <div className={styles.infoRow}>
+              <span className={styles.infoLabel}>{t.calendar.guestSelectLabel}</span>
+              <div className={styles.infoValue}>
+                <select 
+                  className={styles.inlineSelect}
+                  value={currentGuests}
+                  onChange={(e) => setCurrentGuests(parseInt(e.target.value))}
+                >
+                  {[1, 2, 3, 4].map(n => (
+                    <option key={n} value={n}>{n}{t.reserve.guests}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <hr className={styles.divider} />
+
+            {pricing && (
+              <div className={styles.pricingList}>
+                <div className={styles.priceItem}>
+                  <span>{t.calendar.baseFee} ({pricing.nights}{t.calendar.days})</span>
+                  <span>{pricing.baseNightly.toLocaleString()}{t.calendar.won}</span>
+                </div>
+                {pricing.guestSurcharge > 0 && (
+                  <div className={styles.priceItem}>
+                    <span>{t.calendar.guestFee}</span>
+                    <span>+{pricing.guestSurcharge.toLocaleString()}{t.calendar.won}</span>
+                  </div>
+                )}
+                {pricing.weekendSurcharge > 0 && (
+                  <div className={styles.priceItem}>
+                    <span>{t.calendar.weekendFee}</span>
+                    <span>+{pricing.weekendSurcharge.toLocaleString()}{t.calendar.won}</span>
+                  </div>
+                )}
+                <div className={styles.priceItem}>
+                  <span>{t.calendar.cleaningFee}</span>
+                  <span>+{pricing.cleaningFee.toLocaleString()}{t.calendar.won}</span>
+                </div>
+                {pricing.discount > 0 && (
+                  <div className={`${styles.priceItem} ${styles.discount}`}>
+                    <span>{t.calendar.longStayDiscount}</span>
+                    <span>-{pricing.discount.toLocaleString()}{t.calendar.won}</span>
+                  </div>
+                )}
+                <div className={styles.totalPrice}>
+                  <span>{language === 'ko' ? '총 결제 금액' : 'Total Amount'}</span>
+                  <span>{pricing.total.toLocaleString()}{t.calendar.won}</span>
+                </div>
+              </div>
+            )}
           </div>
 
+          <div className={styles.paymentCard}>
+            <h3>💳 {t.calendar.feeGuideTitle} (Deposit)</h3>
+            <div className={styles.accountList}>
+              <p><strong>KR (한국계좌):</strong> KakaoBank 3333-03-7249602 (홍병석)</p>
+              <p><strong>Wise (USD):</strong> Acc 352665336763211 / Routing 084009519</p>
+              <p><strong>International:</strong> SWIFT/BIC TRWIUS35XXX</p>
+            </div>
+          </div>
+        </aside>
+
+        {/* Right/Bottom: Information Form */}
+        <main className={styles.formSection}>
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.formGroup}>
               <label htmlFor="name">{t.reserve.nameLabel} <span className={styles.required}>*</span></label>
@@ -118,17 +187,8 @@ export default function ReserveForm({
                   <option value="+81">JP (+81)</option>
                   <option value="+86">CN (+86)</option>
                   <option value="+84">VN (+84)</option>
-                  <option value="+63">PH (+63)</option>
-                  <option value="+66">TH (+66)</option>
-                  <option value="+65">SG (+65)</option>
-                  <option value="+60">MY (+60)</option>
-                  <option value="+886">TW (+886)</option>
-                  <option value="+34">ES (+34)</option>
-                  <option value="+33">FR (+33)</option>
-                  <option value="+39">IT (+39)</option>
                   <option value="+44">UK (+44)</option>
-                  <option value="+49">DE (+49)</option>
-                  <option value="+90">TR (+90)</option>
+                  <option value="+61">AU (+61)</option>
                 </select>
                 <input 
                   type="tel" 
@@ -154,7 +214,7 @@ export default function ReserveForm({
 
             <div className={styles.directWarning}>
               {t.reserve.directBookingWarning.split('\n').map((line: string, i: number) => (
-                <React.Fragment key={i}>{line}<br/></React.Fragment>
+                <p key={i}>{line}</p>
               ))}
             </div>
 
@@ -162,7 +222,7 @@ export default function ReserveForm({
               {isSubmitting ? t.reserve.submitting : t.reserve.submitBtn}
             </button>
           </form>
-        </div>
+        </main>
       </div>
     </div>
   );

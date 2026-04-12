@@ -51,9 +51,8 @@ export function useProjectData() {
         SafeStorage.setJson('ft_user', updatedUser);
         checkAdminStatus(updatedUser);
         
-        // Notify other components (like UserMyPage) that user info has changed
-        window.dispatchEvent(new CustomEvent('ft_user_updated'));
-        console.log('User profile synced and event dispatched:', updatedUser.staffRole);
+        // window.dispatchEvent(new CustomEvent('ft_user_updated')); // 순환 호출 방지를 위해 제거
+        console.log('User profile synced from DB:', updatedUser.staffRole);
       }
     } catch (error) {
       console.error('Error syncing user from DB:', error);
@@ -99,8 +98,8 @@ export function useProjectData() {
           const savedUser = SafeStorage.getJson<{ phone: string }>('ft_user');
           if (savedUser) {
             const { phone } = savedUser;
-            const normalizedPhone = phone.replace(/[^0-9]/g, '');
-            const userRegs = regData.filter(r => r.phone === normalizedPhone);
+            const normalizedPhone = phone?.replace(/[^0-9]/g, '');
+            const userRegs = normalizedPhone ? regData.filter(r => r.phone === normalizedPhone) : [];
             const dbClassIds = userRegs.flatMap(r => r.classIds || []);
             const localIds = SafeStorage.getJson<string[]>('my_tango_classes') || [];
             setAppliedClassIds(new Set([...dbClassIds, ...localIds]));

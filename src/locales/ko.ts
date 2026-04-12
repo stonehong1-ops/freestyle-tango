@@ -9,18 +9,18 @@ export default {
     join: '함께하기'
   },
   nav: {
-    home: 'Class',
-    milonga: 'Milonga',
-    stay: 'Stay',
-    class: 'Class',
-    info: 'Info',
-    mypage: 'MyPage',
-    lucy: 'Milonga',
-    chat: 'Chatting',
-    guide: 'Info',
-    classGuide: '수업안내',
-    fullSchedule: '캘린더',
-    media: '미디어',
+    home: '수업',
+    milonga: '밀롱가',
+    stay: '스테이',
+    class: '수업',
+    info: '정보',
+    mypage: '마이',
+    lucy: '밀롱가',
+    chat: '채팅',
+    guide: '안내',
+    classGuide: '안내',
+    fullSchedule: '달력',
+    media: '메뉴',
     story: '스토리'
   },
 
@@ -308,12 +308,93 @@ export default {
       role: '역할'
     },
     tabs: {
-      registration: '04월 소식/신청',
-      history: '기록',
+      registration: '{month}월 신청',
+      history: '현황',
       wallet: '지갑',
       coaching: '코칭',
-      profile: '내 정보',
-      admin: '어드민'
+      profile: '내정보',
+      admin: '관리'
+    },
+    alerts: {
+      registration_failed: '알림 등록에 실패했습니다.\n상세 정보: {detail}\n\n브라우저 설정의 알림 허용 여부나 네트워크를 확인해주세요.',
+      permission_denied: '알림 권한이 거부되었습니다. 주소창의 자물쇠 아이콘을 클릭하여 권한을 허용해주세요.',
+      update_error: '설정 업데이트 중 오류가 발생했습니다: {detail}',
+      confirm_logout: '로그아웃 하시겠습니까?',
+      only_for_active_users: '이번 달 수업 진행 중인 사용자만 받을 수 있습니다.',
+      wait_7_days: '마지막 쿠폰을 받은 후 7일이 지나야 다시 받을 수 있습니다.',
+      already_issued: '이미 발급받은 쿠폰입니다.',
+      sold_out: '정해진 쿠폰 {total}매가 모두 발급되었습니다.',
+      confirm_issue: '이 쿠폰을 받으시겠습니까?',
+      issue_success: '쿠폰이 발급되었습니다.',
+      issue_failed: '발급 실패: {message}',
+      confirm_cancel: '정말 쿠폰을 취소(반납)하시겠습니까? 취소된 쿠폰 수량은 다시 복구됩니다.',
+      cancel_success: '쿠폰이 성공적으로 취소되었습니다.',
+      cancel_failed: '취소 실패: {message}',
+      general_error: '오류가 발생했습니다. 다시 시도해 주세요.',
+      expired_coupon: '사용 기간이 만료되어 사용할 수 없는 쿠폰입니다.',
+      confirm_use: '이 쿠폰을 사용하시겠습니까?',
+      only_self: '자신의 페이지만 볼 수 있습니다.'
+    },
+    payment: {
+      status_paid: '결제완료',
+      status_pending: '입금확인중',
+      history_title: '{month}월 신청 내역',
+      date_label: '신청일',
+      no_history: '신청 내역이 없습니다.'
+    },
+    notices: {
+      title: '📢 쿠폰 발급 안내',
+      list: [
+        '수업 신청 완료(입금 확인) 후 쿠폰을 받으실 수 있습니다.',
+        '발급된 쿠폰은 취소(수량 복구)가 가능합니다.',
+        '쿠폰별 사용 기간과 대상(리더/팔로어 등)을 확인해주세요.',
+        '쿠폰 사용 버튼은 사용 직전에만 눌러주세요.'
+      ],
+      no_coupons: '현재 발행 중인 쿠폰이 없습니다.'
+    },
+    labels: {
+      get_coupon: '쿠폰받기',
+      used: '사용완료',
+      expired: '기한만료',
+      use_now: '사용하기',
+      issued: '발행완료',
+      free: '무료',
+      ticket: '입장권',
+      off: 'OFF',
+      won_off: '원 할인',
+      ten_thousand_off: '만원 할인',
+      status_available: '발급가능',
+      status_can_use: '사용가능',
+      duration_limited: '발급 후 {duration}개월 이내 사용',
+      duration_unlimited: '기간 제한 없음',
+      count_unit: '명',
+      role_leader: '리더',
+      role_follower: '팔로어',
+      phone: '전화번호',
+      push_notif: '푸시 알림',
+      edit_profile: '내 정보 수정'
+    },
+    admin_menu: {
+      member: {
+        title: '회원 관리',
+        desc: '전체 회원 목록 및 정보 관리'
+      },
+      coaching: {
+        title: '전체 코칭 관리',
+        desc: '전체 코칭 신청 현황 조회 및 관리'
+      },
+      checklist: {
+        title: '스테이 체크리스트',
+        desc: '숙소 예약 평면도 및 체크리스트'
+      },
+      sms: {
+        title: '스테이 문자설정',
+        desc: '예약 확정 및 안내 메시지 관리'
+      },
+      coupon: {
+        title: '쿠폰 발행 및 관리',
+        desc: '신규 쿠폰 발행 및 사용 현황'
+      }
     },
     walletDesc: '보유하신 쿠폰 목록입니다.',
     wallet: {
@@ -357,8 +438,8 @@ export default {
   },
   info: {
     tabs: {
-      location: '장소안내',
-      membership: '멤버쉽',
+      location: '위치',
+      membership: '멤버',
       story: '스토리'
     }
   },
@@ -399,7 +480,8 @@ export default {
     checkin: '체크인',
     checkout: '체크아웃',
     clearBtn: '지우기',
-    feeGuideTitle: '요금 안내'
+    feeGuideTitle: '요금 안내',
+    reserveBtn: '예약 신청하기'
   },
   location: {
     naver: '네이버 지도',
@@ -647,50 +729,70 @@ export default {
         bldg: '스테이 홍대'
       },
       guide: {
-        title: '홍대 상세 안내',
-        subtitle: '활기찬 에너지와 편안한 쉼의 조화',
+        title: '상세 정보 & 이용 안내',
+        subtitle: '"몸만 오셔도 바로 일상을 시작하실 수 있게 모든 것을 준비했습니다"',
         highlights: {
-          title: '공간의 특징',
+          title: '✨ 이 숙소의 포인트',
           list: [
             {
-              t: '중심지',
-              d: '홍대입구역과 합정역 사이 최적의 위치'
+              t: '홍대 중심가',
+              d: '홍대의 트렌디한 문화를 즐기기에 최적의 입지입니다.'
             },
             {
-              t: '트렌드',
-              d: 'MZ세대의 감성이 듬뿍 담긴 인테리어'
+              t: '타협 없는 완벽한 청결',
+              d: '침구와 러그는 매번 런드리고 전문 세탁, 실내 스팀 청소 실시, 수건과 행주는 매번 아낌없이 모두 새것으로 교체합니다.'
             },
             {
-              t: '준비중',
-              d: '현재 오픈 준비 중입니다.'
+              t: '프리미엄 휴식 가구',
+              d: '넓은 침대 2개(퀸, 슈퍼싱글), 편안한 소파, 고성능 리클라이닝 안마의자 완비.'
+            },
+            {
+              t: '풍성한 엔터테인먼트',
+              d: '거실에는 2026 삼성 무빙스타일 최신 스마트 TV, 그리고 침실에도 별도의 TV가 마련되어 있습니다.'
             }
           ],
-          quote: '가장 힙한 거리에서 가장 편안한 밤을 약속합니다.'
+          quote: '"홍대의 열기를 즐긴 후, 프리미엄한 휴식을 만끽하세요~"'
         },
         transport: {
-          title: '오시는 길',
+          title: '📍 편리한 입지 & 교통',
           list: [
             {
-              t: '지하철',
-              d: '2호선/공항철도 홍대입구역 도보 7분'
+              t: '홍대입구역 역세권',
+              d: '2호선, 공항철도, 경의중앙선 이용이 매우 편리한 위치입니다.'
+            },
+            {
+              t: '풍부한 버스 노선',
+              d: '서울 전역 및 인천공항으로 향하는 다양한 버스를 이용 가능합니다.'
+            },
+            {
+              t: '도보 이동 최적',
+              d: '홍대, 합정, 연남동을 모두 도보로 탐방할 수 있는 최고의 장소에 위치합니다.'
             }
           ]
         },
         facilities: {
-          title: '시설 안내',
-          base: '기본 시설',
-          baseDesc: '최고급 침구류, 빔프로젝터',
-          add: '주방/편의 시설',
-          addDesc: '준비 중입니다.',
-          freeTitle: '무료 제공 품목',
-          freeDesc: '생수, 타올'
+          title: ' Stay 시설 & 옵션 (무료 소모품 안내)',
+          base: '기본 가전·가구',
+          baseDesc: '냉장고, 세탁기, 에어컨, 스마트TV(2대), 기가 Wi-Fi, 싱크대, 인덕션, 퀸 & 슈퍼싱글 침대',
+          add: '추가 편의 시설',
+          addDesc: '안전한 도어락과 CCTV/관리실, 다이닝 테이블, 위생적인 정수기, 폭신한 소파, 넓은 데스크, 대용량 옷장, 신발장',
+          freeTitle: '✨ 모든 소모품이 무료!!!',
+          freeDesc: '라면, 햇반, 롤휴지, 티슈, 칫솔세트, 샴푸/린스, 바디워시, 핸드워시 등 모든 일회용품·소모품이 준비되어 있습니다.\n세탁용 건조대와 세제, 유연제는 물론 종량제 봉투까지 모두 자유롭게 무료로 사용하세요!'
         },
         attractions: {
-          title: '주변 명소',
+          title: '🛍️ 주변 생활 인프라 & 즐길거리',
           list: [
             {
-              t: '쇼핑/핫플',
-              d: '홍대 메인 거리, 연남동 숲길 인접'
+              t: '홍대 걷고싶은거리',
+              d: '버스킹과 다양한 샵들이 즐비한 홍대의 메인 스트리트입니다.'
+            },
+            {
+              t: '연남동 경의선숲길',
+              d: '산책과 피크닉의 명소 "연트럴파크"를 즐길 수 있습니다.'
+            },
+            {
+              t: '셀 수 없는 맛집과 카페',
+              d: '수백 미터 이내에 국내외 유명 맛집과 숨은 감성 카페들이 밀집해 있습니다.'
             }
           ]
         }
@@ -757,18 +859,18 @@ export default {
       ]
     },
     story: {
-      title: '탱고스테이 이야기',
-      subtitle: '서울에서 즐기는 예술과 휴식의 공존',
-      p1: '프리스타일 탱고는 춤과 일상이 어우러지는 문화를 선도합니다. 탱고인을 위한 최적의 휴식 공간을 제공하는 것이 탱고스테이의 목표입니다.',
-      sol1Title: '접근성',
-      sol1Text: '합정동 등 주요 밀롱가와 가까운 거리에 위치하여 이동이 편리합니다.',
-      sol2Title: '아티스트를 위한 공간',
-      sol2Text: '단순한 숙박을 넘어, 영감을 얻을 수 있는 예술적인 인테리어와 분위기를 제공합니다.',
-      sol3Title: '커뮤니티',
-      sol3Text: '전 세계 탱고인들이 모여 소통하고 추억을 쌓을 수 있는 플랫폼을 지향합니다.',
-      closing: '탱고스테이에서 여러분만의 특별한 서울 여행을 시작해보세요.',
-      hostName: 'Stone Hong',
-      hostBio: '탱고 인스트럭터 / 스테이 호스트'
+      title: '탱고스테이 스토리',
+      subtitle: '"몸만 오세요"… 탱고스테이의 [무인도 실험]을 소개합니다.',
+      p1: "호스트로서 이 공간을 준비하며 설정한 단 하나의 목표, 바로 '무인도 실험'입니다. 트렁크 하나만 들고 입실해도 일주일 이상 밖으로 한 발자국도 나가지 않고 완벽하게 쾌적한 생활이 가능한 공간을 만드는 것. 제가 게스트로서 경험했던 '수많은 불편함'들을 완벽하게 해결하기 위해 기획했습니다.",
+      sol1Title: '스테이 팩: 불쾌감 제로, 웰컴 기프트 세트',
+      sol1Text: "남이 쓰던 수건이나 비누의 찜찜함은 이제 그만. 모든 게스트분께 호텔 어메니티 급의 '새' 수건, 행주, 비누, 칫솔 세트를 제공합니다. 첫날 편의점으로 달려갈 필요가 전혀 없습니다.",
+      sol2Title: '물 걱정 끝! 최신 정수기 설치',
+      sol2Text: "무거운 생수를 나르는 고통에서 해방되세요. 최상위 정수기가 설치되어 언제든 깨끗하고 시원한 물을 마음껏 드실 수 있습니다.",
+      sol3Title: '타협 없는 청결함 (세탁 전문 런드리고)',
+      sol3Text: "모든 침구(이불, 커버, 패드, 베개커버)와 러그는 2세트씩 준비되어, 전문 비대면 세탁 업체(런드리고)를 통한 고온 살균과 건조를 거친 것으로 매번 교체됩니다. 눈에 보이지 않는 진드기까지 완벽하게 소독된 폭신한 침구에서 깊은 숙면을 경험하세요.",
+      closing: "세상에서 가장 편안한 나만의 '무인도'에서 진정한 휴식을 즐기실 여러분을 기다립니다.",
+      hostName: '👋 아르헨티나 탱고 추는 남자, 스톤입니다.',
+      hostBio: ''
     },
     footer: {
       term: '이용약관',
@@ -893,6 +995,9 @@ export default {
     creating: '등록 중...',
     updates: '활동 기록',
     activityAdd: '활동 추가',
+    comment: '코멘트',
+    placeholderComment: '코멘트를 남겨보세요...',
+    media: '미디어',
     addComment: '코멘트 작성...',
     uploadMedia: '사진/동영상 추가',
     updateProgress: '진행률 업데이트',
@@ -900,6 +1005,11 @@ export default {
     noUpdates: '기록이 없습니다.',
     confirmStatusChange: '상태를 변경하시겠습니까?',
     reopen: '재개',
+    editActivity: '활동 수정',
+    deleteActivity: '활동 삭제',
+    confirmDelete: '정말로 삭제하시겠습니까?',
+    cancel: '취소',
+    confirm: '확인',
     errorSave: '저장 중 오류가 발생했습니다.'
   }
 };

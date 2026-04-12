@@ -1,12 +1,12 @@
 export default {
   "header": {
-    "story": "Storia di TangoStay",
+    "story": "Storie TangoStay",
     "location": "Posizione",
-    "guide": "Dettagli e Guida",
-    "contact": "Contattaci",
-    "login": "Register",
-    "community": "Community",
-    "join": "Join"
+    "guide": "Guida Dettagliata",
+    "contact": "Contatto",
+    "login": "Accedi",
+    "community": "Comunità",
+    "join": "Unisciti a noi"
   },
   "nav": {
     "home": "Class",
@@ -14,350 +14,431 @@ export default {
     "stay": "Stay",
     "class": "Class",
     "info": "Info",
-    "mypage": "MyPage",
+    "mypage": "My",
     "lucy": "Milonga",
-    "chat": "Chatting",
-    "guide": "Membership",
-    "classGuide": "Class Info",
+    "chat": "Chat",
+    "guide": "Guide",
+    "classGuide": "Guide",
     "fullSchedule": "Calendar",
     "media": "Media",
     "story": "Story"
   },
   "reserve": {
-    "closed": "Reservation Closed",
-    "title": "Dettagli della prenotazione",
-    "nameLabel": "Nome dell'ospite",
-    "namePlace": "Inserisci il tuo nome completo",
-    "phoneLabel": "Contatto",
-    "phonePlace": "010-0000-0000",
-    "guests": "Ospiti",
-    "reqLabel": "Richieste",
-    "reqPlace": "Hai richieste particolari o domande?",
-    "submitting": "In corso...",
-    "submitBtn": "Invia prenotazione",
-    "directBookingWarning": "Click the button below to complete. Your reservation will be cancelled if payment is not received within 1 hour.",
-    "smsTemplate": "[{stayName} Confirmation]\nName: {name}\nDate: {checkIn} ~ {checkOut}\nGuests: {guests}\nAmount: {amount} KRW\n\n[Payment]\n1. KR: KakaoBank 3333-03-7249602 (Hong Byong Seok)\n2. US: Acc 352665336763211 / Routing: 084009519 (ACH Free)\n3. International: SWIFT/BIC TRWIUS35XXX\n\n[Check-in]\nTime: 4 PM\nPassword: 9999\n\nThank you!",
-    "errorFill": "Per favor, inserisci nome, contatto e numero di ospiti.",
-    "errorFail": "Si è verificato un errore durante l'operazione.",
+    "closed": "Chiuso",
+    "title": "Richiesta di Prenotazione Stay",
+    "nameLabel": "Nickname del Prenotante",
+    "namePlace": "Inserisci il tuo nickname",
+    "phoneLabel": "Contatto Telefonico",
+    "phonePlace": "Inserisci il tuo numero di telefono",
+    "guests": "persone",
+    "reqLabel": "Note Aggiuntive",
+    "reqPlace": "Inserisci eventuali richieste particolari (opzionale)",
+    "submitting": "Elaborazione in corso...",
+    "submitBtn": "Completa Prenotazione",
+    "directBookingWarning": "Cliccando sul pulsante sotto, la prenotazione sarà completata.\nSe il bonifico non viene effettuato entro 1 ora, l'host può annullare la prenotazione.",
+    "smsTemplate": "[Conferma Prenotazione {stayName}]\nNome: {name}\nDate: {checkIn} ~ {checkOut}\nPersone: {guests}\nImporto: {amount} KRW\n\n[Guida al Pagamento]\n1. KR (Corea): KakaoBank 3333-03-7249602 (Hong Byong Seok)\n2. US (Wise): Acc 352665336763211 / Routing: 084009519 (ACH Free)\n3. Internazionale: SWIFT/BIC TRWIUS35XXX\n\n[Guida all'Arrivo]\nOrario: 16:00\nCodice: 9999\n\nGrazie!",
+    "errorFill": "Inserisci il tuo nickname e contatto.",
+    "errorFail": "Si è verificato un errore durante la prenotazione. Riprova.",
     "save": "Salva",
     "cancel": "Annulla"
   },
   "complete": {
-    "title": "Prenotazione completata! 🎉",
-    "desc": "Le istruzioni per il pagamento e il check-in verranno inviate al tuo numero di contatto a breve.",
+    "title": "Prenotazione Completata",
+    "desc": "La tua richiesta è stata inviata. Ti invieremo un messaggio di conferma dopo la verifica del pagamento.",
     "homeBtn": "Torna alla Home",
-    "guestSmsBtn": "Ottieni info prenotazione (SMS)"
+    "guestSmsBtn": "Richiedi via SMS"
   },
   "home": {
-    "studioName": "FreestyleTango",
+    "studioName": "Freestyle Tango",
     "info": {
-      "subtitle": "Freestyle Tango Membership Guide",
-      "intro": "Like a fresh rose with mother's milk\nLooking like a mix of colors\nWhite, yellow, red roses\n\nSpring where flower buds bloom\nIn the eternal time of autumn leaves\nTo everyone who sweats\nCultivating body and mind\n\nFreestyle will be\nA shelter and a guide.",
-      "highlight": "180,000 KRW for all classes!",
-      "benefitsTitle": "Membership Benefits",
+      "subtitle": "Guida per i Membri Freestyle Tango",
+      "intro": "",
+      "highlight": "180,000 KRW All-Pass",
+      "benefitsTitle": "Vantaggi Membri",
       "benefits": [
-        "Monthly Membership: 180k, all classes included / Intl workshop d.c",
-        "New member 6-month discount: 20% d.c 860k",
-        "Open floor access (16h/month)",
-        "Partner class application (for existing partners)",
-        "Benefits: Instructor/Staff discount 100k d.c, free 1:1 lesson for referrals"
+        "Pass Mensile: 180k, accesso a tutti i corsi / Sconti seminari internazionali",
+        "Offerta 6 mesi (Nuovi): 20% di sconto (860k)",
+        "Uso libero dello studio (16 ore/mese)",
+        "Possibilità di richiedere partner per 2 corsi aggiuntivi (solo coppie esistenti)",
+        "Vantaggi: -100k/mese per insegnanti/staff/team Lucy, 1 lezione privata gratuita (nuovi/referenti)"
       ],
-      "cultureTitle": "Community Culture",
+      "cultureTitle": "La Cultura che perseguiamo",
       "cultureList": [
-        "Be nice to everyone (Happy space, Warm people)",
-        "Gender balance (aiming for 15:15)"
+        "Gentilezza per tutti, comunità senza negatività (Spazio Felice, Persone Calde)",
+        "Bilanciamento follower/leader basato su 15 persone (crescita a coppie)"
       ],
-      "bankTitle": "Membership Fee Payment",
+      "bankTitle": "Conto per il Pagamento",
       "bankName": "KakaoBank 3333-14-3159646 (Hong Byong Seok)",
-      "copyBtn": "Copy Account Number",
-      "copyHint": "Please contact us with your name after payment.",
-      "contactPhone": "Phone Inquiry",
+      "copyBtn": "Copia Conto",
+      "copyHint": "Indica il tuo nickname nel bonifico e contattaci.",
+      "contactPhone": "Chiama",
       "contactKakao": "KakaoTalk",
       "contactWhatsapp": "WhatsApp",
-      "openChatBanner": "Join Freestyle Tango Open Chat",
-      "copySuccess": "Account number copied.",
-      "contactTitle": "Contact",
-      "contactSlogan": "Inquire about classes, facilities, and stays (24/7 inquiries welcome)",
-      "photoGallery": "Photo Gallery",
-      "facilityGallery": "Facility Guide"
+      "openChatBanner": "Vai alla Chat Aperta Freestyle Tango",
+      "copySuccess": "Numero conto copiato.",
+      "contactTitle": "Contattaci",
+      "contactSlogan": "Corsi, accesso studio e alloggio (24/7)",
+      "photoGallery": "Galleria Foto",
+      "facilityGallery": "Guida Strutture"
     },
     "admin": {
-      "addClass": "Add Class",
-      "addMilonga": "Add Milonga",
-      "editMilonga": "Edit Milonga",
-      "saveNotice": "Save Notice",
-      "editNotice": "Edit Notice",
-      "noticePlaceholder": "Enter notice (2-3 lines)",
-      "noticeEmpty": "No monthly notices registered. Click to add one.",
-      "saveSuccess": "Notice saved.",
-      "saveFail": "Save failed"
+      "addClass": "Aggiungi Corso",
+      "addMilonga": "Aggiungi Milonga",
+      "editMilonga": "Modifica Milonga",
+      "saveNotice": "Salva Avviso",
+      "editNotice": "Modifica Avviso",
+      "noticePlaceholder": "Inserisci il contenuto dell'avviso (2-3 righe)",
+      "noticeEmpty": "Nessun avviso mensile. Clicca per aggiungerne uno.",
+      "saveSuccess": "Avviso salvato.",
+      "saveFail": "Errore durante il salvataggio"
     },
     "chat": {
       "title": "Chat",
-      "newRoom": "+ New Room",
-      "roomPlaceholder": "Chat Room",
-      "enterName": "Enter room name:",
-      "enterType": "Enter room type (public, notice, private, support):",
-      "leaveRoom": "Leave Room",
-      "renameRoom": "Rename Room",
-      "participants": "Participants",
-      "readCount": "Read",
-      "allRead": "All Read",
-      "noActiveChats": "No active chats."
+      "newRoom": "+ Nuova Chat",
+      "roomPlaceholder": "Stanza di Chat",
+      "enterName": "Nome stanza:",
+      "enterType": "Tipo (public, notice, private, support):",
+      "leaveRoom": "Esci dalla stanza",
+      "renameRoom": "Rinomina stanza",
+      "participants": "Partecipanti",
+      "readCount": "Letto",
+      "allRead": "Leggi tutto",
+      "noActiveChats": "Nessuna chat attiva."
     },
     "export": {
-      "imageBtn": "📸 Save Promo Image (PNG)",
-      "error": "Error generating image."
+      "imageBtn": "📸 Salva Immagine (PNG)",
+      "error": "Errore generico durante la creazione dell'immagine."
     },
     "exit": {
-      "toast": "Press back again to exit"
+      "toast": "Premi di nuovo per uscire"
     },
     "stay": {
-      "viewMonthly": "View Monthly Status",
-      "monthlyTitle": "Monthly Reservation Status"
+      "viewMonthly": "Vedi stato mensile",
+      "monthlyTitle": "Stato Prenotazioni Globale"
     },
     "registration": {
-      "title": "Class Registration",
-      "classDetail": "Class Details",
-      "fullListTitle": "Full Registration Status",
-      "addClass": "Add Class",
-      "loading": "Loading...",
-      "noClasses": "No classes registered for {month}.",
-      "cartAdded": "Class added to cart! Proceed to final registration in [MyPage].",
-      "deleteConfirm": "Are you sure you want to delete this class?",
-      "deleteSuccess": "Deleted.",
-      "deleteFail": "Delete failed: {error}",
-      "saveSuccess": "Saved.",
-      "saveFail": "Save failed: {error}",
-      "pastMonthWarning": "Cannot apply for past classes.",
-      "selected": "✅ Selected",
+      "title": "Iscrizione Corsi",
+      "classDetail": "Dettagli Corso",
+      "fullListTitle": "Stato Globale Iscrizioni",
+      "addClass": "Aggiungi Corso",
+      "loading": "Caricamento...",
+      "noClasses": "Nessun corso registrato per {month}.",
+      "cartAdded": "Iscrizione aggiunta. Puoi modificarla in \"Mypage\".",
+      "deleteConfirm": "Vuoi eliminare questo corso?",
+      "deleteSuccess": "Eliminato.",
+      "deleteFail": "Errore: {error}",
+      "saveSuccess": "Salvato.",
+      "saveFail": "Errore: {error}",
+      "pastMonthWarning": "Non puoi iscriverti ai corsi passati.",
+      "selected": "✅ Selezionato",
       "leader": "Leader",
       "follower": "Follower",
-      "teacherLabel": "Instructor:",
+      "teacherLabel": "Insegnante:",
       "priceLabel": "KRW",
-      "datesTitle": "Class Schedule (4 weeks)",
-      "noDates": "No schedule registered.",
-      "curriculumTitle": "Curriculum Details",
-      "previewTitle": "Preview Video",
-      "introTitle": "Class Intro",
-      "currentStatus": "Current Status",
-      "waiting": "Waiting for application",
-      "adminTitle": "Applicant List (Admin)",
+      "datesTitle": "Orari (4 settimane)",
+      "noDates": "Nessun orario registrato.",
+      "curriculumTitle": "Programma Dettagliato",
+      "previewTitle": "Video Anteprima",
+      "introTitle": "Introduzione Corso",
+      "currentStatus": "Stato Attuale",
+      "waiting": "In attesa",
+      "adminTitle": "Lista Dettagliata (Admin)",
       "nickname": "Nickname",
-      "phone": "Phone",
-      "status": "Status",
-      "paid": "Paid",
-      "edit": "Edit",
-      "delete": "Delete",
-      "download": "Download",
-      "addToList": "Add to List",
-      "applied": "Applied",
-      "footerNote": "You can apply for all classes at once in MyPage later.",
+      "phone": "Contatto",
+      "status": "Stato",
+      "paid": "Pagato",
+      "edit": "Modifica",
+      "delete": "Elimina",
+      "download": "Scarica",
+      "addToList": "Aggiungi alla lista",
+      "applied": "Iscritto",
+      "footerNote": "Completa tutte le iscrizioni in \"Mypage\"",
       "dayNames": [
-        "Sun",
-        "Mon",
-        "Tue",
-        "Wed",
-        "Thu",
-        "Fri",
-        "Sat"
+        "Dom",
+        "Lun",
+        "Mar",
+        "Mer",
+        "Gio",
+        "Ven",
+        "Sab"
       ],
       "daysFull": [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Other"
+        "Domenica",
+        "Lunedì",
+        "Martedì",
+        "Mercoledì",
+        "Giovedì",
+        "Venerdì",
+        "Sabato",
+        "Altro"
       ],
-      "monthLabel": "Month",
-      "dayLabel": "Day",
-      "viewFullStatus": "View Status",
-      "viewFullStatusHint": "(Only for applicants)",
-      "bittersweet": "For Milonga",
-      "fullStatusTitle": "Full Status for {month}",
-      "fullStatusSummary": "Leaders {leader} / Followers {follower}",
-      "noPermissionMessage": "Only for applicants.",
-      "role": "Role",
-      "classSelection": "Registration",
-      "noData": "No registration data."
+      "monthLabel": "Mese",
+      "dayLabel": "Giorno",
+      "viewFullStatus": "Stato Iscrizione",
+      "viewFullStatusHint": "(Solo per gli iscritti)",
+      "bittersweet": "Per Milonga",
+      "fullStatusTitle": "Stato Iscrizioni di {month}",
+      "fullStatusSummary": "Leader {leader} / Follower {follower}",
+      "noPermissionMessage": "Solo gli iscritti possono vedere questo pulsante.",
+      "role": "Ruolo",
+      "classSelection": "Dettagli Iscriz.",
+      "noData": "Nessun dato."
     },
     "milonga": {
-      "bookingBtn": "🎟️ Book Milonga Table",
-      "eventTitle": "Event Info",
-      "eventSubtitle": "Make memories at Lucy",
-      "normalTable": "Table Booking",
-      "normalTableDesc": "Available for 2+ people.",
-      "event2plus1": "2+1 Event",
-      "event2plus1Desc": "One person free for every three people.",
-      "event3plus1": "3+1 Event",
-      "event3plus1Desc": "One person free for every four people.",
-      "noSchedule": "No milonga schedule registered.",
-      "checkBack": "Please check back later.",
-      "bookingStatus": "Booking Status",
-      "noReservations": "No bookings yet.",
-      "editTitle": "Edit Booking",
-      "editDesc": "You can modify your booking.",
-      "confirmPayBtn": "Request Payment Check",
-      "deleteConfirm": "Are you sure you want to delete this booking?",
-      "deleteSuccess": "Deleted.",
-      "error": "An error occurred.",
+      "bookingBtn": "🎟️ Prenota Tavolo Milonga",
+      "eventTitle": "Guida Eventi",
+      "eventSubtitle": "Momenti speciali da Lucy",
+      "normalTable": "Prenotazione Tavolo",
+      "normalTableDesc": "Prenota per 2 o più persone.",
+      "event2plus1": "Evento 2+1",
+      "event2plus1Desc": "3 persone, una gratis.",
+      "event3plus1": "Evento 3+1",
+      "event3plus1Desc": "4 persone, una gratis.",
+      "noSchedule": "Nessuna milonga in programma.",
+      "checkBack": "Torna a consultare più tardi.",
+      "bookingStatus": "Stato Prenotazioni",
+      "noReservations": "Nessuna prenotazione.",
+      "editTitle": "Modifica Prenotazione",
+      "editDesc": "Modifica i tuoi dettagli.",
+      "confirmPayBtn": "Richiedi Conferma Pagamento",
+      "deleteConfirm": "Vuoi eliminare questa prenotazione?",
+      "deleteSuccess": "Eliminato.",
+      "error": "Si è verificato un errore.",
       "options": [
-        "15k KRW per person",
-        "Event (Free)"
+        "1 pers. 15k KRW",
+        "Evento (Gratis)"
       ],
-      "optionPrompt": "Select an option.",
-      "cancel": "Cancel",
-      "submit": "OK",
-      "datePending": "Schedule Pending",
-      "newTitle": "New Booking",
-      "dateLabel": "Date",
-      "optionLabel": "Option",
-      "nicknamePlaceholder": "Enter nickname",
-      "phoneLabel": "Phone",
-      "requestsLabel": "Requests",
-      "requestsPlaceholder": "Additional requests (Optional)",
-      "submitting": "Processing...",
-      "saveEdit": "Save Changes",
-      "saveNew": "Book",
-      "noPoster": "Poster is being prepared."
+      "optionPrompt": "Scegli un'opzione.",
+      "cancel": "Annulla",
+      "submit": "Conferma",
+      "datePending": "Data in attesa",
+      "newTitle": "Nuova Prenotazione",
+      "dateLabel": "Data",
+      "optionLabel": "Opzione",
+      "nicknamePlaceholder": "Tuo nickname",
+      "phoneLabel": "Telefono",
+      "requestsLabel": "Note",
+      "requestsPlaceholder": "Richieste (opzionale)",
+      "submitting": "Elaborazione...",
+      "saveEdit": "Modifica finita",
+      "saveNew": "Prenota",
+      "noPoster": "Locandina non disponibile."
     },
     "membership": {
-      "title": "Membership Guide",
-      "desc": "Check the benefits of Freestyle Tango membership.",
-      "type1": "1 Month Free Pass",
+      "title": "Guida Membri",
+      "desc": "Scopri i vantaggi Freestyle Tango.",
+      "type1": "Free Pass 1 Mese",
       "type1Price": "180,000 KRW",
-      "type2": "3+1 Event",
+      "type2": "Evento 3+1",
       "type2Price": "120,000 KRW",
-      "type3": "6 Months Membership",
+      "type3": "Membro 6 Mesi",
       "type3Price": "860,000 KRW",
-      "close": "Close"
+      "close": "Chiudi"
     },
     "registrationStatus": {
-      "editTitle": "Edit Registration",
-      "newTitle": "Apply for {month} Classes",
-      "cancelEdit": "Cancel Edit",
-      "desc": "Select classes to apply.",
-      "selectPrompt": "Please select a class",
-      "typeSelectorTitle": "Select Type",
-      "typeIndividual": "Individual / 1 Month",
-      "typeMembership6": "6 Months Membership",
-      "editSubmit": "Save Changes",
-      "newSubmit": "Apply"
+      "editTitle": "Modifica Iscrizione",
+      "newTitle": "Iscrizione Corsi {month}",
+      "cancelEdit": "Annulla",
+      "desc": "Scegli i tuoi corsi.",
+      "selectPrompt": "Scegli un corso",
+      "typeSelectorTitle": "Tipo di Iscrizione",
+      "typeIndividual": "Individuale / 1 Mese",
+      "typeMembership6": "6 Mesi",
+      "editSubmit": "Modifica",
+      "newSubmit": "Iscriviti"
     },
     "payment": {
-      "title": "Payment Options",
-      "desc": "Select the payment option matching your registration.",
-      "placeholder": "Select an option",
+      "title": "Opzione di Pagamento",
+      "desc": "Scegli l'opzione che corrisponde ai tuoi corsi.",
+      "placeholder": "Seleziona",
       "options": [
-        "Individual",
-        "1 Month",
-        "6 Months (1st)",
-        "6 Months (2nd)",
-        "6 Months (3rd)",
-        "6 Months (4th)",
-        "6 Months (5th)",
-        "6 Months (6th)"
+        "Individuale",
+        "1 Mese",
+        "6 Mesi (1° pag)",
+        "6 Mesi (2° pag)",
+        "6 Mesi (3° pag)",
+        "6 Mesi (4° pag)",
+        "6 Mesi (5° pag)",
+        "6 Mesi (6° pag)"
       ],
-      "optionPrompt": "Please select a payment option.",
-      "cancel": "Cancel",
-      "submit": "Confirm"
+      "optionPrompt": "Scegli l'opzione.",
+      "cancel": "Annulla",
+      "submit": "Valida"
     },
     "history": {
-      "title": "My History",
-      "loading": "Loading...",
-      "empty": "No history found.",
-      "appliedLabel": "Registered for {month}",
-      "statusPaid": "Paid",
-      "statusWaiting": "Waiting for Payment",
-      "appliedDate": "Applied: {date}",
-      "paidMsg": "{type} / {amount} KRW Paid",
-      "paidDate": "Confirmed: {date}",
-      "confirmPayBtn": "Request Payment Check",
-      "edit": "Edit",
-      "delete": "Delete",
-      "deleteConfirm": "Are you sure you want to delete this history?",
-      "alreadyRegistered": "Already registered. Please use edit function.",
-      "deleteSuccess": "Deleted.",
-      "confirmSuccess": "Completed.",
-      "error": "An error occurred."
+      "title": "Le mie Iscrizioni",
+      "loading": "Caricamento...",
+      "empty": "Nessun record.",
+      "appliedLabel": "Corsi di {month}",
+      "statusPaid": "Pagamento Confermato",
+      "statusWaiting": "In attesa",
+      "appliedDate": "Data: {date}",
+      "paidMsg": "{type} / {amount} KRW Pagato",
+      "paidDate": "Confermato il: {date}",
+      "confirmPayBtn": "Conferma Pagamento",
+      "edit": "Modifica",
+      "delete": "Elimina",
+      "deleteConfirm": "Eliminare questo record?",
+      "alreadyRegistered": "Già esistente. Usa \"Modifica\".",
+      "deleteSuccess": "Eliminato.",
+      "confirmSuccess": "Terminato.",
+      "error": "Errore."
     },
     "success": {
-      "welcome": "Thank you for applying.",
-      "completed": "Please transfer to the account below and click 'Request Payment Check' in MyPage.",
-      "info": "For other inquiries, contact us via the channels below.",
-      "bankLabel": "Account",
+      "welcome": "Grazie per l'iscrizione.",
+      "completed": "Effettua il bonifico e clicca su \"Conferma Pagamento\" in Mypage.",
+      "info": "Per domande, contattaci.",
+      "bankLabel": "Conto bancario",
       "bankNumber": "KakaoBank 3333-14-3159646 (Hong Byong Seok)",
-      "copyBtn": "Copy",
-      "copySuccess": "Copied.",
-      "done": "OK"
+      "copyBtn": "Copia",
+      "copySuccess": "Copiato.",
+      "done": "Valida"
     }
   },
   "mypage": {
-    "title": "La mia pagina",
-    "loginPrompt": "Login required.",
-    "loginBtn": "Login",
+    "title": "Mypage",
+    "loginPrompt": "Accesso richiesto.",
+    "loginBtn": "Vai al Login",
     "logoutBtn": "Logout",
-    "membership": "Info Membership",
+    "membership": "Guida Membri",
     "profile": {
       "nickname": "Nickname",
-      "phone": "Phone",
-      "role": "Role"
+      "phone": "Contatto",
+      "role": "Ruolo"
     },
     "tabs": {
-      "registration": "Apr. News/Apply",
-      "history": "History",
-      "wallet": "Wallet & Coupons",
+      "registration": "Corsi {month}",
+      "history": "Stato",
+      "wallet": "Portafoglio",
       "coaching": "Coaching",
-      "profile": "My Info",
+      "profile": "Profilo",
       "admin": "Admin"
     },
-    "walletDesc": "List of your active coupons.",
+    "alerts": {
+      "registration_failed": "Errore notifica.\nDettaglio: {detail}",
+      "permission_denied": "Permesso negato. Controlla le impostazioni browser.",
+      "update_error": "Errore aggiornamento: {detail}",
+      "confirm_logout": "Vuoi disconnetterti?",
+      "only_for_active_users": "Riservato ai membri attivi questo mese.",
+      "wait_7_days": "Attendi 7 giorni tra due coupon.",
+      "already_issued": "Coupon già emesso.",
+      "sold_out": "Esaurito ({total}).",
+      "confirm_issue": "Ottenere questo coupon?",
+      "issue_success": "Coupon emesso.",
+      "issue_failed": "Errore: {message}",
+      "confirm_cancel": "Restituire il coupon?",
+      "cancel_success": "Annullato con successo.",
+      "cancel_failed": "Errore: {message}",
+      "general_error": "Errore. Riprova.",
+      "expired_coupon": "Coupon scaduto.",
+      "confirm_use": "Usare questo coupon?",
+      "only_self": "Accesso limitato alla tua pagina."
+    },
+    "payment": {
+      "status_paid": "Pagato",
+      "status_pending": "Verifica...",
+      "history_title": "Corsi di {month}",
+      "date_label": "Data",
+      "no_history": "Nessuna cronologia."
+    },
+    "notices": {
+      "title": "📢 Guida ai Coupon",
+      "list": [
+        "Ottieni i coupon dopo la conferma del pagamento.",
+        "I coupon emessi sono reversibili.",
+        "Controlla la data di scadenza.",
+        "Clicca su \"Usa\" al momento dell'utilizzo."
+      ],
+      "no_coupons": "Nessun coupon."
+    },
+    "labels": {
+      "get_coupon": "Prendi",
+      "used": "Usato",
+      "expired": "Scaduto",
+      "use_now": "Usa ora",
+      "issued": "Emesso",
+      "free": "Gratis",
+      "ticket": "Ticket",
+      "off": "Sconto",
+      "won_off": "KRW OFF",
+      "ten_thousand_off": "10k KRW OFF",
+      "status_available": "Disponibile",
+      "status_can_use": "Pronto",
+      "duration_limited": "Valido {duration} mesi",
+      "duration_unlimited": "Illimitato",
+      "count_unit": "pers.",
+      "role_leader": "Leader",
+      "role_follower": "Follower",
+      "phone": "Telefono",
+      "push_notif": "Notif Push",
+      "edit_profile": "Modifica Profilo"
+    },
+    "admin_menu": {
+      "member": {
+        "title": "Membri",
+        "desc": "Gestisci la lista membri"
+      },
+      "coaching": {
+        "title": "Coaching",
+        "desc": "Monitoraggio globale"
+      },
+      "checklist": {
+        "title": "Checklist Stay",
+        "desc": "Piani e check-list"
+      },
+      "sms": {
+        "title": "SMS Stay",
+        "desc": "Messaggi di benvenuto"
+      },
+      "coupon": {
+        "title": "Coupon",
+        "desc": "Emetti e gestisci"
+      }
+    },
+    "walletDesc": "I tuoi coupon attivi.",
     "wallet": {
-      "title": "My Wallet & Coupons",
-      "noCoupons": "No coupons found.",
-      "useCoupon": "Use Now",
-      "usedCoupon": "Used",
+      "title": "Il mio Portafoglio",
+      "noCoupons": "Nessun coupon.",
+      "useCoupon": "Usa ora",
+      "usedCoupon": "Già usato",
       "membershipCoupon": {
-        "title": "1-Month Membership 5% Discount",
-        "desc": "5% discount for 3rd-week class application (10,000 KRW off)",
-        "target": "For Membership Members"
+        "title": "Coupon Mensile",
+        "desc": "Per l'iscrizione ai corsi",
+        "target": "Membri"
       },
       "milongaCoupon": {
-        "title": "Milonga Luci 1-Time Free Pass",
-        "desc": "1-time free entry coupon for class registrants",
-        "target": "For Class Registrants"
+        "title": "Pass Gratis Lucy",
+        "desc": "1 ingresso gratuito",
+        "target": "Allievi"
       },
-      "usageConfirm": "Would you like to use this coupon?\nUsed coupons cannot be restored.",
-      "usageSuccess": "Coupon successfully used."
+      "usageConfirm": "Usare?\nL'azione è irreversibile.",
+      "usageSuccess": "Usato."
     }
   },
   "admin": {
     "member": {
-      "searchPlaceholder": "Search nickname or number",
-      "searchBtn": "Search",
-      "engagement": "Engagement",
-      "joinDate": "Join Date",
-      "recentVisit": "Recent Visit",
-      "loading": "Loading data...",
-      "noResults": "No members found.",
-      "instructor": "Instructor",
-      "pushStatus": "Notifications",
-      "lastRegMonth": "Last Applied",
+      "searchPlaceholder": "Nickname o numero",
+      "searchBtn": "Cerca",
+      "engagement": "Attività",
+      "joinDate": "Iscritto dal",
+      "recentVisit": "Ultima visita",
+      "loading": "Caricamento...",
+      "noResults": "Nessun risultato.",
+      "instructor": "Insegnante",
+      "pushStatus": "Notif Push",
+      "lastRegMonth": "Ultimo corso",
       "topPercent": "Top {percent}%",
-      "grantInstructor": "Grant Instructor",
-      "revokeInstructor": "Revoke Instructor",
+      "grantInstructor": "Rendi Insegnante",
+      "revokeInstructor": "Rimuovi Insegnante",
       "leader": "Leader",
       "follower": "Follower",
-      "errorToggle": "Error changing permissions."
+      "errorToggle": "Errore durante la modifica."
     }
   },
   "info": {
     "tabs": {
-      "location": "Location",
-      "membership": "Membership",
+      "location": "Posizione",
+      "membership": "Membri",
       "story": "Story"
     }
   },
@@ -369,451 +450,559 @@ export default {
     "Thu": "Gio",
     "Fri": "Ven",
     "Sat": "Sab",
-    "blockedAlert": "[Tutto esaurito]\nOspite:",
-    "period": "Periodo:",
-    "invalidRange": "L'intervallo selezionato include date già prenotate. Riprova.",
-    "viewList": "Vedi come lista",
-    "available": "Disponibile",
+    "blockedAlert": "Già prenotato.",
+    "period": "Periodo Admin:",
+    "invalidRange": "Intervallo non valido.",
+    "viewList": "Vista globale",
+    "available": "Disp",
     "booked": "Prenotato",
-    "selected": "Selezionato",
-    "days": "Notti",
+    "selected": "Scelto",
+    "days": "notti",
     "won": "KRW",
-    "hintSelectOut": "Seleziona una data di check-out!",
-    "hintSelectDates": "Seleziona le date sul calendario per vedere il prezzo totale esatto.",
-    "finalPriceTitle": "Prezzo finale totale",
-    "baseFee": "Tariffa base notturna",
-    "guestFee": "Supplemento ospite extra",
-    "weekendFee": "Supplemento weekend/festivi",
-    "cleaningFee": "Spese di pulizia",
-    "longStayDiscount": "Sconto lunga permanenza",
-    "proceedBtn": "Procedi alla prenotazione",
-    "stay": "Soggiorno",
-    "guestSelectLabel": "Ospiti",
+    "hintSelectOut": "Data di uscita.",
+    "hintSelectDates": "Date del soggiorno.",
+    "finalPriceTitle": "Totale Finale",
+    "baseFee": "Tariffa Base",
+    "guestFee": "Pers. aggiuntive",
+    "weekendFee": "Tariffa Weekend",
+    "cleaningFee": "Pulizia",
+    "longStayDiscount": "Sconto lunga durata",
+    "proceedBtn": "Prenota ora",
+    "stay": "Stay",
+    "guestSelectLabel": "Persone",
     "guestOptions": [
-      "1 Ospite (Base)",
-      "2 Ospiti (+10k/notte)",
-      "3 Ospiti (+20k/notte)",
-      "4 Ospiti (Max, +30k/notte)"
+      "1 pers.",
+      "2 pers.",
+      "3 pers.",
+      "4 pers."
     ],
-    "checkin": "Check-in",
-    "checkout": "Check-out",
-    "clearBtn": "Cancella selezione",
-    "feeGuideTitle": "Guida ai prezzi"
+    "checkin": "Entrata",
+    "checkout": "Uscita",
+    "clearBtn": "Cancella",
+    "feeGuideTitle": "Guida Tariffe",
+    "reserveBtn": "Prenota ora"
   },
   "location": {
-    "naver": "Apri in Naver Map",
-    "kakao": "Apri in Kakao Map"
+    "naver": "Naver Map",
+    "kakao": "Kakao Map"
   },
   "stays": {
-    "viewMonthlyStatus": "View Monthly Status",
-    "monthlyStatusTitle": "Monthly Reservation Status",
+    "viewMonthlyStatus": "Stato Mensile",
+    "monthlyStatusTitle": "Calendario Globale",
     "hapjeong": {
       "name": "Hapjeong",
       "hero": {
-        "subtitle": "A 1 min dalla stazione di Hapjeong, Parco Hangang a pochi passi, il tuo soggiorno tranquillo e accogliente"
+        "subtitle": "Arte e vista sul fiume Han"
       },
       "location": {
-        "title": "Posizione",
-        "addressLabel": "Indirizzo:",
-        "address": "13 Yanghwa-ro, Mapo-gu, Seul",
-        "bldgLabel": "Edificio:",
+        "title": "Ubicazione",
+        "addressLabel": "Address",
+        "address": "Yanghwa-ro 13, Seul",
+        "bldgLabel": "Building",
         "bldg": "Hapjeong Square Riverview"
       },
       "guide": {
-        "title": "Dettagli e Guida",
-        "subtitle": "\"Abbiamo equipaggiato tutto in modo che tu possa iniziare la tua vita quotidiana senza preparativi\"",
+        "title": "Dettagli Hapjeong",
+        "subtitle": "Un riposo artistico nel cuore di Seul",
         "highlights": {
-          "title": "✨ Punti salienti della camera",
+          "title": "Punti forti",
           "list": [
             {
-              "t": "Nuova costruzione premium con vista aperta",
-              "d": "Goditi eccezionali viste sul fiume Han dallo studio più nuovo e pulito nell'area di Hapjeong/Hongdae."
+              "t": "Posizione",
+              "d": "1 min dalla stazione Hapjeong"
             },
             {
-              "t": "Pulizia senza compromessi",
-              "d": "La biancheria e i tappeti vengono lavati professionalmente da Laundrygo ogni volta. Pulizia a vapore degli interni e tutti gli asciugamani/strofinacci vengono sostituiti al 100% con nuovi."
+              "t": "Vista",
+              "d": "Vista esclusiva fiume Han"
             },
             {
-              "t": "Mobili per il relax premium",
-              "d": "Due letti spaziosi (Queen, Super Single), divano accogliente e una poltrona massaggiante reclinabile ad alte prestazioni."
-            },
-            {
-              "t": "Intrattenimento ricco",
-              "d": "Soggiorno con Samsung Moving Style Smart TV 2026, oltre a una TV aggiuntiva in camera da letto."
+              "t": "Stile",
+              "d": "Arredo amato dagli artisti"
             }
           ],
-          "quote": "\"Goditi la poltrona massaggiante guardando la vista notturna del fiume Han~\""
+          "quote": "Dove il tango incontra la quotidianità."
         },
         "transport": {
-          "title": "📍 Posizione e trasporti convenienti (Parcheggio gratuito)",
+          "title": "Trasporti",
           "list": [
             {
-              "t": "Posizione super privilegiata",
-              "d": "1 min a pie dalla stazione di Hapjeong. Accesso rapido a Hongdae/Sinchon a piedi/metro/autobus (10 min a piedi da Hongdae)."
+              "t": "Metropolitana",
+              "d": "Linea 2/6, Uscita 7"
             },
             {
-              "t": "Hub di trasporto",
-              "d": "Punto di convergenza per tutti gli autobus che si spostano per Seul. (Stazione Mangwon, Stazione Hongdae tutte adiacenti)"
-            },
-            {
-              "t": "Parcheggio conveniente",
-              "d": "Porta la tua auto e parcheggia gratuitamente. (L'host copre la tariffa mensile di 30,000 KRW)"
-            },
-            {
-              "t": "Guida e taxi",
-              "d": "Solo 1 minuto per immettersi nella superstrada Gangbyeon verso Gangnam, Ilsan, Yeouido."
+              "t": "Autobus",
+              "d": "Fermata a 1 min"
             }
           ]
         },
         "facilities": {
-          "title": " Couch Servizi e strutture (Materiali di consumo gratuiti)",
-          "base": "Elettrodomestici/Mobili di base",
-          "baseDesc": "Frigorifero, lavatrice, aria condizionata, Smart TV (2), Wi-Fi Giga, lavabo, fornello a induzione, letti Queen e Super Single",
-          "add": "Strutture aggiuntive",
-          "addDesc": "Serratura sicura, ufficio di gestione/CCTV, tavolo da pranzo, purificatore d'acqua, divano, scrivania grande, armadio spazioso, scarpiera",
-          "freeTitle": "✨ Tutti i consumabili sono forniti gratuitamente!!!",
-          "freeDesc": "Vengono forniti ramen, riso istantaneo, carta igienica, fazzoletti, set spazzolino/dentifricio, shampoo/balsamo, bagnoschiuma, detergente per le mani.\nUsa liberamente lo stendibiancheria, il detersivo, l'ammorbidente e i sacchetti per rifiuti/riciclaggio!"
+          "title": "Dotazioni",
+          "base": "Basi",
+          "baseDesc": "Letto Queen, AC, Wi-Fi",
+          "add": "Cucina",
+          "addDesc": "Frigo, Piastre, Lavatrice",
+          "freeTitle": "Offerto",
+          "freeDesc": "Acqua, Asciugamani, Shampoo, Asciugacapelli"
         },
         "attractions": {
-          "title": "🛍️ Stile di vita del quartiere e attrazioni",
+          "title": "Nelle vicinanze",
           "list": [
             {
-              "t": "Distretto di Hapjeong / Hongdae",
-              "d": "Adiacente ai migliori ristoranti e caffè di Hapjeong e alle vivaci strade di Hongdae."
+              "t": "Shopping",
+              "d": "Mecenatpolis"
             },
             {
-              "t": "Supermercati convenienti",
-              "d": "Wang Mart è a 1 min per la spesa rapida. Homeplus Mega Mart è a 5 min a piedi per tutto il resto."
-            },
-            {
-              "t": "Fuga sul fiume Han in qualsiasi momento",
-              "d": "1 minuto a piedi dall'ingresso del parco Hangang. Strettamente collegato al parco Mangwon Hangang."
+              "t": "Cultura",
+              "d": "Hapjeong-dong, Mangwon-dong"
             }
           ]
         }
       },
       "calendar": {
-        "title": "Disponibilità Prenotazioni",
-        "feeGuideTitle": "Price List",
+        "title": "Prenotazioni Hapjeong",
+        "feeGuideTitle": "Tariffe",
         "feeGuideLines": [
-          "80,000 KRW a notte (1 Ospite)",
-          "+10,000 KRW per ospite aggiuntivo (Max 4)",
-          "+10,000 KRW nei fine settimana e festività",
-          "30,000 KRW di spese di pulizia",
-          "Sconto di 20,000 KRW per soggiorni di 7+ notti"
+          "80,000 KRW / notte",
+          "Supp. pers : 10,000 KRW (max 4)",
+          "+10,000 KRW weekend",
+          "Sconto lunga durata disponibile",
+          "Pulizia : 30,000 KRW"
         ]
       },
       "gallery": {
-        "more": "Vedi altre foto",
+        "more": "Altre foto",
         "categories": [
           "Tutto",
-          "Soggiorno",
-          "Camera da letto",
+          "Salotto",
+          "Camera",
           "Cucina",
           "Bagno",
           "Vista"
         ],
         "descriptions": [
-          "Soggiorno, Scrivania (Specchiera), Tavolo da pranzo per 2",
-          "Studio premium con soffitti alti",
-          "Layout perfetto per il relax e la cena",
-          "Samsung Smart TV M7 2026 / Scrivania e Specchiera",
-          "Canali TV Premium e OTT gratuiti (Accesso personale disponibile)",
-          "Smart Speaker Kakao Park",
-          "Biancheria da letto premium IKEA (Misura Queen)",
-          "TV in camera da letto",
-          "Poltrona massaggiante reclinabile (Alte prestazioni)",
-          "Letto singolo Ace con biancheria IKEA",
-          "Capacità per 3 ospiti (si può usare il divano del soggiorno)",
-          "Purificatore d'acqua, utensilis da cucina, condimenti, usa e getta completamente attrezzati",
-          "Frigorifero e lavatrice Samsung",
-          "Lavabo, toilette e doccia separati",
-          "Shampoo, balsamo, bagnoschiuma forniti",
-          "Bidet disponibile",
-          "Vista sul fiume Han e fresca brezza fluviale",
-          "A 1 minuto dal parco Hangang",
-          "Vista sul fiume Han e vista sulla città"
+          "Salotto Hapjeong",
+          "Divano comodo",
+          "Interno chic",
+          "Illuminazione",
+          "Luce naturale",
+          "Spazio living",
+          "Camera",
+          "Letto soffice",
+          "Riposo",
+          "Vista camera",
+          "Armadio",
+          "Cucina attrezzata",
+          "Rangement cucina",
+          "Bagno pulito",
+          "Prodotti bagno",
+          "Doccia",
+          "Vista Han",
+          "Vista notte",
+          "Spazio relax"
         ]
       }
     },
     "deokeun": {
-      "name": "Deokeun",
+      "name": "Deokeun (Sangam)",
       "hero": {
-        "subtitle": "Prossimamente"
+        "subtitle": "Comfort moderno e calma"
       },
       "location": {
-        "title": "",
-        "addressLabel": "",
-        "address": "",
-        "bldgLabel": "",
-        "bldg": ""
+        "title": "Location",
+        "addressLabel": "Address",
+        "address": "Jeil-ro 110, Goyang",
+        "bldgLabel": "Building",
+        "bldg": "Hillstate Eco Deokeun"
       },
       "guide": {
-        "title": "",
-        "subtitle": "",
+        "title": "Dettagli Deokeun",
+        "subtitle": "Rifugio privato e tranquillo",
         "highlights": {
-          "title": "",
-          "list": [],
-          "quote": ""
+          "title": "Vantaggi",
+          "list": [
+            {
+              "t": "Nuovo",
+              "d": "Edificio recente"
+            },
+            {
+              "t": "Calma",
+              "d": "Lontano dal rumore urbano"
+            },
+            {
+              "t": "Equipaggiato",
+              "d": "Elettrodomestici moderni"
+            }
+          ],
+          "quote": "Per chi cerca un riposo profondo."
         },
         "transport": {
-          "title": "",
-          "list": []
+          "title": "Accesso",
+          "list": [
+            {
+              "t": "Auto",
+              "d": "5 min da Sangam-dong"
+            },
+            {
+              "t": "Autobus",
+              "d": "Fermata a 3 min"
+            }
+          ]
         },
         "facilities": {
-          "title": "",
-          "base": "",
-          "baseDesc": "",
-          "add": "",
-          "addDesc": "",
-          "freeTitle": "",
-          "freeDesc": ""
+          "title": "Materiale",
+          "base": "Basi",
+          "baseDesc": "Letto comodo, climatizzazione, Smart TV",
+          "add": "Cucina",
+          "addDesc": "Microonde, Tostapane",
+          "freeTitle": "Offerto",
+          "freeDesc": "Capsule caffè, Acqua, Igiene"
         },
         "attractions": {
-          "title": "",
-          "list": []
+          "title": "Natura",
+          "list": [
+            {
+              "t": "Parchi",
+              "d": "Noeul & Haneul Park"
+            },
+            {
+              "t": "Business",
+              "d": "Sangam DMC"
+            }
+          ]
         }
       },
       "calendar": {
-        "title": "",
-        "feeGuideTitle": "Price List",
-        "feeGuideLines": []
+        "title": "Prenotazioni Deokeun",
+        "feeGuideTitle": "Tariffe",
+        "feeGuideLines": [
+          "60,000 KRW / notte",
+          "Supp/pers : 10,000 KRW",
+          "+10,000 KRW weekend",
+          "Pulizia : 30,000 KRW"
+        ]
       },
       "gallery": {
-        "more": "",
-        "categories": [],
-        "descriptions": []
+        "more": "Foto",
+        "categories": [
+          "Tutto",
+          "Salotto",
+          "Camera",
+          "Cucina",
+          "Bagno",
+          "Vista"
+        ],
+        "descriptions": [
+          "Vista Deokeun",
+          "Camera",
+          "Entrata",
+          "Scrivania",
+          "Interno",
+          "Televisione",
+          "Armadio",
+          "Aria",
+          "Cucina",
+          "Utensili",
+          "Stoviglie",
+          "Caffè",
+          "Snack",
+          "Igiene",
+          "Toilette",
+          "Doccia",
+          "Soccorso",
+          "Gym",
+          "Esterno"
+        ]
       }
     },
     "hongdae": {
       "name": "Hongdae",
       "hero": {
-        "subtitle": "Prossimamente"
+        "subtitle": "Riposo nel cuore della gioventù e dell'arte"
       },
       "location": {
-        "title": "",
-        "addressLabel": "",
-        "address": "",
-        "bldgLabel": "",
-        "bldg": ""
+        "title": "Location",
+        "addressLabel": "Address",
+        "address": "Seogyo-dong, Seul",
+        "bldgLabel": "Building",
+        "bldg": "Stay Hongdae"
       },
       "guide": {
-        "title": "",
-        "subtitle": "",
+        "title": "Info & Guida Hongdae",
+        "subtitle": "\"Tutto pronto, vieni come sei\"",
         "highlights": {
-          "title": "",
-          "list": [],
-          "quote": ""
+          "title": "✨ Punti Chiave",
+          "list": [
+            {
+              "t": "Core Hongdae",
+              "d": "La posizione ideale per vivere Hongdae."
+            },
+            {
+              "t": "Ultra-pulizia",
+              "d": "Biancheria lavata professionalmente ogni volta."
+            },
+            {
+              "t": "Mobili di Lusso",
+              "d": "2 letti Queen/Super Single e poltrona massaggiante."
+            },
+            {
+              "t": "Svago",
+              "d": "Smart TV Samsung MovingStyle (2026)."
+            }
+          ],
+          "quote": "Dopo la vivacità di Hongdae, un riposo reale."
         },
         "transport": {
-          "title": "",
-          "list": []
+          "title": "📍 Localizzazione",
+          "list": [
+            {
+              "t": "Stazione Hongdae",
+              "d": "Linea 2, AREX, Gyeongui."
+            },
+            {
+              "t": "Bus",
+              "d": "Accesso diretto Seul & Incheon."
+            },
+            {
+              "t": "A piedi",
+              "d": "Yeonnam-dong, Hapjeong inclusi."
+            }
+          ]
         },
         "facilities": {
-          "title": "",
-          "base": "",
-          "baseDesc": "",
-          "add": "",
-          "addDesc": "",
-          "freeTitle": "",
-          "freeDesc": ""
+          "title": "Dotazioni & Programma Gratis",
+          "base": "Materiale",
+          "baseDesc": "Frigo, Lavatrice, 2 Smart TV, Letto Queen",
+          "add": "Extra",
+          "addDesc": "Sicurezza CCTV, Tavolo, Purificatore d'acqua",
+          "freeTitle": "✨ Tutto Gratis !!!",
+          "freeDesc": "Ramen, Riso, Spazzolino, Shampoo... c'è tutto.\nDetersivo e sacchetti spazzatura gratis."
         },
         "attractions": {
-          "title": "",
-          "list": []
+          "title": "🛍️ Uscite",
+          "list": [
+            {
+              "t": "Walking Street",
+              "d": "Spettacoli di strada."
+            },
+            {
+              "t": "Bosco di Yeonnam",
+              "d": "Picnic e passeggiate."
+            },
+            {
+              "t": "Ristorazione",
+              "d": "Centinaia di ristoranti e caffè."
+            }
+          ]
         }
       },
       "calendar": {
-        "title": "",
+        "title": "Prenotazioni Hongdae",
         "feeGuideTitle": "Price List",
-        "feeGuideLines": []
+        "feeGuideLines": [
+          "80,000 KRW / notte",
+          "Offerta di apertura"
+        ]
       },
       "gallery": {
-        "more": "",
-        "categories": [],
-        "descriptions": []
+        "more": "View More",
+        "categories": [
+          "Tutto",
+          "Salotto",
+          "Camera",
+          "Cucina",
+          "Bagno"
+        ],
+        "descriptions": [
+          "Caricamento galleria...",
+          "Ambiente accogliente",
+          "Interno"
+        ]
       }
     }
   },
   "common": {
-    "save": "Save",
-    "cancel": "Cancel",
-    "loading": "Loading...",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "loading": "Caricamento...",
     "contact": {
-      "title": "Contattaci",
-      "desc": "Non esitare a contattarci in qualsiasi momento per domande.",
-      "call": "Chiama",
-      "callDesc": "010-7209-2468 (Stone)",
+      "title": "Consultazioni",
+      "desc": "Contattaci in qualsiasi momento.",
+      "call": "Chiamata",
+      "callDesc": "Direct Call",
       "sms": "SMS",
-      "smsDesc": "Risposta rapida garantita",
-      "kakao": "Chat Kakao",
-      "kakaoDesc": "ID: stonehong@kakao.com",
+      "smsDesc": "Inquire via SMS",
+      "kakao": "KakaoTalk",
+      "kakaoDesc": "KakaoTalk Channel",
       "whatsapp": "WhatsApp",
-      "whatsappDesc": "Per ospiti globali",
-      "fb": "FB Messenger",
-      "fbDesc": "Messaggio Facebook"
+      "whatsappDesc": "WhatsApp Inquiry",
+      "fb": "Messenger",
+      "fbDesc": "Facebook Message"
     },
     "hostGuide": {
-      "title": "🛡️ Linee guida della camera e comunicazione con l'host",
+      "title": "L'Host",
       "list": [
         {
-          "t": "🔓 Check-in / Out (Flessibile)",
-          "d": "Ingresso contactless. Password e info camera inviati tramite messaggio il giorno del check-in.\nStandard: Check-in 15:00 / Check-out 11:00 (Può essere regolato per tua comodità!)"
+          "t": "Host",
+          "d": "Stone Hong"
         },
         {
-          "t": "🏠 Regole rigorose",
-          "d": "Assoluto DIVIETO DI FUMO in tutto l'edificio. Si applicano spese di pulizia speciali in caso di violazione.\nPer favore, differenzia il riciclaggio e lava i piatti prima del check-out.\nEssendo uno studio di nuova costruzione, astieniti dai rumori forti dopo le 22:00."
-        },
-        {
-          "t": "🤩 Comunicazione host 24/7",
-          "d": "Contattami in qualsiasi momento, anche la mattina presto! Non esitare a scrivermi se sei a disagio.\nSe ti mancano articoli essenziali durante il soggiorno, fammelo sapere. Li acquisterò e consegnerò in giornata."
+          "t": "Profilo",
+          "d": "Insegnante di Tango & Host.\nUn'accoglienza dedicata alla tua passione."
         }
       ]
     },
     "story": {
-      "title": "Storia di TangoStay",
-      "subtitle": "\"Porta solo te stesso\"... Presentazione dell'[Esperimento dell'Isola Deserta] di TangoStay.",
-      "p1": "Il mio unico obiettivo nel creare questo spazio come host è stato l'\"Esperimento dell'Isola Deserta\". Uno spazio in cui puoi entrare con una sola valigia e vivere in modo perfettamente confortevole per più di una settimana senza mai uscire. Ho progettato questo spazio per risolvere completamente gli innumerevoli inconvenienti che ho sperimentato come ospite.",
-      "sol1Title": "Stay Pack: ZERO discomfort, pacchetto regalo di benvenuto",
-      "sol1Text": "Smetti di preoccuparti di usare gli asciugamani o il sapone di qualcun altro. Forniamo a ogni ospite asciugamani, strofinacci, sapone e set di spazzolini nuovi di zecca, qualità da hotel, tutto nuovo. Non c'è bisogno di correre al minimarket il primo giorno.",
-      "sol2Title": "Niente più preoccupazioni per l'acqua! Purificatore d'acqua premium",
-      "sol2Text": "Liberati dal trasporto di pesanti bottiglie d'acqua. È stato installato un purificatore d'acqua all'avanguardia, che fornisce acqua fresca e pulita illimitata in qualsiasi momento.",
-      "sol3Title": "Pulizia senza compromessi (Lavanderia professionale Laundrygo)",
-      "sol3Text": "Tutta la biancheria da letto (piumone, copripiumino, coprimaterasso, federe) e i tappeti vengono preparati in duplice copia e lavati professionalmente e sterilizzati ad alta temperatura da Laundrygo per ogni nuovo ospite. Sperimenta un sommo profondo su biancheria impeccabilmente pulita.",
-      "closing": "Non vedo l'ora di accoglierti nella mia \"Isola Deserta\", il luogo più confortevole per rilassarsi davvero.",
+      "title": "La Storia Tango Stay",
+      "subtitle": "\"Vieni come sei\" - [L'esperimento dell'isola deserta]",
+      "p1": "Il mio scopo: far sì che tu possa vivere comodamente per una settimana senza uscire, solo con una valigia. Una soluzione per tutti i fastidi che ho vissuto come viaggiatore.",
+      "sol1Title": "Stay Pack: Comfort puro",
+      "sol1Text": "Biancheria e cosmetici nuovi per ogni ospite. Qualità hotel.",
+      "sol2Title": "Basta comprare bottiglie d'acqua!",
+      "sol2Text": "Purificatore d'acqua all'avanguardia installato.",
+      "sol3Title": "Igiene drastica (Laundrygo)",
+      "sol3Text": "Disinfezione ad alta temperatura per tutta la biancheria.",
+      "closing": "Goditi la tua \"isola deserta\" privata.",
       "hostName": "👋 Sono Stone, il ballerino di Tango Argentino.",
-      "hostBio": "Mi sono specializzato in Business Administration e Intelligenza Artificiale, e ho lavorato come lead planner per molte app famose che probabilmente usi ogni giorno.\n\nRecentemente, ho lasciato la vita aziendale per dedicare il resto della mia vita come istruttore e ricercatore di Tango."
+      "hostBio": ""
     },
     "footer": {
-      "term": "Termini di Servizio",
-      "privacy": "Informativa sulla Privacy",
-      "termTitle": "[Termini di Servizio]",
-      "privacyTitle": "[Informativa sulla Privacy]",
-      "termText": "Articolo 1 (Scopo)\nLo scopo di questi termini è quello di stipulare i diritti, gli obblighi e le responsabilità tra l'host e l'ospite in merito ai servizi di alloggio forniti da TangoStay.\n\nArticolo 2 (Fornitura del Servizio)\n1. TangoStay fornisce all'ospite l'alloggio specificato e tutte le strutture accessorie (inclusi i materiali di consumo gratuiti).\n2. L'host può richiedere il risarcimento dei danni effettivi all'ospite per qualsiasi danno alla proprietà all'interno dell'alloggio.\n\nArticolo 3 (Obblighi dell'Ospite)\n1. Agli ospiti è vietato fumare o fare rumori forti (dopo le 22:00) che possano disturbare gli altri.\n2. Le violazioni possono comportare lo sfratto forzato e una spesa di pulizia speciale.",
-      "privacyText": "1. Informazioni Personali Raccolte\nTangoStay raccoglie le seguenti informazioni personali per una prenotazione e una comunicazione fluide.\n- Articoli raccolti: Nome, Numero di contatto, Orario della prenotazione\n\n2. Scopo della Raccolta e dell'Uso\n- Guida alle password per l'edificio e la serratura della stanza\n- Conferma del pagamento e della prenotazione, risposta al cliente per la gestione della qualità del soggiorno\n\n3. Periodo di Conservazione\n- In linea di principio, le informazioni vengono distrutte immediatamente dopo il raggiungimento dello scopo (1 mese dopo il check-out)."
+      "term": "Termini",
+      "privacy": "Privacy",
+      "termTitle": "Termini d'Uso",
+      "privacyTitle": "Privacy",
+      "termText": "Art. 1 (Scopo)...",
+      "privacyText": "I tuoi dati sono protetti..."
     }
   },
-  "startTime": "Start Time",
-  "endTime": "End Time",
+  "startTime": "Inizio",
+  "endTime": "Fine",
   "media": {
     "title": "Media",
-    "edit": "Edit Media",
+    "edit": "Modifica Video",
     "type": {
       "youtube": "YouTube",
       "demonstration": "Demo",
-      "general": "General"
+      "general": "Generico"
     },
-    "filterAll": "All",
-    "addBtn": "Register",
-    "like": "Like",
-    "comment": "Comment",
-    "views": "Views",
-    "noAccess": "Demonstration video for class participants only.",
+    "filterAll": "Tutti i corsi",
+    "addBtn": "Aggiungi",
+    "like": "Mi piace",
+    "comment": "Commenta",
+    "views": "Visualizzazioni",
+    "noAccess": "Riservato agli allievi",
     "placeholder": {
-      "title": "Enter title",
-      "url": "YouTube ID or Video URL",
-      "desc": "Enter description",
-      "class": "Select Class (Optional)",
-      "comment": "Leave a comment..."
+      "title": "Titolo",
+      "url": "Link YouTube",
+      "desc": "Descrizione",
+      "class": "Corso associato",
+      "comment": "Il tuo parere..."
     },
-    "uploading": "Uploading...",
-    "deleteConfirm": "Delete this?",
-    "saveSuccess": "Saved.",
-    "deleteSuccess": "Deleted."
+    "uploading": "Invio...",
+    "deleteConfirm": "Eliminare?",
+    "saveSuccess": "Successo.",
+    "deleteSuccess": "Eliminato."
   },
   "story": {
     "campaign": {
-      "title": "Core Campaign",
+      "title": "Partecipazione",
       "slogan": "Happy Space, Warm People",
-      "sloganKo": "Happy Space, Warm People"
+      "sloganKo": "Spazio Felice, Persone Calde"
     },
     "hero": {
-      "title": "The Playground We Dream of,\nA Sanctuary for All",
-      "subtitle": "A Freestyle Tango community where we grow together with respect"
+      "title": "Il Nostro Rifugio,\nIl Nostro Sogno",
+      "subtitle": "Comunità Freestyle Tango, cresciamo insieme"
     },
     "ethics": {
-      "title": "Community Core Values",
-      "respectTitle": "Attitude First (Respect)",
-      "respectDesc": "The premise that we must respect each other is too clear. Otherwise, club activities may be restricted.",
-      "teachingTitle": "No Teaching",
-      "teachingDesc": "One-sided teaching among students can hinder the progress of both yourself and others. We welcome exchange of opinions, but please resolve technical issues through the instructors.",
+      "title": "Valori Core",
+      "respectTitle": "Rispetto Prima di Tutto",
+      "respectDesc": "Il rispetto reciproco è imperativo.",
+      "teachingTitle": "No Teaching Privato",
+      "teachingDesc": "Nessuna lezione tra allievi. Rivolgiti agli insegnanti.",
       "teachingDetail": "It is important to accurately understand the teacher's intentions. Regardless of experience, please refrain from one-sided teaching."
     },
     "projects": {
-      "title": "Strategic Projects",
+      "title": "Progetti Strategici",
       "azit": {
-        "title": "Project 'Azit'",
-        "desc": "Our own sanctuary where we can comfortably talk and enjoy food and drinks before and after classes."
+        "title": "Progetto 'Azit'",
+        "desc": "Spazio relax post-corso."
       },
       "camp": {
-        "title": "Project 'Camp'",
-        "desc": "A pension space that can be a sanctuary for us outside the city on weekends and holidays."
+        "title": "Progetto 'Camp'",
+        "desc": "Ritiri in natura."
       },
       "nuevo": {
-        "title": "Project Professional Performance Team 'Nuevo Company'",
-        "desc": "Operation of a professional performance team and activation of yoga rooms and cultural centers for wellness."
+        "title": "Progetto 'Nuevo Company'",
+        "desc": "Compagnia pro & benessere."
       },
       "orchestra": {
-        "title": "Project 'House Ochestra'",
-        "desc": "Freestyle's own house orchestra for salon recitals and live milongas."
+        "title": "Progetto 'House Orchestra'",
+        "desc": "Orchestra propria per milongas live."
       }
     },
     "roadmap": {
-      "title": "Sustainable Future",
+      "title": "Futuro Sostenibile",
       "cooperative": {
-        "title": "Cooperative Transition",
-        "desc": "A system where members share ownership of the club and jointly operate and make decisions."
+        "title": "Verso una Cooperativa",
+        "desc": "Gestione condivisa."
       },
       "donation": {
-        "title": "Establishing a Donation Culture",
-        "desc": "A culture that supports new members and helps the club grow through scholarships and volunteering."
+        "title": "Cultura del Dono",
+        "desc": "Borse per i nuovi arrivati."
       },
       "instructor": {
-        "title": "Internal Instructor Training",
-        "desc": "A system to nurture the next generation of leaders from within our community."
+        "title": "Formazione Interna",
+        "desc": "Ogni membro può approfondire ed insegnare."
       }
     },
     "guidelines": {
-      "title": "General Guide",
-      "cleaning": "Wipe up spills immediately.",
-      "shoes": "Only dedicated shoes or bare feet are allowed inside.",
-      "toilet": "Only toilet paper in the toilet (No hand towels, wet wipes).",
-      "trash": "Sort trash and dispose of it in bins when leaving.",
-      "power": "Use the main switch next to the door when entering/leaving.",
+      "title": "Guida Generale",
+      "cleaning": "Pulisci subito ogni liquido versato sul pavimento.",
+      "shoes": "Scarpe da ballo o piedi scalzi in sala.",
+      "toilet": "Solo carta igienica nel water.",
+      "trash": "Fai la differenziata quando esci.",
+      "power": "Usa l'interruttore generale.",
       "facilities": {
         "wifi": "WiFi: freestyle1234",
-        "pc": "PC PW: 7788",
-        "lockers": "Items cannot be stored outside personal lockers."
+        "pc": "PC: 7788",
+        "lockers": "Niente oggetti fuori dai cassetti."
       }
     }
   },
   "coaching": {
-    "title": "Coaching Management",
-    "newCoaching": "New Coaching",
-    "empty": "No coaching items found.",
-    "student": "Student",
-    "instructor": "Instructor",
-    "progress": "Progress",
-    "status": "Status",
-    "ongoing": "Ongoing",
-    "solved": "Solved",
-    "solvedBadge": "Solved",
-    "itemTitle": "Title",
-    "itemDesc": "Description",
-    "selectStudent": "Select Student",
-    "searchStudentPlaceholder": "Search name or phone...",
-    "searchSearching": "Searching...",
-    "searchNoResults": "No results found.",
-    "creating": "Creating...",
-    "updates": "Activity Logs",
-    "activityAdd": "Add Activity",
-    "addComment": "Add a comment...",
-    "uploadMedia": "Add Photo/Video",
-    "updateProgress": "Update Progress",
-    "saveUpdate": "Save Log",
-    "noUpdates": "No logs yet.",
+    "title": "Gestione Coaching",
+    "newCoaching": "Nuovo Coaching",
+    "empty": "Nulla per il momento.",
+    "student": "Allievo",
+    "instructor": "Coach",
+    "progress": "Progressi",
+    "status": "Stato",
+    "ongoing": "In corso",
+    "solved": "Risolto",
+    "solvedBadge": "Risolto",
+    "itemTitle": "Titolo",
+    "itemDesc": "Descrizione",
+    "selectStudent": "Scegli Allievo",
+    "searchStudentPlaceholder": "Nome o tel.",
+    "searchSearching": "Ricerca...",
+    "searchNoResults": "Nessun risultato.",
+    "creating": "Iscrizione...",
+    "updates": "Attività",
+    "activityAdd": "Aggiungi att.",
+    "comment": "Comment",
+    "placeholderComment": "Write a comment...",
+    "media": "Media",
+    "addComment": "Commento...",
+    "uploadMedia": "Media",
+    "updateProgress": "Aggiorna progressi",
+    "saveUpdate": "Salva record",
+    "noUpdates": "Nessun dato.",
     "confirmStatusChange": "Cambia stato?",
-    "reopen": "Reopen",
-    "errorSave": "Error saving update."
+    "reopen": "Riapri",
+    "editActivity": "Edit Activity",
+    "deleteActivity": "Delete Activity",
+    "confirmDelete": "Are you sure you want to delete this?",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "errorSave": "Errore."
   }
 };

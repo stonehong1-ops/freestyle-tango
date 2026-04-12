@@ -22,6 +22,48 @@ export default function MemberManagement({ registrations, onClose }: Props) {
     fetchData();
   }, []);
 
+  const handleChat = async (targetUser: any) => {
+    try {
+      const stored = localStorage.getItem('ft_user');
+      if (!stored) {
+        alert("로그인이 필요합니다.");
+        return;
+      }
+      const currentUser = JSON.parse(stored);
+      
+      const { getOrCreatePrivateRoom } = await import('@/lib/chat');
+      const myPhone = currentUser.phone.replace(/[^0-9]/g, '');
+      const otherPhone = targetUser.phone.replace(/[^0-9]/g, '');
+      
+      if (myPhone === otherPhone) {
+        alert("자기 자신과는 채팅할 수 없습니다.");
+        return;
+      }
+
+      const roomId = await getOrCreatePrivateRoom(
+        [
+          { nickname: currentUser.nickname, phone: myPhone },
+          { nickname: targetUser.nickname || targetUser.phone, phone: otherPhone }
+        ],
+        myPhone
+      );
+
+      if (roomId) {
+        window.dispatchEvent(new CustomEvent('ft_open_chat', {
+          detail: {
+            roomId: roomId,
+            roomName: targetUser.nickname || targetUser.phone,
+            participants: [myPhone, otherPhone]
+          }
+        }));
+        onClose(); // MemberManagement 모달 닫기
+      }
+    } catch (error) {
+      console.error("Chat Error:", error);
+      alert("채팅방을 열 수 없습니다.");
+    }
+  };
+
   const handleSort = (type: typeof sortBy) => {
     if (sortBy === type) {
       setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
@@ -304,12 +346,25 @@ export default function MemberManagement({ registrations, onClose }: Props) {
                             {user.phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3')}
                           </div>
                         </div>
-                        <div style={{ 
-                          padding: '4px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700,
-                          background: user.role === 'leader' ? '#e8f3ff' : '#fff0f0',
-                          color: user.role === 'leader' ? '#3182f6' : '#f04452'
-                        }}>
-                          {user.role === 'leader' ? t.admin.member.leader : t.admin.member.follower}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <button 
+                            onClick={() => handleChat(user)}
+                            style={{ 
+                              background: '#f2f4f6', border: 'none', borderRadius: '8px', 
+                              width: '32px', height: '32px', display: 'flex', alignItems: 'center', 
+                              justifyContent: 'center', cursor: 'pointer', fontSize: '1rem' 
+                            }}
+                            title="Message"
+                          >
+                            💬
+                          </button>
+                          <div style={{ 
+                            padding: '4px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700,
+                            background: user.role === 'leader' ? '#e8f3ff' : '#fff0f0',
+                            color: user.role === 'leader' ? '#3182f6' : '#f04452'
+                          }}>
+                            {user.role === 'leader' ? t.admin.member.leader : t.admin.member.follower}
+                          </div>
                         </div>
                       </div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px' }}>

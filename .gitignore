@@ -47,3 +47,9 @@ backups/
 *.zip
 *.bak
 
+# artifacts and scratch
+/scratch/
+/artifacts/
+set_cors.js
+test_urls.js
+/src/app/api/diag/

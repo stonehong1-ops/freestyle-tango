@@ -462,8 +462,78 @@
   background: #94a3b8;
 }
 
-.loading, .empty {
-  text-align: center;
-  padding: 60px 20px;
+.chatIconBtn {
+  background: white;
+  border: 1px solid #e2e8f0;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.chatIconBtn:hover {
+  background: #f1f5f9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+}
+
+.moreBtn {
+  background: none;
+  border: none;
   color: #94a3b8;
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.moreBtn:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.sheetOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 0;
+}
+
+.sheetBtn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: none;
+  background: #f8fafc;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sheetBtn:hover {
+  background: #f1f5f9;
+}
+
+.sheetBtn.delete {
+  color: #ef4444;
+}
+
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 10px 0;
 }

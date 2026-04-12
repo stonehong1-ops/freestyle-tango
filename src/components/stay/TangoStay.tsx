@@ -20,14 +20,15 @@ export default function TangoStay() {
   const { language, setLanguage, t } = useLanguage();
   const [selectedStayId, setSelectedStayId] = useState('hapjeong');
   
-  // View State: 'overview' | 'reserve' | 'complete'
-  const [view, setView] = useState<'overview' | 'reserve' | 'complete'>('overview');
+  // View State: 'overview' | 'complete'
+  const [view, setView] = useState<'overview' | 'complete'>('overview');
+  const [showReserveModal, setShowReserveModal] = useState(false);
   const [reserveData, setReserveData] = useState<any>(null);
   const [showMonthlyStatus, setShowMonthlyStatus] = useState(false);
   const [activeSubTab, setActiveSubTab] = useState<'intro' | 'reserve' | 'info'>('intro');
 
   useModalHistory(showMonthlyStatus, () => setShowMonthlyStatus(false), 'stayMonthly');
-  useModalHistory(view === 'reserve', () => { setView('overview'); setReserveData(null); }, 'stayReserve');
+  useModalHistory(showReserveModal, () => { setShowReserveModal(false); setReserveData(null); }, 'stayReserve');
   useModalHistory(view === 'complete', () => { setView('overview'); setReserveData(null); }, 'stayComplete');
 
   // @ts-ignore
@@ -38,12 +39,12 @@ export default function TangoStay() {
 
   const handleReserveInit = (data: any) => {
     setReserveData(data);
-    setView('reserve');
-    window.scrollTo(0, 0);
+    setShowReserveModal(true);
   };
 
   const handleReserveComplete = (data: any) => {
     setReserveData(data);
+    setShowReserveModal(false);
     setView('complete');
     window.scrollTo(0, 0);
   };
@@ -53,20 +54,6 @@ export default function TangoStay() {
     setReserveData(null);
     window.scrollTo(0, 0);
   };
-
-  if (view === 'reserve' && reserveData) {
-    return (
-      <ReserveForm 
-        stayId={selectedStayId}
-        checkIn={reserveData.checkIn}
-        checkOut={reserveData.checkOut}
-        guests={reserveData.guests}
-        totalAmount={reserveData.pricing.total}
-        onBack={() => setView('overview')}
-        onComplete={handleReserveComplete}
-      />
-    );
-  }
 
   if (view === 'complete' && reserveData) {
     return (
@@ -147,7 +134,7 @@ export default function TangoStay() {
             </header>
 
             <section className={styles.heroSection}>
-              <Gallery stayId={selectedStayId} />
+              <Gallery key={selectedStayId} stayId={selectedStayId} />
             </section>
             
             <section className={styles.section}>
@@ -172,6 +159,7 @@ export default function TangoStay() {
               </p>
 
               <CalendarSection 
+                key={selectedStayId}
                 stayId={selectedStayId} 
                 onReserve={handleReserveInit} 
                 showInlineGrid={false}
@@ -197,6 +185,25 @@ export default function TangoStay() {
           </>
         )}
       </div>
+
+      <FullscreenModal
+        isOpen={showReserveModal}
+        onClose={() => setShowReserveModal(false)}
+        title={t.reserve.title}
+        hideHeader={true}
+      >
+        {reserveData && (
+          <ReserveForm 
+            stayId={selectedStayId}
+            checkIn={reserveData.checkIn}
+            checkOut={reserveData.checkOut}
+            guests={reserveData.guests}
+            totalAmount={reserveData.pricing.total}
+            onBack={() => setShowReserveModal(false)}
+            onComplete={handleReserveComplete}
+          />
+        )}
+      </FullscreenModal>
 
       <FullscreenModal
         isOpen={showMonthlyStatus}

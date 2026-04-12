@@ -29,7 +29,7 @@ export const NOTICE_ROOM_ID = 'freestyle_notice';
 // Get rooms accessible by user
 export const subscribeRooms = (userPhone: string, isAdmin: boolean, pinnedRoomIds: string[], callback: (rooms: ChatRoom[]) => void) => {
   const roomsRef = collection(db, ROOMS_COLLECTION);
-  const cleanPhone = userPhone.replace(/[^0-9]/g, '');
+  const cleanPhone = (userPhone === 'admin' || userPhone.length < 6) ? userPhone : userPhone.replace(/[^0-9]/g, '');
   
   // Combine all results and sort
   const handleSnapshot = (publicR: ChatRoom[], privateR: ChatRoom[]) => {
@@ -75,7 +75,7 @@ export const subscribeRooms = (userPhone: string, isAdmin: boolean, pinnedRoomId
         ...data,
         thumbnail: remapStorageUrl(data.thumbnail),
         imageUrl: remapStorageUrl(data.imageUrl)
-      } as ChatRoom;
+      } as unknown as ChatRoom;
     });
     handleSnapshot(publicRooms, privateRooms);
   }, (err) => {
@@ -90,7 +90,7 @@ export const subscribeRooms = (userPhone: string, isAdmin: boolean, pinnedRoomId
         ...data,
         thumbnail: remapStorageUrl(data.thumbnail),
         imageUrl: remapStorageUrl(data.imageUrl)
-      } as ChatRoom;
+      } as unknown as ChatRoom;
     });
     handleSnapshot(publicRooms, privateRooms);
   }, (err) => {
@@ -144,16 +144,23 @@ export const subscribeMessages = (roomId: string, callback: (messages: ChatMessa
 // Send message
 export const sendMessage = async (message: Omit<ChatMessage, 'id' | 'timestamp' | 'readBy'>, roomData?: { name?: string; participants?: string[] }) => {
   try {
-    const sanitizedMessage = Object.fromEntries(
-      Object.entries(message).filter(([_, v]) => v !== undefined)
-    );
+    const cleanSenderId = (message.senderId.includes('admin') || message.senderId.length < 5) 
+      ? message.senderId 
+      : message.senderId.replace(/[^0-9]/g, '');
 
-    const docRef = await addDoc(collection(db, MESSAGES_COLLECTION), {
-      ...sanitizedMessage,
-      mediaUrl: remapStorageUrl(message.mediaUrl),
-      readBy: [message.senderId.replace(/[^0-9]/g, '')], 
+    const messageData: any = {
+      ...Object.fromEntries(Object.entries(message).filter(([_, v]) => v !== undefined)),
+      senderId: cleanSenderId, // Ensure consistently cleaned sender ID
+      readBy: [cleanSenderId], 
       timestamp: serverTimestamp()
-    });
+    };
+
+    // Only add mediaUrl if it exists and remap it
+    if (message.mediaUrl) {
+      messageData.mediaUrl = remapStorageUrl(message.mediaUrl);
+    }
+
+    const docRef = await addDoc(collection(db, MESSAGES_COLLECTION), messageData);
     
     const roomRef = doc(db, ROOMS_COLLECTION, message.roomId);
     const roomSnap = await getDoc(roomRef);
@@ -163,9 +170,9 @@ export const sendMessage = async (message: Omit<ChatMessage, 'id' | 'timestamp' 
     // Update unreadCounts for others
     const currentUnreadCounts = roomDataFirestore.unreadCounts || {};
     participants.forEach((p: string) => {
-      const cleanP = p.replace(/[^0-9]/g, '');
-      const cleanSender = message.senderId.replace(/[^0-9]/g, '');
-      if (cleanP !== cleanSender) {
+      // Use consistent cleaning for participant IDs too
+      const cleanP = (p === 'admin' || p.length < 6) ? p : p.replace(/[^0-9]/g, '');
+      if (cleanP && cleanP !== cleanSenderId) {
         currentUnreadCounts[cleanP] = (currentUnreadCounts[cleanP] || 0) + 1;
       }
     });
@@ -173,13 +180,16 @@ export const sendMessage = async (message: Omit<ChatMessage, 'id' | 'timestamp' 
     await updateDoc(roomRef, {
       lastMessage: message.type === 'text' ? message.text : `[${message.type}]`,
       lastMessageTime: serverTimestamp(),
-      lastMessageSenderId: message.senderId.replace(/[^0-9]/g, ''),
-      lastMessageReadBy: [message.senderId.replace(/[^0-9]/g, '')],
+      lastMessageSenderId: cleanSenderId,
+      lastMessageReadBy: [cleanSenderId],
       unreadCounts: currentUnreadCounts
     });
 
     // Trigger Notification
-    const targets = participants.filter((p: string) => p.replace(/[^0-9]/g, '') !== message.senderId.replace(/[^0-9]/g, ''));
+    const cleanSenderIdForNotify = message.senderId.includes('admin') || message.senderId.length < 5 
+      ? message.senderId 
+      : message.senderId.replace(/[^0-9]/g, '');
+    const targets = participants.filter((p: string) => p.replace(/[^0-9]/g, '') !== cleanSenderIdForNotify);
     if (targets.length > 0) {
       fetch('/api/chat/notify', {
         method: 'POST',
@@ -203,7 +213,7 @@ export const sendMessage = async (message: Omit<ChatMessage, 'id' | 'timestamp' 
 
 export const leaveChatRoom = async (roomId: string, userPhone: string) => {
   try {
-    const cleanPhone = userPhone.replace(/[^0-9]/g, '');
+    const cleanPhone = (userPhone === 'admin' || userPhone.length < 6) ? userPhone : userPhone.replace(/[^0-9]/g, '');
     const roomRef = doc(db, ROOMS_COLLECTION, roomId);
     const snap = await getDoc(roomRef);
     if (!snap.exists()) return;
@@ -231,7 +241,7 @@ export const updateChatRoom = async (roomId: string, data: Partial<ChatRoom>) =>
 
 export const resetUnreadCount = async (roomId: string, userPhone: string) => {
   try {
-    const cleanPhone = userPhone.replace(/[^0-9]/g, '');
+    const cleanPhone = (userPhone === 'admin' || userPhone.length < 6) ? userPhone : userPhone.replace(/[^0-9]/g, '');
     const roomRef = doc(db, ROOMS_COLLECTION, roomId);
     await updateDoc(roomRef, {
       [`unreadCounts.${cleanPhone}`]: 0
@@ -244,7 +254,7 @@ export const resetUnreadCount = async (roomId: string, userPhone: string) => {
 // Mark message as read
 export const markMessageAsRead = async (roomId: string, messageId: string, userPhone: string) => {
   try {
-    const cleanPhone = userPhone.replace(/[^0-9]/g, '');
+    const cleanPhone = (userPhone === 'admin' || userPhone.length < 6) ? userPhone : userPhone.replace(/[^0-9]/g, '');
     
     // 1. Update individual message
     const messageRef = doc(db, MESSAGES_COLLECTION, messageId);
@@ -269,7 +279,7 @@ export const markMessageAsRead = async (roomId: string, messageId: string, userP
 export const toggleReaction = async (messageId: string, userPhone: string, emoji: string) => {
   try {
     const messageRef = doc(db, MESSAGES_COLLECTION, messageId);
-    const cleanPhone = userPhone.replace(/[^0-9]/g, '');
+    const cleanPhone = (userPhone === 'admin' || userPhone.length < 6) ? userPhone : userPhone.replace(/[^0-9]/g, '');
     
     const msgSnap = await getDoc(messageRef);
     if (!msgSnap.exists()) return;
@@ -356,7 +366,7 @@ export const searchUsers = async (searchTerm: string = '') => {
 
 // Get nicknames and photos for a list of phones
 export const getParticipantsInfo = async (phones: string[]) => {
-  const cleanPhones = phones.map(p => p.replace(/[^0-9]/g, ''));
+  const cleanPhones = phones.map(p => (p === 'admin' || p.length < 6) ? p : p.replace(/[^0-9]/g, ''));
   const results: { [phone: string]: { nickname: string; photoURL?: string } } = {};
   if (cleanPhones.length === 0) return results;
 
@@ -381,7 +391,7 @@ export const getParticipantsInfo = async (phones: string[]) => {
 };
 
 export const subscribeParticipantsInfo = (phones: string[], callback: (info: Record<string, any>) => void) => {
-  const cleanPhones = phones.map(p => p.replace(/[^0-9]/g, '')).filter(p => p.length > 0);
+  const cleanPhones = phones.map(p => (p === 'admin' || p.length < 6) ? p : p.replace(/[^0-9]/g, '')).filter(p => p.length > 0 || p === 'admin');
   if (cleanPhones.length === 0) {
     callback({});
     return () => {};
@@ -410,7 +420,7 @@ export const subscribeParticipantsInfo = (phones: string[], callback: (info: Rec
 };
 
 export const getOrCreatePrivateRoom = async (participants: { nickname: string; phone: string }[], createdBy: string, customName?: string) => {
-  const cleanParticipants = participants.map(p => p.phone.replace(/[^0-9]/g, '')).sort();
+  const cleanParticipants = participants.map(p => (p.phone === 'admin' || p.phone.length < 6) ? p.phone : p.phone.replace(/[^0-9]/g, '')).sort();
   const roomsRef = collection(db, ROOMS_COLLECTION);
   
   if (cleanParticipants.length === 2) {
@@ -440,7 +450,7 @@ export const getOrCreatePrivateRoom = async (participants: { nickname: string; p
     customName: customName || '',
     type: 'private',
     participants: cleanParticipants,
-    createdBy: createdBy.replace(/[^0-9]/g, ''),
+    createdBy: (createdBy === 'admin' || createdBy.length < 6) ? createdBy : createdBy.replace(/[^0-9]/g, ''),
     createdAt: serverTimestamp(),
     lastMessageTime: serverTimestamp(),
     lastMessage: '채팅방이 생성되었습니다.'
@@ -453,7 +463,7 @@ export const inviteUserToChatRoom = async (roomId: string, user: { nickname: str
   try {
     if (roomId === COMMUNITY_ROOM_ID || roomId === NOTICE_ROOM_ID) return;
     
-    const cleanPhone = user.phone.replace(/[^0-9]/g, '');
+    const cleanPhone = (user.phone === 'admin' || user.phone.length < 6) ? user.phone : user.phone.replace(/[^0-9]/g, '');
     const roomRef = doc(db, ROOMS_COLLECTION, roomId);
     
     // Add to participants

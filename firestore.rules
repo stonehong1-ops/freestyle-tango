@@ -9,10 +9,30 @@ service cloud.firestore {
     
     // [Rules] More strict for reservations and users
     match /milonga_reservations/{docId} {
-      allow read, write: if true; // Temporarily allow for smooth migration, can tighten later
+      allow read, write: if true; 
     }
     match /users/{userId} {
       allow read, write: if true; 
+    }
+    match /chat_rooms/{roomId} {
+      allow read, write: if true;
+    }
+    match /chat_messages/{messageId} {
+      allow read, write: if true;
+    }
+    match /coaching_items/{itemId} {
+      allow read, write: if true;
+    }
+    match /coaching_updates/{updateId} {
+      allow read, write: if true;
+    }
+    
+    // FCM Tokens
+    match /fcm_tokens/{tokenId} {
+      allow read, write: if true;
+    }
+    match /fcm_errors/{errorId} {
+      allow create: if true;
     }
     
     // Default fallback

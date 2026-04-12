@@ -5,6 +5,7 @@ import { TangoClass, Registration } from '@/lib/db';
 import { useLanguage } from '@/contexts/LanguageContext';
 import styles from './RegistrationFullList.module.css';
 import { useModalHistory } from '@/hooks/useModalHistory';
+import { maskPhoneNumber } from '@/lib/chat';
 
 interface Props {
   classes: TangoClass[];
@@ -127,7 +128,7 @@ export default function RegistrationFullList({ classes, registrations, selectedM
             </div>
             <div className={styles.infoItem}>
               <span className={styles.label}>연락처:</span>
-              <span className={styles.value}>{selectedReg.phone}</span>
+              <span className={styles.value}>{maskPhoneNumber(selectedReg.phone)}</span>
             </div>
             <div className={styles.infoItem}>
               <span className={styles.label}>역할:</span>

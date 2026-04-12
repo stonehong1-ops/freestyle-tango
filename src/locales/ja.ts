@@ -1,12 +1,12 @@
 export default {
   "header": {
-    "story": "タンゴステイ ストーリー",
+    "story": "ストーリー",
     "location": "アクセス",
-    "guide": "詳細 & ご利用案内",
+    "guide": "ご利用案内",
     "contact": "お問い合わせ",
-    "login": "Register",
-    "community": "Community",
-    "join": "Join"
+    "login": "登録",
+    "community": "コミュニティ",
+    "join": "参加"
   },
   "nav": {
     "home": "Class",
@@ -14,11 +14,11 @@ export default {
     "stay": "Stay",
     "class": "Class",
     "info": "Info",
-    "mypage": "MyPage",
+    "mypage": "My",
     "lucy": "Milonga",
-    "chat": "Chatting",
-    "guide": "Membership",
-    "classGuide": "Class Info",
+    "chat": "Chat",
+    "guide": "Guide",
+    "classGuide": "Guide",
     "fullSchedule": "Calendar",
     "media": "Media",
     "story": "Story"
@@ -297,41 +297,122 @@ export default {
   },
   "mypage": {
     "title": "マイページ",
-    "loginPrompt": "Login required.",
-    "loginBtn": "Login",
-    "logoutBtn": "Logout",
-    "membership": "会員情報",
+    "loginPrompt": "ログインが必要なサービスです。",
+    "loginBtn": "ログイン",
+    "logoutBtn": "ログアウト",
+    "membership": "メンバーシップガイド",
     "profile": {
-      "nickname": "Nickname",
-      "phone": "Phone",
-      "role": "Role"
+      "nickname": "ニックネーム",
+      "phone": "連絡先",
+      "role": "役割"
     },
     "tabs": {
-      "registration": "Apr. News/Apply",
-      "history": "History",
-      "wallet": "Wallet & Coupons",
-      "coaching": "Coaching",
-      "profile": "My Info",
-      "admin": "Admin"
+      "registration": "{month}月 申込み",
+      "history": "履歴",
+      "wallet": "ウォレット",
+      "coaching": "コーチング",
+      "profile": "プロフィール",
+      "admin": "管理"
     },
-    "walletDesc": "List of your active coupons.",
+    "alerts": {
+      "registration_failed": "通知の登録に失敗しました。\n詳細: {detail}\n\nブラウザの設定で通知が許可されているか、ネットワークを確認してください。",
+      "permission_denied": "通知権限が拒否されました。設定から通知を許可してください。",
+      "update_error": "設定の更新中にエラーが発生しました: {detail}",
+      "confirm_logout": "ログアウトしますか？",
+      "only_for_active_users": "今月の授業を受講中のユーザーのみ受け取ることができます。",
+      "wait_7_days": "最後のクーポンを受け取ってから7日が経過する必要があります。",
+      "already_issued": "すでに発行済みのクーポンです。",
+      "sold_out": "限定枚数 {total}枚がすべて発行されました。",
+      "confirm_issue": "このクーポンを受け取りますか？",
+      "issue_success": "クーポンが発行されました。",
+      "issue_failed": "発行失敗: {message}",
+      "confirm_cancel": "本当にクーポンをキャンセル（返却）しますか？キャンセルされたクーポンは再発行可能になります。",
+      "cancel_success": "クーポンが正常にキャンセルされました。",
+      "cancel_failed": "キャンセル失敗: {message}",
+      "general_error": "エラーが発生しました。もう一度お試しください。",
+      "expired_coupon": "有効期限が切れているため使用できないクーポンです。",
+      "confirm_use": "このクーポンを使用しますか？",
+      "only_self": "自分のページのみ確認できます。"
+    },
+    "payment": {
+      "status_paid": "決済完了",
+      "status_pending": "入금確認中",
+      "history_title": "{month}月 申込み履歴",
+      "date_label": "申込み日",
+      "no_history": "申込み履歴がありません。"
+    },
+    "notices": {
+      "title": "📢 クーポン発行のご案内",
+      "list": [
+        "授業の申込み完了（入金確認）後にクーポンを受け取ることができます。",
+        "発行されたクーポンはキャンセル（枚数復旧）が可能です。",
+        "クーポンごとの使用期間と言象（リーダー/フォロワーなど）を確認してください。",
+        "クーポン使用ボタンは、使用する直前に押してください。"
+      ],
+      "no_coupons": "現在発行中のクーポンはありません。"
+    },
+    "labels": {
+      "get_coupon": "クーポンを受け取る",
+      "used": "使用済み",
+      "expired": "期限切れ",
+      "use_now": "使用する",
+      "issued": "発行完了",
+      "free": "無料",
+      "ticket": "入場券",
+      "off": "OFF",
+      "won_off": "ウォン割引",
+      "ten_thousand_off": "万ウォン割引",
+      "status_available": "発行可能",
+      "status_can_use": "使用可能",
+      "duration_limited": "発行から {duration}ヶ月以内に使用",
+      "duration_unlimited": "期限なし",
+      "count_unit": "名",
+      "role_leader": "リーダー",
+      "role_follower": "フォロワー",
+      "phone": "電話番号",
+      "push_notif": "プッシュ通知",
+      "edit_profile": "プロフィール編集"
+    },
+    "admin_menu": {
+      "member": {
+        "title": "会員管理",
+        "desc": "会員リストおよび情報の管理"
+      },
+      "coaching": {
+        "title": "全体コーチング管理",
+        "desc": "全体のコーチング状況の照회および管理"
+      },
+      "checklist": {
+        "title": "ステイ チェックリスト",
+        "desc": "宿舎の予約状況およびチェックリスト"
+      },
+      "sms": {
+        "title": "ステイ 文字設定",
+        "desc": "予約確定および案内メッセージの管理"
+      },
+      "coupon": {
+        "title": "クーポン発行・管理",
+        "desc": "新規クーポンの発行および使用状況"
+      }
+    },
+    "walletDesc": "お持ちのクーポンリストです。",
     "wallet": {
-      "title": "My Wallet & Coupons",
-      "noCoupons": "No coupons found.",
-      "useCoupon": "Use Now",
-      "usedCoupon": "Used",
+      "title": "マイウォレット & クーポン",
+      "noCoupons": "クーポンがありません。",
+      "useCoupon": "使用する",
+      "usedCoupon": "使用済み",
       "membershipCoupon": {
-        "title": "1-Month Membership 5% Discount",
-        "desc": "5% discount for 3rd-week class application (10,000 KRW off)",
-        "target": "For Membership Members"
+        "title": "1ヶ月メンバーシップ クーポン",
+        "desc": "授業申込み時に使用可能なクーポン",
+        "target": "メンバーシップ会員対象"
       },
       "milongaCoupon": {
-        "title": "Milonga Luci 1-Time Free Pass",
-        "desc": "1-time free entry coupon for class registrants",
-        "target": "For Class Registrants"
+        "title": "ミロンガ ルーシー 1回無料入場券",
+        "desc": "授業申込み者対象 ミロンガ1回無料クーポン",
+        "target": "授業申込み者対象"
       },
-      "usageConfirm": "Would you like to use this coupon?\nUsed coupons cannot be restored.",
-      "usageSuccess": "Coupon successfully used."
+      "usageConfirm": "クーポンを使用しますか？\n使用したクーポンは元に戻せません。",
+      "usageSuccess": "クーポンの使用が完了しました。"
     }
   },
   "admin": {
@@ -356,9 +437,9 @@ export default {
   },
   "info": {
     "tabs": {
-      "location": "Location",
-      "membership": "Membership",
-      "story": "Story"
+      "location": "位置",
+      "membership": "メンバー",
+      "story": "ストーリー"
     }
   },
   "calendar": {
@@ -398,7 +479,8 @@ export default {
     "checkin": "チェックイン",
     "checkout": "チェックアウト",
     "clearBtn": "日付を再選択",
-    "feeGuideTitle": "ご利用料金案内"
+    "feeGuideTitle": "ご利用料金案内",
+    "reserveBtn": "Apply Now"
   },
   "location": {
     "naver": "Naverマップを開く",
@@ -871,97 +953,105 @@ export default {
   },
   "story": {
     "campaign": {
-      "title": "Core Campaign",
+      "title": "みんな一緒に",
       "slogan": "Happy Space, Warm People",
-      "sloganKo": "Happy Space, Warm People"
+      "sloganKo": "행복한 공간, 따뜻한 사람들"
     },
     "hero": {
-      "title": "The Playground We Dream of,\nA Sanctuary for All",
-      "subtitle": "A Freestyle Tango community where we grow together with respect"
+      "title": "私たちが夢見る遊び場、\nみんなの休息場所",
+      "subtitle": "お互いを尊重し、共に成長するフリースタイルタンゴコミュニティ"
     },
     "ethics": {
-      "title": "Community Core Values",
-      "respectTitle": "Attitude First (Respect)",
-      "respectDesc": "The premise that we must respect each other is too clear. Otherwise, club activities may be restricted.",
-      "teachingTitle": "No Teaching",
-      "teachingDesc": "One-sided teaching among students can hinder the progress of both yourself and others. We welcome exchange of opinions, but please resolve technical issues through the instructors.",
-      "teachingDetail": "It is important to accurately understand the teacher's intentions. Regardless of experience, please refrain from one-sided teaching."
+      "title": "コミュニティの核心価値",
+      "respectTitle": "態度が第一 (Respect)",
+      "respectDesc": "お互いに尊重し合わなければならないということは、あまりにも明白な命題です。そうでなければクラブ活動が制限される場合があります。",
+      "teachingTitle": "ティーチング禁止 (No Teaching)",
+      "teachingDesc": "学生同士の一方的な教えは、本人と相手の両方の発展を妨げる可能性があります。意見交換は歓迎しますが、技術的な問題は講師陣を通じて解決してください。",
+      "teachingDetail": "先生の意図を正確に理解することが重要です。経歴に関わらず、一方的なティーチングはお控えください。"
     },
     "projects": {
-      "title": "Strategic Projects",
+      "title": "戦略プロジェクト",
       "azit": {
         "title": "Project 'Azit'",
-        "desc": "Our own sanctuary where we can comfortably talk and enjoy food and drinks before and after classes."
+        "desc": "レッスンの前後で快適に会話を楽しみ、食事や飲み物を楽しめる自分たちだけの憩いの空間。"
       },
       "camp": {
         "title": "Project 'Camp'",
-        "desc": "A pension space that can be a sanctuary for us outside the city on weekends and holidays."
+        "desc": "週末や連休に都心を離れ、自分たちだけの隠れ家となるペンション空間。"
       },
       "nuevo": {
-        "title": "Project Professional Performance Team 'Nuevo Company'",
-        "desc": "Operation of a professional performance team and activation of yoga rooms and cultural centers for wellness."
+        "title": "Project プロフェッショナル公演団 'Nuevo Company'",
+        "desc": "プロフェッショナル公演団の運営、およびウェルネスのためのヨガルームや文化センターの活性化。"
       },
       "orchestra": {
-        "title": "Project 'House Ochestra'",
-        "desc": "Freestyle's own house orchestra for salon recitals and live milongas."
+        "title": "Project 'House Orchestra'",
+        "desc": "サロンコンサートやライブミロンガのためのフリースタイルだけのハウスオーケストラ。"
       }
     },
     "roadmap": {
-      "title": "Sustainable Future",
+      "title": "持続可能な未来",
       "cooperative": {
-        "title": "Cooperative Transition",
-        "desc": "A system where members share ownership of the club and jointly operate and make decisions."
+        "title": "協同組合への転換",
+        "desc": "クラブの所有権をメンバーで分け合い、共同で運営・意思決定を行うシステム。"
       },
       "donation": {
-        "title": "Establishing a Donation Culture",
-        "desc": "A culture that supports new members and helps the club grow through scholarships and volunteering."
+        "title": "寄付文化の定着",
+        "desc": "奨学制度やボランティアを通じて新入メンバーを支援し、クラブの成長を助ける文化。"
       },
       "instructor": {
-        "title": "Internal Instructor Training",
-        "desc": "A system to nurture the next generation of leaders from within our community."
+        "title": "内部講師の養成",
+        "desc": "誰もが特定のテーマを深く研究し、直接クラスを開設できるシステム。"
       }
     },
     "guidelines": {
-      "title": "General Guide",
-      "cleaning": "Wipe up spills immediately.",
-      "shoes": "Only dedicated shoes or bare feet are allowed inside.",
-      "toilet": "Only toilet paper in the toilet (No hand towels, wet wipes).",
-      "trash": "Sort trash and dispose of it in bins when leaving.",
-      "power": "Use the main switch next to the door when entering/leaving.",
+      "title": "利用規約 (General Guide)",
+      "cleaning": "床に飲み物をこぼした場合は、すぐにきれいに拭いてください。",
+      "shoes": "専用シューズまたは裸足以外での室内への立ち入りは禁止です。",
+      "toilet": "便器にはトイレットペーパーのみを流してください（ハンドタオル、ウェットティッシュ厳禁）。",
+      "trash": "退室時にゴミは分別してゴミ箱に捨ててください。",
+      "power": "入退室時には出入り口横のメインスイッチを使用してください。",
       "facilities": {
         "wifi": "WiFi: freestyle1234",
         "pc": "PC PW: 7788",
-        "lockers": "Items cannot be stored outside personal lockers."
+        "lockers": "個人用ロッカー以外の場所への物品保管はできません。"
       }
     }
   },
   "coaching": {
-    "title": "Coaching Management",
-    "newCoaching": "New Coaching",
-    "empty": "No coaching items found.",
-    "student": "Student",
-    "instructor": "Instructor",
-    "progress": "Progress",
-    "status": "Status",
-    "ongoing": "Ongoing",
-    "solved": "Solved",
-    "solvedBadge": "Solved",
-    "itemTitle": "Title",
-    "itemDesc": "Description",
-    "selectStudent": "Select Student",
-    "searchStudentPlaceholder": "Search name or phone...",
-    "searchSearching": "Searching...",
-    "searchNoResults": "No results found.",
-    "creating": "Creating...",
-    "updates": "Activity Logs",
-    "activityAdd": "Add Activity",
-    "addComment": "Add a comment...",
-    "uploadMedia": "Add Photo/Video",
-    "updateProgress": "Update Progress",
-    "saveUpdate": "Save Log",
-    "noUpdates": "No logs yet.",
+    "title": "コーチング管理",
+    "newCoaching": "新規コーチング登録",
+    "empty": "登録されたコーチング項目がありません。",
+    "student": "受講生",
+    "instructor": "担当講師",
+    "progress": "進捗率",
+    "status": "ステータス",
+    "ongoing": "進行中",
+    "solved": "問題解決",
+    "solvedBadge": "解決済み",
+    "itemTitle": "コーチングタイトル",
+    "itemDesc": "コーチング説明",
+    "selectStudent": "受講生を選択",
+    "searchStudentPlaceholder": "名前または電話番号で検索",
+    "searchSearching": "検索中...",
+    "searchNoResults": "検索結果がありません。",
+    "creating": "登録中...",
+    "updates": "活動記録",
+    "activityAdd": "活動追加",
+    "comment": "Comment",
+    "placeholderComment": "Write a comment...",
+    "media": "Media",
+    "addComment": "コメントを作成...",
+    "uploadMedia": "写真/動画追加",
+    "updateProgress": "進捗率を更新",
+    "saveUpdate": "記録を保存",
+    "noUpdates": "まだ記録がありません。",
     "confirmStatusChange": "ステータスを変更しますか？",
-    "reopen": "Reopen",
-    "errorSave": "Error saving update."
+    "reopen": "再開",
+    "editActivity": "Edit Activity",
+    "deleteActivity": "Delete Activity",
+    "confirmDelete": "Are you sure you want to delete this?",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "errorSave": "更新の保存中にエラーが発生しました。"
   }
 };

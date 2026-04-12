@@ -14,11 +14,11 @@ export default {
     stay: 'Stay',
     class: 'Class',
     info: 'Info',
-    mypage: 'MyPage',
+    mypage: 'My',
     lucy: 'Milonga',
-    chat: 'Chatting',
-    guide: 'Membership',
-    classGuide: 'Class Info',
+    chat: 'Chat',
+    guide: 'Guide',
+    classGuide: 'Guide',
     fullSchedule: 'Calendar',
     media: 'Media',
     story: 'Story'
@@ -288,12 +288,93 @@ export default {
       role: 'Role'
     },
     tabs: {
-      registration: 'April News/Apply',
+      registration: '{month} Apply',
       history: 'History',
       wallet: 'Wallet',
       coaching: 'Coaching',
-      profile: 'My Info',
+      profile: 'Profile',
       admin: 'Admin'
+    },
+    alerts: {
+      registration_failed: 'Notification registration failed.\nDetails: {detail}\n\nPlease check browser settings or network.',
+      permission_denied: 'Notification permission denied. Please allow it in browser settings.',
+      update_error: 'Update error: {detail}',
+      confirm_logout: 'Are you sure you want to logout?',
+      only_for_active_users: 'Only for active students this month.',
+      wait_7_days: 'You can receive another coupon after 7 days.',
+      already_issued: 'Coupon already issued.',
+      sold_out: 'All {total} coupons have been issued.',
+      confirm_issue: 'Would you like to receive this coupon?',
+      issue_success: 'Coupon issued successfully.',
+      issue_failed: 'Issue failed: {message}',
+      confirm_cancel: 'Are you sure you want to cancel the coupon? The quantity will be restored.',
+      cancel_success: 'Coupon cancelled successfully.',
+      cancel_failed: 'Cancel failed: {message}',
+      general_error: 'An error occurred. Please try again.',
+      expired_coupon: 'This coupon has expired.',
+      confirm_use: 'Are you sure you want to use this coupon?',
+      only_self: 'Only your own page is accessible.'
+    },
+    payment: {
+      status_paid: 'Paid',
+      status_pending: 'Pending',
+      history_title: '{month} History',
+      date_label: 'Date',
+      no_history: 'No history found.'
+    },
+    notices: {
+      title: '📢 Coupon Guide',
+      list: [
+        'Coupons can be received after payment check.',
+        'Issued coupons can be cancelled (quantity restored).',
+        'Please check validity period and target (Leader/Follower).',
+        'Click "Use" button only when you are about to use it.'
+      ],
+      no_coupons: 'No coupons currently available.'
+    },
+    labels: {
+      get_coupon: 'Get',
+      used: 'Used',
+      expired: 'Expired',
+      use_now: 'Use Now',
+      issued: 'Issued',
+      free: 'Free',
+      ticket: 'Ticket',
+      off: 'OFF',
+      won_off: 'KRW OFF',
+      ten_thousand_off: '10k OFF',
+      status_available: 'Available',
+      status_can_use: 'Can Use',
+      duration_limited: 'Use within {duration} month(s)',
+      duration_unlimited: 'Unlimited',
+      count_unit: 'pers',
+      role_leader: 'Leader',
+      role_follower: 'Follower',
+      phone: 'Phone',
+      push_notif: 'Notifications',
+      edit_profile: 'Edit Profile'
+    },
+    admin_menu: {
+      member: {
+        title: 'Members',
+        desc: 'Manage member list and info'
+      },
+      coaching: {
+        title: 'Coaching',
+        desc: 'View and manage all coaching status'
+      },
+      checklist: {
+        title: 'Stay Checklist',
+        desc: 'Stay floor plan and checklist'
+      },
+      sms: {
+        title: 'Stay SMS',
+        desc: 'Manage booking confirmation messages'
+      },
+      coupon: {
+        title: 'Coupons',
+        desc: 'Issue and manage coupons'
+      }
     },
     walletDesc: 'Your coupon list.',
     wallet: {
@@ -302,17 +383,17 @@ export default {
       useCoupon: 'Use Now',
       usedCoupon: 'Used',
       membershipCoupon: {
-        title: '1-Month Membership 5% Discount',
-        desc: '5% discount for 3rd-week class application (10,000 KRW off)',
+        title: '1-Month Membership Coupon',
+        desc: 'Coupon for class registration',
         target: 'For Membership Members'
       },
       milongaCoupon: {
-        title: 'Milonga Luci 1-Time Free Pass',
-        desc: '1-time free entry coupon for class registrants',
+        title: 'Milonga Luci 1-Time Free Entry',
+        desc: 'Free entry coupon for class registrants',
         target: 'For Class Registrants'
       },
       usageConfirm: 'Would you like to use this coupon?\nUsed coupons cannot be restored.',
-      usageSuccess: 'Payment check request sent.'
+      usageSuccess: 'Coupon used successfully.'
     }
   },
   admin: {
@@ -338,7 +419,7 @@ export default {
   info: {
     tabs: {
       location: 'Location',
-      membership: 'Membership',
+      membership: 'Member',
       story: 'Story'
     }
   },
@@ -374,7 +455,8 @@ export default {
     checkin: 'Check-in',
     checkout: 'Check-out',
     clearBtn: 'Clear',
-    feeGuideTitle: 'Fees'
+    feeGuideTitle: 'Fees',
+    reserveBtn: 'Apply Now'
   },
   location: {
     naver: 'Naver Map',
@@ -568,36 +650,71 @@ export default {
         bldg: 'Stay Hongdae'
       },
       guide: {
-        title: 'Details',
-        subtitle: 'Harmony of energy and comfort',
+        title: 'Details & Usage Guide',
+        subtitle: '"Everything is prepared so you can start your daily life right away"',
         highlights: {
-          title: 'Highlights',
+          title: '✨ Points of This Stay',
           list: [
-            { t: 'Center', d: 'Optimal location between Hongdae and Hapjeong' },
-            { t: 'Trend', d: 'Interior filled with MZ sensibility' },
-            { t: 'Prep', d: 'Currently preparing to open.' }
+            {
+              t: 'Central Hongdae',
+              d: 'The perfect location to enjoy the trendy culture of Hongdae.'
+            },
+            {
+              t: 'Uncompromising Cleanliness',
+              d: 'Bedding and rugs are professionally laundered by LaundryGo every time. Indoor steam cleaning is performed, and towels/dishcloths are generously replaced with new ones for every guest.'
+            },
+            {
+              t: 'Premium Relaxation Furniture',
+              d: '2 large beds (Queen, Super Single), comfortable sofa, and a high-performance reclining massage chair.'
+            },
+            {
+              t: 'Abundant Entertainment',
+              d: 'The living room features the latest 2026 Samsung Moving Style Smart TV, and there is a separate TV in the bedroom.'
+            }
           ],
-          quote: 'We promise the most comfortable night in the hippest street.'
+          quote: '"After enjoying the energy of Hongdae, indulge in premium relaxation~"'
         },
         transport: {
-          title: 'Directions',
+          title: '📍 Convenient Location & Transport',
           list: [
-            { t: 'Subway', d: '7 min walk from Hongdae Station Line 2' }
+            {
+              t: 'Hongdae Station Area',
+              d: 'Extremely convenient access to Line 2, Airport Railroad, and Gyeongui-Jungang Line.'
+            },
+            {
+              t: 'Rich Bus Routes',
+              d: 'Various buses to all parts of Seoul and Incheon Airport are available.'
+            },
+            {
+              t: 'Optimal Walking',
+              d: 'Located in the best spot to explore Hongdae, Hapjeong, and Yeonnam-dong all on foot.'
+            }
           ]
         },
         facilities: {
-          title: 'Facilities',
-          base: 'Basic',
-          baseDesc: 'Premium bedding, Beam projector',
-          add: 'Kitchen/Conv',
-          addDesc: 'Under preparation.',
-          freeTitle: 'Freebies',
-          freeDesc: 'Water, towels'
+          title: 'Stay Facilities & Options (Free Supplies)',
+          base: 'Basic Appliances/Furniture',
+          baseDesc: 'Fridge, Washer, AC, 2 Smart TVs, Giga Wi-Fi, Kitchen sink, Induction, Queen & Super Single Beds',
+          add: 'Additional Amenities',
+          addDesc: 'Secure door lock and CCTV/Office, Dining table, Hygienic water purifier, Fluffy sofa, Large desk, Spacious wardrobe, Shoe rack',
+          freeTitle: '✨ All supplies are free!!!',
+          freeDesc: 'Ramen, Instant rice, Toilet paper, Tissues, Toothbrush sets, Shampoo/Rinse, Body wash, Hand wash - all disposables and consumables are ready.\nLaundry drying rack, detergent, and fabric softener, as well as waste bags, are all available for free!'
         },
         attractions: {
-          title: 'Attractions',
+          title: '🛍️ Neighborhood Infrastructure',
           list: [
-            { t: 'Hot Place', d: 'Hongdae Street, Yeonnam-dong nearby' }
+            {
+              t: 'Hongdae Walking Street',
+              d: 'The main street of Hongdae with busking and various shops.'
+            },
+            {
+              t: 'Yeonnam-dong Forest Line',
+              d: 'Enjoy "Yeontral Park," a famous spot for walks and picnics.'
+            },
+            {
+              t: 'Countless Restaurants',
+              d: 'Home to hundreds of famous restaurants and hidden emotional cafes within walking distance.'
+            }
           ]
         }
       },
@@ -648,17 +765,17 @@ export default {
     },
     story: {
       title: 'TangoStay Story',
-      subtitle: 'Art and Rest in Seoul',
-      p1: 'Freestyle Tango leading the culture where dance and life harmonize. Providing optimal rest for tangueros is our goal.',
-      sol1Title: 'Accessibility',
-      sol1Text: 'Located near major milongas like Hapjeong for easy travel.',
-      sol2Title: 'For Artists',
-      sol2Text: 'Beyond simple stay, providing an artistic interior for inspiration.',
-      sol3Title: 'Community',
-      sol3Text: 'A platform where tangueros worldwide communicate and make memories.',
-      closing: 'Start your special Seoul journey at TangoStay.',
-      hostName: 'Stone Hong',
-      hostBio: 'Tango Instructor / Stay Host'
+      subtitle: '"Just Bring Yourself"… Introducing TangoStay\'s [Uninhabited Island Experiment]',
+      p1: "As a host, I set a single goal when preparing this space: the 'Uninhabited Island Experiment'. The goal was to create a place where you can live in complete comfort for over a week without stepping outside, even if you arrive with only a single suitcase. I planned this to perfectly solve the 'numerous inconveniences' I experienced as a guest.",
+      sol1Title: 'Stay Pack: Zero Discomfort, Welcome Gift Set',
+      sol1Text: "No more worrying about used towels or soap. We provide every guest with a set of 'new' towels, dishcloths, soap, and toothbrushes of hotel amenity quality. There's no need to rush to the convenience store on your first day.",
+      sol2Title: 'No more water worries! Latest water purifier installed',
+      sol2Text: "Free yourself from the hassle of carrying heavy bottled water. A top-of-the-line water purifier is installed, so you can enjoy clean, cold water whenever you want.",
+      sol3Title: 'Uncompromising Cleanliness (Professional Laundry via LaundryGo)',
+      sol3Text: "All bedding (duvets, covers, pads, pillowcases) and rugs are prepared in two sets and replaced every time after undergoing high-temperature sterilization and drying through a professional non-face-to-face laundry service (LaundryGo). Experience deep sleep in fluffy bedding that is perfectly disinfected, even down to invisible dust mites.",
+      closing: "We look forward to having you enjoy true relaxation in your own most comfortable 'uninhabited island' in the world.",
+      hostName: '👋 Stone, the man who dances Argentine Tango.',
+      hostBio: ''
     },
     footer: {
       term: 'Terms',
@@ -783,6 +900,9 @@ export default {
     creating: 'Creating...',
     updates: 'Activity Log',
     activityAdd: 'Add Activity',
+    comment: 'Comment',
+    placeholderComment: 'Write a comment...',
+    media: 'Media',
     addComment: 'Write a comment...',
     uploadMedia: 'Add Photo/Video',
     updateProgress: 'Update Progress',
@@ -790,6 +910,11 @@ export default {
     noUpdates: 'No logs found.',
     confirmStatusChange: 'Change status?',
     reopen: 'Reopen',
+    editActivity: 'Edit Activity',
+    deleteActivity: 'Delete Activity',
+    confirmDelete: 'Are you sure you want to delete this?',
+    cancel: 'Cancel',
+    confirm: 'Confirm',
     errorSave: 'Error saving update.'
   }
 };

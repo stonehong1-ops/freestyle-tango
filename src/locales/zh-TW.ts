@@ -1,12 +1,12 @@
 export default {
   "header": {
-    "story": "探戈住宿故事",
-    "location": "住宿位置",
-    "guide": "詳細資訊與使用指南",
-    "contact": "聯絡我們",
-    "login": "Register",
-    "community": "Community",
-    "join": "Join"
+    "story": "TangoStay 故事",
+    "location": "住宿地點",
+    "guide": "詳細資訊",
+    "contact": "聯繫我們",
+    "login": "註冊",
+    "community": "社區",
+    "join": "加入我們"
   },
   "nav": {
     "home": "Class",
@@ -14,351 +14,432 @@ export default {
     "stay": "Stay",
     "class": "Class",
     "info": "Info",
-    "mypage": "MyPage",
+    "mypage": "My",
     "lucy": "Milonga",
-    "chat": "Chatting",
-    "guide": "Membership",
-    "classGuide": "Class Info",
+    "chat": "Chat",
+    "guide": "Guide",
+    "classGuide": "Guide",
     "fullSchedule": "Calendar",
     "media": "Media",
     "story": "Story"
   },
   "reserve": {
-    "closed": "Reservation Closed",
-    "title": "輸入預訂資訊",
-    "nameLabel": "姓名(暱稱)",
-    "namePlace": "請輸入姓名或暱稱",
-    "phoneLabel": "聯絡方式",
-    "phonePlace": "010-0000-0000",
-    "guests": "人",
-    "reqLabel": "特殊要求",
-    "reqPlace": "請輸入計畫其他諮詢或特殊要求。",
+    "closed": "已截止",
+    "title": "住宿預約申請",
+    "nameLabel": "預約人暱稱",
+    "namePlace": "請輸入暱稱",
+    "phoneLabel": "聯繫方式",
+    "phonePlace": "請輸入電話號碼",
+    "guests": "名",
+    "reqLabel": "備註事項",
+    "reqPlace": "如有其他要求請在此輸入（可選）",
     "submitting": "處理中...",
-    "submitBtn": "提交預訂",
-    "directBookingWarning": "Click the button below to complete. Your reservation will be cancelled if payment is not received within 1 hour.",
-    "smsTemplate": "[{stayName} Confirmation]\nName: {name}\nDate: {checkIn} ~ {checkOut}\nGuests: {guests}\nAmount: {amount} KRW\n\n[Payment]\n1. KR: KakaoBank 3333-03-7249602 (Hong Byong Seok)\n2. US: Acc 352665336763211 / Routing: 084009519 (ACH Free)\n3. International: SWIFT/BIC TRWIUS35XXX\n\n[Check-in]\nTime: 4 PM\nPassword: 9999\n\nThank you!",
-    "errorFill": "請填寫姓名、聯絡方式和人數。",
-    "errorFail": "處理預訂時發生錯誤。",
+    "submitBtn": "完成預約",
+    "directBookingWarning": "點擊下方按鈕即完成預約。\n如果1小時內未匯款，房東可能會取消您的預約。",
+    "smsTemplate": "[{stayName} 預約確認]\n預約人: {name}\n日期: {checkIn} ~ {checkOut}\n人數: {guests}名\n金額: {amount}韓元\n\n[匯款指南 / Payment]\n1. KR (韓國賬戶): KakaoBank 3333-03-7249602 (Hong Byong Seok)\n2. US (美國 Wise): Acc 352665336763211 / Routing: 084009519 (ACH Free)\n3. International: SWIFT/BIC TRWIUS35XXX\n\n[入住指南]\n時間: 下午 4點\n密碼: 9999\n\n謝謝！",
+    "errorFill": "請輸入昵稱和聯繫方式。",
+    "errorFail": "預約申請過程中發生錯誤。請重試。",
     "save": "保存",
     "cancel": "取消"
   },
   "complete": {
-    "title": "預訂已成功接收！ 🎉",
-    "desc": "付款與入住指南的簡訊將隨後發送至您的聯絡電話。",
+    "title": "預約申請完成",
+    "desc": "您的預約申請已提交。確認匯款後，我們將向您發送確認信息。",
     "homeBtn": "返回首頁",
-    "guestSmsBtn": "發送預訂指南簡訊 (SMS)"
+    "guestSmsBtn": "通過短信諮詢"
   },
   "home": {
-    "studioName": "FreestyleTango",
+    "studioName": "Freestyle Tango",
     "info": {
-      "subtitle": "Freestyle Tango Membership Guide",
-      "intro": "Like a fresh rose with mother's milk\nLooking like a mix of colors\nWhite, yellow, red roses\n\nSpring where flower buds bloom\nIn the eternal time of autumn leaves\nTo everyone who sweats\nCultivating body and mind\n\nFreestyle will be\nA shelter and a guide.",
-      "highlight": "180,000 KRW for all classes!",
-      "benefitsTitle": "Membership Benefits",
+      "subtitle": "Freestyle Tango 會員指南",
+      "intro": "",
+      "highlight": "180,000韓元 All-Pass",
+      "benefitsTitle": "會員福利",
       "benefits": [
-        "Monthly Membership: 180k, all classes included / Intl workshop d.c",
-        "New member 6-month discount: 20% d.c 860k",
-        "Open floor access (16h/month)",
-        "Partner class application (for existing partners)",
-        "Benefits: Instructor/Staff discount 100k d.c, free 1:1 lesson for referrals"
+        "月度會員：18萬，可參加所有課程 / 海外研討會折扣",
+        "新成員6個月會員優惠：20%折扣 86萬",
+        "全時段開放式舞池使用（每月16小時）",
+        "除舞伴課外，可申請另外2個課程的舞伴（僅限現有舞伴）",
+        "福利：講師、工作人員、Lucy團隊每月10萬折扣，新成員/推薦人可獲贈1次私教課"
       ],
-      "cultureTitle": "Community Culture",
+      "cultureTitle": "我們追求的文化",
       "cultureList": [
-        "Be nice to everyone (Happy space, Warm people)",
-        "Gender balance (aiming for 15:15)"
+        "對每個人都友善，打造無負面情緒的社區（幸福的空間，溫暖的人們）",
+        "以15人為基準平衡男女比例（成對增加）"
       ],
-      "bankTitle": "Membership Fee Payment",
+      "bankTitle": "學費匯款賬戶",
       "bankName": "KakaoBank 3333-14-3159646 (Hong Byong Seok)",
-      "copyBtn": "Copy Account Number",
-      "copyHint": "Please contact us with your name after payment.",
-      "contactPhone": "Phone Inquiry",
-      "contactKakao": "KakaoTalk",
+      "copyBtn": "複製賬號",
+      "copyHint": "匯款後請備註昵稱並聯繫我們。",
+      "contactPhone": "電話諮詢",
+      "contactKakao": "KakaoTalk 諮詢",
       "contactWhatsapp": "WhatsApp",
-      "openChatBanner": "Join Freestyle Tango Open Chat",
-      "copySuccess": "Account number copied.",
-      "contactTitle": "Contact",
-      "contactSlogan": "Inquire about classes, facilities, and stays (24/7 inquiries welcome)",
-      "photoGallery": "Photo Gallery",
-      "facilityGallery": "Facility Guide"
+      "openChatBanner": "前往 Freestyle Tango 開放聊天室",
+      "copySuccess": "賬號已複製。",
+      "contactTitle": "聯繫我們",
+      "contactSlogan": "課程、設施使用、住宿諮詢（24小時全天候歡迎諮詢）",
+      "photoGallery": "照片庫",
+      "facilityGallery": "設施指南"
     },
     "admin": {
-      "addClass": "Add Class",
-      "addMilonga": "Add Milonga",
-      "editMilonga": "Edit Milonga",
-      "saveNotice": "Save Notice",
-      "editNotice": "Edit Notice",
-      "noticePlaceholder": "Enter notice (2-3 lines)",
-      "noticeEmpty": "No monthly notices registered. Click to add one.",
-      "saveSuccess": "Notice saved.",
-      "saveFail": "Save failed"
+      "addClass": "添加課程",
+      "addMilonga": "添加米隆加",
+      "editMilonga": "編輯米隆加",
+      "saveNotice": "保存公告",
+      "editNotice": "編輯公告",
+      "noticePlaceholder": "請輸入公告內容（2~3行）",
+      "noticeEmpty": "暫無月度公告。點擊此處添加公告。",
+      "saveSuccess": "公告已保存。",
+      "saveFail": "保存失敗"
     },
     "chat": {
-      "title": "Chat",
-      "newRoom": "+ New Room",
-      "roomPlaceholder": "Chat Room",
-      "enterName": "Enter room name:",
-      "enterType": "Enter room type (public, notice, private, support):",
-      "leaveRoom": "Leave Room",
-      "renameRoom": "Rename Room",
-      "participants": "Participants",
-      "readCount": "Read",
-      "allRead": "All Read",
-      "noActiveChats": "No active chats."
+      "title": "聊天",
+      "newRoom": "+ 新聊天室",
+      "roomPlaceholder": "聊天室",
+      "enterName": "請輸入聊天室名稱:",
+      "enterType": "請輸入聊天室類型 (public, notice, private, support):",
+      "leaveRoom": "退出聊天室",
+      "renameRoom": "修改聊天室名稱",
+      "participants": "參與者",
+      "readCount": "已讀",
+      "allRead": "全部已讀",
+      "noActiveChats": "暫無進行中的聊天。"
     },
     "export": {
-      "imageBtn": "📸 Save Promo Image (PNG)",
-      "error": "Error generating image."
+      "imageBtn": "📸 保存宣傳圖 (PNG)",
+      "error": "生成圖片時發生錯誤。"
     },
     "exit": {
-      "toast": "Press back again to exit"
+      "toast": "再按一次返回鍵將關閉頁面"
     },
     "stay": {
-      "viewMonthly": "View Monthly Status",
-      "monthlyTitle": "Monthly Reservation Status"
+      "viewMonthly": "查看月度總狀態",
+      "monthlyTitle": "月度總預約狀態"
     },
     "registration": {
-      "title": "Class Registration",
-      "classDetail": "Class Details",
-      "fullListTitle": "Full Registration Status",
-      "addClass": "Add Class",
-      "loading": "Loading...",
-      "noClasses": "No classes registered for {month}.",
-      "cartAdded": "Class added to cart! Proceed to final registration in [MyPage].",
-      "deleteConfirm": "Are you sure you want to delete this class?",
-      "deleteSuccess": "Deleted.",
-      "deleteFail": "Delete failed: {error}",
-      "saveSuccess": "Saved.",
-      "saveFail": "Save failed: {error}",
-      "pastMonthWarning": "Cannot apply for past classes.",
-      "selected": "✅ Selected",
-      "leader": "Leader",
-      "follower": "Follower",
-      "teacherLabel": "Instructor:",
-      "priceLabel": "KRW",
-      "datesTitle": "Class Schedule (4 weeks)",
-      "noDates": "No schedule registered.",
-      "curriculumTitle": "Curriculum Details",
-      "previewTitle": "Preview Video",
-      "introTitle": "Class Intro",
-      "currentStatus": "Current Status",
-      "waiting": "Waiting for application",
-      "adminTitle": "Applicant List (Admin)",
-      "nickname": "Nickname",
-      "phone": "Phone",
-      "status": "Status",
-      "paid": "Paid",
-      "edit": "Edit",
-      "delete": "Delete",
-      "download": "Download",
-      "addToList": "Add to List",
-      "applied": "Applied",
-      "footerNote": "You can apply for all classes at once in MyPage later.",
+      "title": "課程申請",
+      "classDetail": "課程詳情",
+      "fullListTitle": "全員申請現狀",
+      "addClass": "添加課程",
+      "loading": "加載中...",
+      "noClasses": "{month}月暫無登記的課程。",
+      "cartAdded": "課程申請已完成。您可以在“我的申請”中進行修改。",
+      "deleteConfirm": "確定要刪除此課程嗎？",
+      "deleteSuccess": "已刪除。",
+      "deleteFail": "刪除失敗: {error}",
+      "saveSuccess": "已保存。",
+      "saveFail": "保存失敗: {error}",
+      "pastMonthWarning": "不能申請已過去的課程。",
+      "selected": "✅ 已選擇",
+      "leader": "領舞",
+      "follower": "跟舞",
+      "teacherLabel": "講師:",
+      "priceLabel": "元",
+      "datesTitle": "上課日程（4周課程）",
+      "noDates": "暫無註冊日程。",
+      "curriculumTitle": "詳細課程大綱",
+      "previewTitle": "預告視頻",
+      "introTitle": "課程介紹",
+      "currentStatus": "當前申請現狀",
+      "waiting": "申請等待中",
+      "adminTitle": "申請者詳細名單 (管理員)",
+      "nickname": "昵稱",
+      "phone": "聯繫方式",
+      "status": "狀態",
+      "paid": "已匯款",
+      "edit": "編輯",
+      "delete": "刪除",
+      "download": "下載",
+      "addToList": "加入申請課程列表",
+      "applied": "申請完成",
+      "footerNote": "稍後可以在“我的頁面”一次申請所有課程",
       "dayNames": [
-        "Sun",
-        "Mon",
-        "Tue",
-        "Wed",
-        "Thu",
-        "Fri",
-        "Sat"
+        "日",
+        "一",
+        "二",
+        "三",
+        "四",
+        "五",
+        "六"
       ],
       "daysFull": [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Other"
+        "星期日",
+        "星期一",
+        "星期二",
+        "星期三",
+        "星期四",
+        "星期五",
+        "星期六",
+        "其他"
       ],
-      "monthLabel": "Month",
-      "dayLabel": "Day",
-      "viewFullStatus": "View Status",
-      "viewFullStatusHint": "(Only for applicants)",
-      "bittersweet": "For Milonga",
-      "fullStatusTitle": "Full Status for {month}",
-      "fullStatusSummary": "Leaders {leader} / Followers {follower}",
-      "noPermissionMessage": "Only for applicants.",
-      "role": "Role",
-      "classSelection": "Registration",
-      "noData": "No registration data."
+      "monthLabel": "月",
+      "dayLabel": "日",
+      "viewFullStatus": "申請現狀",
+      "viewFullStatusHint": "(僅限申請者查看)",
+      "bittersweet": "米隆加用",
+      "fullStatusTitle": "{month}月全員申請現狀",
+      "fullStatusSummary": "領舞 {leader}名 / 跟舞 {follower}名",
+      "noPermissionMessage": "只有課程申請者才能查看此按鈕。",
+      "role": "區分",
+      "classSelection": "申請詳情",
+      "noData": "暫無申請記錄。"
     },
     "milonga": {
-      "bookingBtn": "🎟️ Book Milonga Table",
-      "eventTitle": "Event Info",
-      "eventSubtitle": "Make memories at Lucy",
-      "normalTable": "Table Booking",
-      "normalTableDesc": "Available for 2+ people.",
-      "event2plus1": "2+1 Event",
-      "event2plus1Desc": "One person free for every three people.",
-      "event3plus1": "3+1 Event",
-      "event3plus1Desc": "One person free for every four people.",
-      "noSchedule": "No milonga schedule registered.",
-      "checkBack": "Please check back later.",
-      "bookingStatus": "Booking Status",
-      "noReservations": "No bookings yet.",
-      "editTitle": "Edit Booking",
-      "editDesc": "You can modify your booking.",
-      "confirmPayBtn": "Request Payment Check",
-      "deleteConfirm": "Are you sure you want to delete this booking?",
-      "deleteSuccess": "Deleted.",
-      "error": "An error occurred.",
+      "bookingBtn": "🎟️ 預約米隆加桌位",
+      "eventTitle": "活動指南",
+      "eventSubtitle": "在 Lucy 度過美好的時光",
+      "normalTable": "桌位預約",
+      "normalTableDesc": "2人以上可申請桌位預約。",
+      "event2plus1": "2+1 活動",
+      "event2plus1Desc": "三人同行，一人免單。",
+      "event3plus1": "3+1 活動",
+      "event3plus1Desc": "四人同行，一人免單。",
+      "noSchedule": "當前暫無登記的米隆加日程。",
+      "checkBack": "請稍後再確認。",
+      "bookingStatus": "預約現狀",
+      "noReservations": "暫無預約。",
+      "editTitle": "修改預約",
+      "editDesc": "您可以修改預約內容。",
+      "confirmPayBtn": "申請匯款確認",
+      "deleteConfirm": "確定要刪除此預約嗎？",
+      "deleteSuccess": "已刪除。",
+      "error": "發生錯誤。",
       "options": [
-        "15k KRW per person",
-        "Event (Free)"
+        "1人 1.5萬韓元",
+        "活動 (免費)"
       ],
-      "optionPrompt": "Select an option.",
-      "cancel": "Cancel",
-      "submit": "OK",
-      "datePending": "Schedule Pending",
-      "newTitle": "New Booking",
-      "dateLabel": "Date",
-      "optionLabel": "Option",
-      "nicknamePlaceholder": "Enter nickname",
-      "phoneLabel": "Phone",
-      "requestsLabel": "Requests",
-      "requestsPlaceholder": "Additional requests (Optional)",
-      "submitting": "Processing...",
-      "saveEdit": "Save Changes",
-      "saveNew": "Book",
-      "noPoster": "Poster is being prepared."
+      "optionPrompt": "請選擇選項。",
+      "cancel": "取消",
+      "submit": "確認",
+      "datePending": "日程協商中",
+      "newTitle": "新增預約",
+      "dateLabel": "日期",
+      "optionLabel": "選項",
+      "nicknamePlaceholder": "請輸入昵稱",
+      "phoneLabel": "聯繫方式",
+      "requestsLabel": "備註事項",
+      "requestsPlaceholder": "額外要求（可選）",
+      "submitting": "處理中...",
+      "saveEdit": "修改完成",
+      "saveNew": "進行預約",
+      "noPoster": "海報準備中。"
     },
     "membership": {
-      "title": "Membership Guide",
-      "desc": "Check the benefits of Freestyle Tango membership.",
-      "type1": "1 Month Free Pass",
-      "type1Price": "180,000 KRW",
-      "type2": "3+1 Event",
-      "type2Price": "120,000 KRW",
-      "type3": "6 Months Membership",
-      "type3Price": "860,000 KRW",
-      "close": "Close"
+      "title": "會員指南",
+      "desc": "請查看 Freestyle Tango 會員福利。",
+      "type1": "1個月自由券",
+      "type1Price": "180,000韓元",
+      "type2": "3+1 活動",
+      "type2Price": "120,000韓元",
+      "type3": "6個月會員",
+      "type3Price": "860,000韓元",
+      "close": "關閉"
     },
     "registrationStatus": {
-      "editTitle": "Edit Registration",
-      "newTitle": "Apply for {month} Classes",
-      "cancelEdit": "Cancel Edit",
-      "desc": "Select classes to apply.",
-      "selectPrompt": "Please select a class",
-      "typeSelectorTitle": "Select Type",
-      "typeIndividual": "Individual / 1 Month",
-      "typeMembership6": "6 Months Membership",
-      "editSubmit": "Save Changes",
-      "newSubmit": "Apply"
+      "editTitle": "修改申請",
+      "newTitle": "{month}月課程申請",
+      "cancelEdit": "取消修改",
+      "desc": "請選擇要申請的課程。",
+      "selectPrompt": "請選擇課程",
+      "typeSelectorTitle": "選擇申請類型",
+      "typeIndividual": "單科 / 1個月會員",
+      "typeMembership6": "6個月會員",
+      "editSubmit": "修改完成",
+      "newSubmit": "提交申請"
     },
     "payment": {
-      "title": "Payment Options",
-      "desc": "Select the payment option matching your registration.",
-      "placeholder": "Select an option",
+      "title": "選擇匯款選項",
+      "desc": "請根據您的申請内容選擇相應的匯款選項。",
+      "placeholder": "請選擇選項",
       "options": [
-        "Individual",
-        "1 Month",
-        "6 Months (1st)",
-        "6 Months (2nd)",
-        "6 Months (3rd)",
-        "6 Months (4th)",
-        "6 Months (5th)",
-        "6 Months (6th)"
+        "單科",
+        "1個月會員",
+        "6個月會員(1期)",
+        "6個月會員(2期)",
+        "6個月會員(3期)",
+        "6個月會員(4期)",
+        "6個月會員(5期)",
+        "6個月會員(6期)"
       ],
-      "optionPrompt": "Please select a payment option.",
-      "cancel": "Cancel",
-      "submit": "Confirm"
+      "optionPrompt": "請選擇匯款選項。",
+      "cancel": "取消",
+      "submit": "完成選擇"
     },
     "history": {
-      "title": "My History",
-      "loading": "Loading...",
-      "empty": "No history found.",
-      "appliedLabel": "Registered for {month}",
-      "statusPaid": "Paid",
-      "statusWaiting": "Waiting for Payment",
-      "appliedDate": "Applied: {date}",
-      "paidMsg": "{type} / {amount} KRW Paid",
-      "paidDate": "Confirmed: {date}",
-      "confirmPayBtn": "Request Payment Check",
-      "edit": "Edit",
-      "delete": "Delete",
-      "deleteConfirm": "Are you sure you want to delete this history?",
-      "alreadyRegistered": "Already registered. Please use edit function.",
-      "deleteSuccess": "Deleted.",
-      "confirmSuccess": "Completed.",
-      "error": "An error occurred."
+      "title": "我的申請記錄",
+      "loading": "加載中...",
+      "empty": "暫無申請記錄。",
+      "appliedLabel": "{month}月申請記錄",
+      "statusPaid": "匯款已確認",
+      "statusWaiting": "匯款等待中",
+      "appliedDate": "申請時間: {date}",
+      "paidMsg": "{type} / {amount}韓元 匯款完成",
+      "paidDate": "確認時間: {date}",
+      "confirmPayBtn": "申請匯款確認",
+      "edit": "編輯",
+      "delete": "刪除",
+      "deleteConfirm": "確定要刪除此申請記錄嗎？",
+      "alreadyRegistered": "已有登記的記錄。請使用修改功能。",
+      "deleteSuccess": "已刪除。",
+      "confirmSuccess": "已完成。",
+      "error": "發生錯誤。"
     },
     "success": {
-      "welcome": "Thank you for applying.",
-      "completed": "Please transfer to the account below and click 'Request Payment Check' in MyPage.",
-      "info": "For other inquiries, contact us via the channels below.",
-      "bankLabel": "Account",
+      "welcome": "感謝您的申請。",
+      "completed": "請匯款至下方賬戶，然後在“我的頁面”點擊“申請匯款確認”按鈕。",
+      "info": "如有其他疑問，請通過下方渠道聯繫我們。",
+      "bankLabel": "匯款賬戶",
       "bankNumber": "KakaoBank 3333-14-3159646 (Hong Byong Seok)",
-      "copyBtn": "Copy",
-      "copySuccess": "Copied.",
-      "done": "OK"
+      "copyBtn": "複製",
+      "copySuccess": "已複製。",
+      "done": "確認"
     }
   },
   "mypage": {
     "title": "我的頁面",
-    "loginPrompt": "Login required.",
-    "loginBtn": "Login",
-    "logoutBtn": "Logout",
-    "membership": "會員信息",
+    "loginPrompt": "此服務需要登錄。",
+    "loginBtn": "前往登錄",
+    "logoutBtn": "退出登錄",
+    "membership": "會員指南",
     "profile": {
-      "nickname": "Nickname",
-      "phone": "Phone",
-      "role": "Role"
+      "nickname": "昵稱",
+      "phone": "聯繫方式",
+      "role": "身份"
     },
     "tabs": {
-      "registration": "Apr. News/Apply",
-      "history": "History",
-      "wallet": "Wallet & Coupons",
-      "coaching": "Coaching",
-      "profile": "My Info",
-      "admin": "Admin"
+      "registration": "{month}月申請",
+      "history": "現狀",
+      "wallet": "錢包",
+      "coaching": "教練",
+      "profile": "資料",
+      "admin": "管理"
     },
-    "walletDesc": "List of your active coupons.",
+    "alerts": {
+      "registration_failed": "通知註冊失敗。\n詳細信息: {detail}\n\n請檢查瀏覽器通知權限或網絡連接。",
+      "permission_denied": "通知權限被拒絕。請點擊地址欄的鎖圖標以允許權限。",
+      "update_error": "設置更新時出錯: {detail}",
+      "confirm_logout": "確定要退出登錄嗎？",
+      "only_for_active_users": "僅限本月參加課程的用戶獲取。",
+      "wait_7_days": "領取最後一張優惠券後，需等待7天方可再次領取。",
+      "already_issued": "已領取的優惠券。",
+      "sold_out": "優惠券 {total}張已全部領完。",
+      "confirm_issue": "確定要領取此優惠券嗎？",
+      "issue_success": "優惠券已發放。",
+      "issue_failed": "發放失敗: {message}",
+      "confirm_cancel": "確定要取消（歸還）優惠券嗎？取消後數量將恢復。",
+      "cancel_success": "優惠券已成功取消。",
+      "cancel_failed": "取消失敗: {message}",
+      "general_error": "發生錯誤。請重試。",
+      "expired_coupon": "優惠券已過期，無法使用。",
+      "confirm_use": "確認使用此優惠券嗎？",
+      "only_self": "只能查看自己的頁面。"
+    },
+    "payment": {
+      "status_paid": "支付完成",
+      "status_pending": "匯款確認中",
+      "history_title": "{month}月申請記錄",
+      "date_label": "申請日期",
+      "no_history": "暫無申請記錄。"
+    },
+    "notices": {
+      "title": "📢 優惠券發放指南",
+      "list": [
+        "課程申請完成（匯款確認）后即可領取優惠券。",
+        "已發放的優惠券可以取消（恢復數量）。",
+        "請檢查每張優惠券的使用期限和對象（領舞/跟舞等）。",
+        "請在即將使用前點擊“使用”按鈕。"
+      ],
+      "no_coupons": "當前沒有正在發行的優惠券。"
+    },
+    "labels": {
+      "get_coupon": "領取優惠券",
+      "used": "使用完畢",
+      "expired": "期限已滿",
+      "use_now": "立即使用",
+      "issued": "發放完成",
+      "free": "免費",
+      "ticket": "入場券",
+      "off": "優惠",
+      "won_off": "韓元優惠",
+      "ten_thousand_off": "萬韓元優惠",
+      "status_available": "可獲取",
+      "status_can_use": "可使用",
+      "duration_limited": "發放後 {duration}個月內使用",
+      "duration_unlimited": "無期限限制",
+      "count_unit": "名",
+      "role_leader": "領舞",
+      "role_follower": "跟舞",
+      "phone": "聯繫方式",
+      "push_notif": "推送通知",
+      "edit_profile": "修改個人資料"
+    },
+    "admin_menu": {
+      "member": {
+        "title": "會員管理",
+        "desc": "管理全體會員列表及信息"
+      },
+      "coaching": {
+        "title": "全體教練管理",
+        "desc": "查詢及管理全體教練申請現狀"
+      },
+      "checklist": {
+        "title": "住宿核對表",
+        "desc": "住宿預約平面圖及核對清單"
+      },
+      "sms": {
+        "title": "住宿短信設置",
+        "desc": "管理預約確認及指南消息"
+      },
+      "coupon": {
+        "title": "優惠券發放及管理",
+        "desc": "新增優惠券及使用狀況"
+      }
+    },
+    "walletDesc": "您擁有的優惠券列表。",
     "wallet": {
-      "title": "My Wallet & Coupons",
-      "noCoupons": "No coupons found.",
-      "useCoupon": "Use Now",
-      "usedCoupon": "Used",
+      "title": "我的錢包 & 優惠券",
+      "noCoupons": "您没有任何優惠券。",
+      "useCoupon": "立即使用",
+      "usedCoupon": "使用完畢",
       "membershipCoupon": {
-        "title": "1-Month Membership 5% Discount",
-        "desc": "5% discount for 3rd-week class application (10,000 KRW off)",
-        "target": "For Membership Members"
+        "title": "1個月會員優惠券",
+        "desc": "申請課程時可使用的優惠券",
+        "target": "針對會員"
       },
       "milongaCoupon": {
-        "title": "Milonga Luci 1-Time Free Pass",
-        "desc": "1-time free entry coupon for class registrants",
-        "target": "For Class Registrants"
+        "title": "Milonga Lucy 1次免費入場券",
+        "desc": "針對課程申請者的米隆加1次免費券",
+        "target": "針對課程申請者"
       },
-      "usageConfirm": "Would you like to use this coupon?\nUsed coupons cannot be restored.",
-      "usageSuccess": "Coupon successfully used."
+      "usageConfirm": "確定要使用此優惠券嗎？\n使用的優惠券無法退回。",
+      "usageSuccess": "優惠券使用完成。"
     }
   },
   "admin": {
     "member": {
-      "searchPlaceholder": "Search nickname or number",
-      "searchBtn": "Search",
-      "engagement": "Engagement",
-      "joinDate": "Join Date",
-      "recentVisit": "Recent Visit",
-      "loading": "Loading data...",
-      "noResults": "No members found.",
-      "instructor": "Instructor",
-      "pushStatus": "Notifications",
-      "lastRegMonth": "Last Applied",
-      "topPercent": "Top {percent}%",
-      "grantInstructor": "Grant Instructor",
-      "revokeInstructor": "Revoke Instructor",
-      "leader": "Leader",
-      "follower": "Follower",
-      "errorToggle": "Error changing permissions."
+      "searchPlaceholder": "搜索昵稱或號碼",
+      "searchBtn": "搜索",
+      "engagement": "活躍度",
+      "joinDate": "加入日期",
+      "recentVisit": "最近訪問",
+      "loading": "數據加載中...",
+      "noResults": "找不到賬戶信息。",
+      "instructor": "講師",
+      "pushStatus": "通知設置",
+      "lastRegMonth": "最終申請月份",
+      "topPercent": "前 {percent}%",
+      "grantInstructor": "賦予講師權限",
+      "revokeInstructor": "解除講師權限",
+      "leader": "領舞",
+      "follower": "跟舞",
+      "errorToggle": "更改權限時出錯。"
     }
   },
   "info": {
     "tabs": {
-      "location": "Location",
-      "membership": "Membership",
-      "story": "Story"
+      "location": "位置",
+      "membership": "會員",
+      "story": "故事"
     }
   },
   "calendar": {
@@ -369,138 +450,123 @@ export default {
     "Thu": "四",
     "Fri": "五",
     "Sat": "六",
-    "blockedAlert": "[預訂滿員]\n預訂者:",
-    "period": "期間:",
-    "invalidRange": "您選擇的期間包含已預訂的日期。請重新選擇。",
-    "viewList": "查看完整列表",
-    "available": "可預訂",
-    "booked": "預訂滿員",
+    "blockedAlert": "該日期已被預約。",
+    "period": "管理員預約期限:",
+    "invalidRange": "日期範圍無效。",
+    "viewList": "查看全體預約現狀",
+    "available": "可預約",
+    "booked": "完成預約",
     "selected": "已選擇",
     "days": "晚",
     "won": "韓元",
-    "hintSelectOut": "請選擇退房日期！",
-    "hintSelectDates": "在日曆上選擇日期後將計算準確金額。",
-    "finalPriceTitle": "最終支付金額",
-    "baseFee": "基礎住宿費",
-    "guestFee": "人數追加費",
-    "weekendFee": "週末及節假日追加",
-    "cleaningFee": "退房清潔費",
-    "longStayDiscount": "長住折扣",
-    "proceedBtn": "繼續預訂",
-    "stay": "住宿",
-    "guestSelectLabel": "入住人數",
+    "hintSelectOut": "請選擇退房日期。",
+    "hintSelectDates": "請選擇入住/退房日期。",
+    "finalPriceTitle": "總結算金額",
+    "baseFee": "客房費用",
+    "guestFee": "追加人數費用",
+    "weekendFee": "週末/公休日加價",
+    "cleaningFee": "清潔費",
+    "longStayDiscount": "長期住宿優惠",
+    "proceedBtn": "提交預約申請",
+    "stay": "客房",
+    "guestSelectLabel": "選擇人數",
     "guestOptions": [
-      "1人 (基礎)",
-      "2人 (+10,000韓元/晚)",
-      "3人 (+20,000韓元/晚)",
-      "4人 (最多, +30,000韓元/晚)"
+      "1人",
+      "2人",
+      "3人",
+      "4人"
     ],
     "checkin": "入住",
     "checkout": "退房",
-    "clearBtn": "重新選擇日期",
-    "feeGuideTitle": "費用說明"
+    "clearBtn": "清除",
+    "feeGuideTitle": "費用指南",
+    "reserveBtn": "提交預約申請"
   },
   "location": {
-    "naver": "打開 Naver 地圖",
-    "kakao": "打開 Kakao 地圖"
+    "naver": "Naver 地圖",
+    "kakao": "Kakao 路線"
   },
   "stays": {
-    "viewMonthlyStatus": "View Monthly Status",
-    "monthlyStatusTitle": "Monthly Reservation Status",
+    "viewMonthlyStatus": "查看月度總狀態",
+    "monthlyStatusTitle": "月度總預約狀態",
     "hapjeong": {
-      "name": "合井",
+      "name": "合井 (Hapjeong)",
       "hero": {
-        "subtitle": "距合井站1分鐘，步行可達漢江公園，安靜舒適的專屬住宿"
+        "subtitle": "俯視漢江的藝術休憩空間"
       },
       "location": {
-        "title": "住宿位置",
-        "addressLabel": "道路名:",
-        "address": "首爾特別市 麻浦區 楊花路 13",
-        "bldgLabel": "建築名:",
-        "bldg": "合井 Square Riverview"
+        "title": "位置指南",
+        "addressLabel": "地址",
+        "address": "首爾麻浦區楊花路 13",
+        "bldgLabel": "商街/建築",
+        "bldg": "合井廣場 Riverview"
       },
       "guide": {
-        "title": "詳細資訊與使用指南",
-        "subtitle": "\"為了讓您無需準備即可開始日常生活，我們準備了一切\"",
+        "title": "合井店詳細指南",
+        "subtitle": "在首爾中心享受藝術般的休息",
         "highlights": {
-          "title": "✨ 本房型的核心亮點",
+          "title": "空間特色",
           "list": [
             {
-              "t": "視野開闊的新建品質",
-              "d": "在合井·弘大地區最新、最乾淨的單身公寓中，為您提供與眾不同的漢江美景。"
+              "t": "位置",
+              "d": "合井站徒步 1分鐘距離"
             },
             {
-              "t": "絕不妥協的完美清潔",
-              "d": "寢具、地毯每次均由 Laundrygo 專業清洗，室內進行蒸氣清潔，毛巾與抹布毫不吝嗇地全部更換全新。"
+              "t": "景觀",
+              "d": "高層獨享的漢江景觀"
             },
             {
-              "t": "高級休閒家具",
-              "d": "配備2張寬大舒適的床（大床、超級單人床）、舒適沙發以及高性能的按摩躺椅。"
-            },
-            {
-              "t": "豐富的娛樂設施",
-              "d": "客廳配備 2026 三星 Moving Style 最新智慧電視，臥室內另設一台專屬電視。"
+              "t": "氛圍",
+              "d": "藝術家青睞的感性裝修"
             }
           ],
-          "quote": "\"一邊欣賞漢江夜景，一邊享受按摩椅吧~\""
+          "quote": "探戈與日常合二為一的特別空間。"
         },
         "transport": {
-          "title": "📍 便利的交通與位置（免費停車）",
+          "title": "交通指南",
           "list": [
             {
-              "t": "超近捷運站",
-              "d": "距合井站步行僅 1 分鐘，前往弘大及新村均可步行、乘捷運或公車快速到達（步行至弘大 10 分鐘）。"
+              "t": "地鐵",
+              "d": "2號線/6號线 合井站 7號出口即達"
             },
             {
-              "t": "最佳大眾運輸",
-              "d": "通往首爾江南江北、東西方向的所有公車的集散地。（緊鄰望遠站、弘大入口站）"
-            },
-            {
-              "t": "便利的停車場",
-              "d": "即使自駕也能免費停車。（每月 3 萬韓元的停車費由房東全額負擔）"
-            },
-            {
-              "t": "自駕及計程車出行",
-              "d": "前往江南、一山、汝矣島等主要樞紐的江邊北路入口僅需 1 分鐘。"
+              "t": "巴士",
+              "d": "合井站巴士站徒步 1分鐘"
             }
           ]
         },
         "facilities": {
-          "title": " Couch配備設施與選項（免費消耗品指南）",
-          "base": "標配家電/家具",
-          "baseDesc": "冰箱、洗衣機、冷氣、智慧電視（2台）、千兆 Wi-Fi、水槽、電磁爐、大床及超單人床",
-          "add": "附加便利設施",
-          "addDesc": "安全智慧門鎖及保全監控/管理室、餐桌、衛生淨水器、坐臥兩用長椅、寬大書桌、寬敞衣櫃及鞋櫃",
-          "freeTitle": "✨ 所有消耗品全部免費！",
-          "freeDesc": "拉麵、微波白飯、捲筒衛生紙、抽取式衛生紙、牙刷牙膏套裝、洗髮精/護髮素、沐浴乳、洗手乳等所有一次性用品和消耗品均已備齊。\n晾衣架、洗衣精、柔軟精，甚至垃圾袋和資源回收袋均可隨意免費使用！"
+          "title": "設施指南",
+          "base": "基本設施",
+          "baseDesc": "皇后尺寸大床, 中央空調, 高速 Wi-Fi",
+          "add": "廚房/便利設施",
+          "addDesc": "冰箱, 電磁爐, 滾筒洗衣機, 基本廚具",
+          "freeTitle": "免費提供項目",
+          "freeDesc": "礦泉水, 高級毛巾, 洗髮水/沐浴露, 吹風機"
         },
         "attractions": {
-          "title": "🛍️ 周邊生活設施與娛樂",
+          "title": "周邊名勝",
           "list": [
             {
-              "t": "合井美食街 / 弘大商圈",
-              "d": "匯聚頂級美食與咖啡廳的合井美食街，以及充滿青春活力的弘大商圈就在步行距離內。"
+              "t": "周邊商圈",
+              "d": "Mecenatpolis, Delight Square 臨近"
             },
             {
-              "t": "便利的大型超市",
-              "d": "日常輕度採購可前往步行 1 分鐘的 Wang Mart，購買大量生活用品及食品可前往步行 5 分鐘的 Homeplus 大型超市。"
-            },
-            {
-              "t": "厭倦時隨時奔向漢江",
-              "d": "走出大門，步行 1 分鐘即可到達漢江公園入口。與望遠漢江公園完美相鄰。"
+              "t": "藝術/文化",
+              "d": "合井洞咖啡街, 望遠洞徒步可達"
             }
           ]
         }
       },
       "calendar": {
-        "title": "預訂狀況",
-        "feeGuideTitle": "Price List",
+        "title": "預約現狀",
+        "feeGuideTitle": "費用指南",
         "feeGuideLines": [
-          "1人每晚 80,000 韓元",
-          "每增加1人加收 10,000 韓元 (最多4人)",
-          "週五、週六及假日前夕加收 10,000 韓元",
-          "退房清潔費 30,000 韓元",
-          "預訂1週（7天）以上可享 20,000 韓元長住折扣"
+          "1晚 8萬韓元",
+          "追加人數每人1萬韓元（最多4人）",
+          "週五、週六、公休日加收1萬韓元",
+          "7晚以上優惠2萬，14晚以上優惠4萬",
+          "退房清潔費 3萬韓元另計"
         ]
       },
       "gallery": {
@@ -510,118 +576,110 @@ export default {
           "客廳",
           "臥室",
           "廚房",
-          "浴室",
+          "衛生間",
           "景觀"
         ],
         "descriptions": [
-          "客廳，書桌（梳妝台），雙人餐桌",
-          "挑高設計的豪華單身公寓",
-          "兼顧休息與就餐的完美格局",
-          "2026 三星智慧電視 M7 / 書桌兼梳妝台",
-          "免費尊享高級電視與OTT頻道",
-          "Kakao Park 智慧音箱",
-          "IKEA高級寢具（加大尺寸）",
-          "臥室專用電視",
-          "可調式按摩沙發（高性能）",
-          "Ace 單人床與IKEA寢具",
-          "最多可住3人（可使用客廳沙發）",
-          "淨水器、廚具、調味料、一次性用品等一應俱全",
-          "三星冰箱與洗衣機",
-          "洗手台、洗手間、淋浴間乾濕分離",
-          "提供洗髮精、護髮素、沐浴乳",
-          "配備智慧免治馬桶",
-          "漢江美景與清涼江風",
-          "距離漢江公園僅1分鐘",
-          "漢江江景與城市夜景"
+          "合井客廳全景",
+          "舒適的沙發和桌子",
+          "幹練的裝修",
+          "客房照明",
+          "採光極佳的空間",
+          "寬敞的起居室",
+          "舒適的臥室",
+          "整潔的床具",
+          "温馨的就寢處",
+          "臥室全景",
+          "梳妝台及收納空間",
+          "餐具齊備的廚房",
+          "整潔的廚房環境",
+          "潔淨的洗手間",
+          "洗浴用品完備",
+          "舒適的浴室",
+          "美麗的漢江前景觀",
+          "夜景絕讚的窗外景觀",
+          "悠閑的景觀空間"
         ]
       }
     },
     "deokeun": {
-      "name": "德恩",
+      "name": "德恩(上岩) (Deokeun)",
       "hero": {
-        "subtitle": "步行幾分鐘即可到達漢江公園，舒適寧靜的優質住宅"
+        "subtitle": "提供最新設施與平和休息的空間"
       },
       "location": {
-        "title": "住宿位置",
-        "addressLabel": "道路名:",
-        "address": "京畿道 高陽市 德陽區 優秀路 110",
-        "bldgLabel": "建築名:",
+        "title": "位置指南",
+        "addressLabel": "地址",
+        "address": "京畿道高陽市德陽區第一路 110",
+        "bldgLabel": "商街/建築",
         "bldg": "Hillstate Eco Deokeun"
       },
       "guide": {
-        "title": "詳細資訊與使用指南",
-        "subtitle": "🏠 [只需帶上自己！] 消耗品全免、健身房免費、停車免費\n為您準備好了一切，毫無準備即可隨時在這開啟新生活。",
+        "title": "德恩(上岩)店詳細指南",
+        "subtitle": "安靜、安樂的私人休息室",
         "highlights": {
-          "title": "✨ 本房型的核心亮點",
+          "title": "空間特色",
           "list": [
             {
-              "t": "清潔度",
-              "d": "寢具、床墊墊、被套、地毯由Laundrygo專業清洗，室內進行蒸氣清潔，毛巾、抹布每次全新更換"
+              "t": "新建",
+              "d": "最新建築技術打造的舒適空間"
             },
             {
-              "t": "廚房/家電",
-              "d": "Coway淨水機、LG空氣清淨機、三星複合烤箱、LG滾筒洗衣機、SK電磁爐等一應俱全"
+              "t": "靜謐",
+              "d": "遠離鬧市喧囂的安靜氛圍"
             },
             {
-              "t": "收納/家具",
-              "d": "三層衣櫃、寬大鞋櫃、可移動單人餐桌及寬辦公桌應有盡有"
+              "t": "設施",
+              "d": "最新家電及實用空間設計"
             }
           ],
-          "quote": ""
+          "quote": "為追求真正深度休息的人們準備的最佳場所。"
         },
         "transport": {
-          "title": "📍 便利的交通與位置",
+          "title": "交通指南",
           "list": [
             {
-              "t": "大樓前公車",
-              "d": "至上岩/DMC僅5分鐘，弘大/合井約15分鐘，加陽約15分鐘，汝矣島約30分鐘"
+              "t": "駕車",
+              "d": "距離上岩洞 5分鐘車程"
             },
             {
-              "t": "停車便利",
-              "d": "新建大樓獨家優勢：寬敞舒適的專屬免費停車場"
-            },
-            {
-              "t": "自駕出行",
-              "d": "前往一山/汝矣島方向極為順暢便捷"
+              "t": "巴士",
+              "d": "在德恩地區巴士站下車後徒步 3分鐘"
             }
           ]
         },
         "facilities": {
-          "title": " Couch配備設施與選項（免費消耗品指南）",
-          "base": "標配家電/家具",
-          "baseDesc": "大容量冰箱、洗衣機、系統冷氣、智慧電視、千兆Wi-Fi、舒適的大床及床墊",
-          "add": "附加便利設施",
-          "addDesc": "智慧門鎖、監控系統、淨水器、空氣清淨機、溫馨的照明系統",
-          "freeTitle": "✨ 各種生活用品/消耗品全免！",
-          "freeDesc": "提供泡麵、微波白飯等零食，更免費提供高級洗髮露/沐浴乳/牙刷套裝等洗漱用品。\n不僅提供洗衣用品（洗衣精、柔軟精），且連官方計量垃圾袋也可無限免費使用。"
+          "title": "設施指南",
+          "base": "基本設施",
+          "baseDesc": "舒適床鋪, 個別冷暖氣, 智能 TV",
+          "add": "廚房/便利設施",
+          "addDesc": "微波爐, 烤面包機, 基本餐具",
+          "freeTitle": "免費提供項目",
+          "freeDesc": "咖啡膠囊, 礦泉水, 衛生用品"
         },
         "attractions": {
-          "title": "🛍️ 新城級周邊生活基礎設施",
+          "title": "周邊名勝",
           "list": [
             {
-              "t": "☕ 附近商圈與餐飲",
-              "d": "園區內設Paris Baguette，隔壁即是星巴克，並密集分布數十家美食名店"
+              "t": "自然",
+              "d": "彩霞公園, 天空公園臨近（步道連接）"
             },
             {
-              "t": "🛒 購物極度便利",
-              "d": "步行1分鐘即可抵達大型超市，購買食材與生活必需品極其方便"
-            },
-            {
-              "t": "🌳 豐富的休閒與綠化環境",
-              "d": "周邊水秀公園與綠色生機盎然，社區入口直通漢江公園，極其適合散步"
+              "t": "商務",
+              "d": "臨近上岩 DMC 商務圈及演播室"
             }
           ]
         }
       },
       "calendar": {
-        "title": "預訂狀況",
-        "feeGuideTitle": "Price List",
+        "title": "德恩預約現狀",
+        "feeGuideTitle": "費用指南",
         "feeGuideLines": [
-          "1人每晚 60,000 韓元",
-          "每增加1人加收 10,000 韓元 (最多4人)",
-          "週五、週六及假日前夕加收 10,000 韓元",
-          "退房清潔費 30,000 韓元",
-          "預訂1週（7天）以上可享 20,000 韓元長住折扣"
+          "1晚 6萬韓元",
+          "追加人數每人1萬韓元（最多4人）",
+          "週五、週六、公休日加收1萬韓元",
+          "7晚以上優惠2萬，14晚以上優惠4萬",
+          "退房清潔費 3萬韓元另計"
         ]
       },
       "gallery": {
@@ -631,122 +689,119 @@ export default {
           "客廳",
           "臥室",
           "廚房",
-          "浴室",
+          "衛生間",
           "景觀"
         ],
         "descriptions": [
-          "明亮舒適的主客廳空間",
-          "最舒適愜意的臥室",
-          "寬敞整潔的玄關結構",
-          "寬大梳妝台與工作區",
-          "隨時保持溫馨放鬆的室內環境",
-          "Android智慧電視，免費觀看OTT(Netflix等)",
-          "超大衣櫃，讓衣物無褶皺存放",
-          "配備空氣清淨機、吸塵器、蒸氣清潔機",
-          "整潔有序的現代化廚房",
-          "烹飪必備的完美廚具 (1)",
-          "烹飪必備的完美廚具 (2)",
-          "免費提供咖啡與綠茶等迎賓飲品",
-          "免費提供泡麵、微波白飯等解饞零食",
-          "免費提供毛巾、牙刷套裝等全新洗漱消耗品",
-          "保持時刻潔淨的智慧免治馬桶",
-          "乾濕分離、防濺水的獨立淋浴間",
-          "應急用急救醫療包",
-          "免費使用社區內配備最新設施的健身中心",
-          "通風良好、可室外晾乾衣物的區域"
+          "德恩主全景",
+          "臥室空間",
+          "房門與入口",
+          "書桌與梳妝台",
+          "舒適的室內",
+          "智能 TV 設施",
+          "寬大的衣櫃家具",
+          "空氣凈化器及家電",
+          "整潔的廚房",
+          "廚具完備",
+          "餐具套裝",
+          "免費茶飲服務",
+          "乾糧零食服務",
+          "浴室易耗品",
+          "智能比德設施",
+          "淋浴室全景",
+          "備有急救箱",
+          "健身中心",
+          "室外晾曬空間"
         ]
       }
     },
     "hongdae": {
-      "name": "弘大",
+      "name": "弘大 (Hongdae)",
       "hero": {
-        "subtitle": "弘大入口站步行圈內，弘大中心地帶的精緻空間"
+        "subtitle": "在青春與藝術之街弘大享受休息"
       },
       "location": {
-        "title": "住宿位置",
-        "addressLabel": "道路名:",
-        "address": "首爾特別市 麻浦區 西橋洞 (預訂後告知詳情)",
-        "bldgLabel": "建築名:",
-        "bldg": "探戈住宿 弘大"
+        "title": "位置指南",
+        "addressLabel": "地址",
+        "address": "首爾麻浦區西橋洞 (詳細地址預定)",
+        "bldgLabel": "商街/建築",
+        "bldg": "Stay Hongdae"
       },
       "guide": {
-        "title": "詳細資訊與使用指南",
-        "subtitle": "\"為了讓您無需準備即可開始日常生活，我們準備了一切\"",
+        "title": "詳細信息 & 利用指南",
+        "subtitle": "“為您準備好了一切，只需人來即可開始您的日常”",
         "highlights": {
-          "title": "✨ 本房型的核心亮點",
+          "title": "✨ 住宿亮點",
           "list": [
             {
-              "t": "弘大核心地帶",
-              "d": "優越的地理位置，盡享弘大前衛文化。"
+              "t": "弘大核心區",
+              "d": "體驗弘大流行文化的最佳地理位置。"
             },
             {
-              "t": "絕不妥協的完美清潔",
-              "d": "寢具、地毯每次均由 Laundrygo 專業清洗，室內進行蒸氣清潔，毛巾與抹布毫不吝嗇地全部更換全新。"
+              "t": "無妥協的乾淨整潔",
+              "d": "床具和地毯均為專業洗滌， 수건和抹布每次都更換為全新的。"
             },
             {
-              "t": "高級休閒家具",
-              "d": "配備2張寬大舒適的床（大床、超級單人床）、舒適沙發以及高性能的按摩躺椅。"
+              "t": "高端休息家具",
+              "d": "備有兩張大床 (Queen, Super Single)，高品質按摩椅。"
             },
             {
-              "t": "豐富的娛樂設施",
-              "d": "客廳配備 2026 三星 Moving Style 最新智慧電視，臥室內另設一台專屬電視。"
+              "t": "豐富的多樣娛樂",
+              "d": "客廳配有 2026 三星 MovingStyle 最新智能 TV，臥室也有獨立 TV。"
             }
           ],
-          "quote": "\"感受弘大的激情後，享受最高級的休息~\""
+          "quote": "享受弘大的熱情后，在此體驗高端的休憩體驗。"
         },
         "transport": {
-          "title": "📍 便利的交通與位置",
+          "title": "📍 便利地理位置 & 交通",
           "list": [
             {
-              "t": "弘大入口站商圈",
-              "d": "極速切換2號線、機場快線、京義中央線。"
+              "t": "弘大入口站超近",
+              "d": "2號線, 機場快線, 京義中央線利用極其方便。"
             },
             {
-              "t": "豐富的公車線路",
-              "d": "多條線路通達首爾全境及仁川機場。"
+              "t": "豐富的巴士路線",
+              "d": "可直達首爾全境及仁川機場。"
             },
             {
-              "t": "步行探索的首選",
-              "d": "步行即可玩轉弘大、合井、延南洞。"
+              "t": "徒步最佳",
+              "d": "弘大, 合井, 延南洞均可徒步遊覽。"
             }
           ]
         },
         "facilities": {
-          "title": " Couch配備設施與選項（免費消耗品指南）",
-          "base": "標配家電/家具",
-          "baseDesc": "冰箱、洗衣機、冷氣、智慧電視（2台）、千兆 Wi-Fi、水槽、電磁爐、大床及超單人床",
-          "add": "附加便利設施",
-          "addDesc": "安全智慧門鎖及保全監控/管理室、餐桌、衛生淨水器、坐臥兩用長椅、寬大書桌、寬敞衣櫃及鞋櫃",
-          "freeTitle": "✨ 所有消耗品全部免費！",
-          "freeDesc": "拉麵、微波白飯、捲筒衛生紙、抽取式衛生紙、牙刷牙膏套裝、洗髮精/護髮素、沐浴乳、洗手乳等所有一次性用品和消耗品均已備齊。\n晾衣架、洗衣精、柔軟精，甚至垃圾袋和資源回收袋均可隨意免費使用！"
+          "title": "Stay 設施 & 選項 (免費消耗品指南)",
+          "base": "基本家電·家具",
+          "baseDesc": "冰箱, 洗衣機, 空調, 智能TV (2台), 千兆 Wi-Fi, 灶台, 電磁爐, 大床",
+          "add": "額外便利設施",
+          "addDesc": "安全門鎖和監控, 用餐桌, 淨水器, 沙發, 大寫字台, 大容量衣櫃",
+          "freeTitle": "✨ 全部消耗品免費!!!",
+          "freeDesc": "拉面, 速食米飯, 紙巾, 牙刷套餐, 洗浴用品等全部準備就緒。\n免費提供洗衣架和洗滌劑、柔順劑，甚至垃圾袋！"
         },
         "attractions": {
-          "title": "🛍️ 周邊生活設施與娛樂",
+          "title": "🛍️ 周邊生活配套 & 好去處",
           "list": [
             {
-              "t": "弘大遊樂街",
-              "d": "街頭表演、時尚店鋪雲集的弘大核心街道。"
+              "t": "弘大想漫步的街道",
+              "d": "充滿街頭表演和各種店鋪的弘大主街。"
             },
             {
-              "t": "延南洞 京義線林蔭道",
-              "d": "體驗\"延特拉爾公園\"的愜意漫步與野餐。"
+              "t": "延南洞京義線林路",
+              "d": "可以享受散步和野餐的“延南中央公園”。"
             },
             {
-              "t": "美食店與咖啡館",
-              "d": "數百公尺內密集分佈著國內外知名的美食餐廳和特色咖啡館。"
+              "t": "無數美食店與咖啡館",
+              "d": "數百米內聚集了國內外著名的美食店和感性咖啡館。"
             }
           ]
         }
       },
       "calendar": {
-        "title": "預訂狀況",
-        "feeGuideTitle": "Price List",
+        "title": "弘大店預約現狀",
+        "feeGuideTitle": "費用指南",
         "feeGuideLines": [
-          "1人每晚 80,000 韓元",
-          "每增加1人加收 10,000 韓元 (最多4人)",
-          "週五、週六及假日前夕加收 10,000 韓元",
-          "退房清潔費 30,000 韓元",
-          "預訂1週（7天）以上可享 20,000 韓元長住折扣"
+          "1晚 8萬韓元",
+          "開業特惠價預定中"
         ]
       },
       "gallery": {
@@ -756,212 +811,204 @@ export default {
           "客廳",
           "臥室",
           "廚房",
-          "浴室",
+          "衛生間",
           "景觀"
         ],
         "descriptions": [
-          "客廳，書桌（梳妝台），雙人餐桌",
-          "挑高設計的豪華單身公寓",
-          "兼顧休息與就餐的完美格局",
-          "2026 三星智慧電視 M7 / 書桌兼梳妝台",
-          "免費尊享高級電視與OTT頻道",
-          "Kakao Park 智慧音箱",
-          "IKEA高級寢具（加大尺寸）",
-          "臥室專用電視",
-          "可調式按摩沙發（高性能）",
-          "Ace 單인床與IKEA寢具",
-          "最多可住3人（可使用客廳沙發）",
-          "淨水器、廚具、調味料、一次性用品等一應俱全",
-          "三星冰箱與洗衣機",
-          "洗手台、洗手間、淋浴間乾濕分離",
-          "提供洗髮精、護髮素、沐浴乳",
-          "配備智慧免治馬桶",
-          "弘大繁華街區的活力景觀",
-          "美食探店的最佳地標",
-          "充滿活力的城市美景"
+          "弘大店畫廊準備中",
+          "舒適的空間配置預定",
+          "感性裝修"
         ]
       }
     }
   },
   "common": {
-    "save": "Save",
-    "cancel": "Cancel",
-    "loading": "Loading...",
+    "save": "保存",
+    "cancel": "取消",
+    "loading": "加載中...",
     "contact": {
-      "title": "聯絡我們",
-      "desc": "如有任何疑問，請隨時聯絡我們。",
-      "call": "撥打電話",
-      "callDesc": "010-7209-2468 (Stone)",
-      "sms": "發送簡訊",
-      "smsDesc": "保證快速回覆",
-      "kakao": "Kakao 開放聊天室",
-      "kakaoDesc": "個人 ID: stonehong@kakao.com",
+      "title": "諮詢",
+      "desc": "如有疑問請隨時聯繫。",
+      "call": "電話諮詢",
+      "callDesc": "直線電話連接",
+      "sms": "短信諮詢",
+      "smsDesc": "通過短信諮詢",
+      "kakao": "KakaoTalk",
+      "kakaoDesc": "KakaoTalk 諮詢頻道",
       "whatsapp": "WhatsApp",
-      "whatsappDesc": "全球賓客專用",
-      "fb": "FB Messenger",
-      "fbDesc": "Facebook 訊息"
+      "whatsappDesc": "WhatsApp 諮詢",
+      "fb": "Messenger",
+      "fbDesc": "Facebook 消息"
     },
     "hostGuide": {
-      "title": "🛡️ 房間使用及與房東溝通指南",
+      "title": "房東介紹",
       "list": [
         {
-          "t": "🔓 入住 / 退房（可協商）",
-          "d": "原則上為無接觸入住。入住當天會提前透過訊息發送公共大門密碼及房間號。\n基本時間為 入住 15:00 / 退房 11:00，但為方便您，可靈活協商時間！"
+          "t": "房東",
+          "d": "Stone Hong (Hong Byong Seok)"
         },
         {
-          "t": "🏠 必須遵守的規則",
-          "d": "整棟建築 絕對禁菸。如若違反將收取特殊清潔費，請務必注意。\n為了保持環境整潔，退房前請務必完成垃圾分類及餐具清洗。\n因是新建公寓，22點以後請避免樓層噪音和高聲喧嘩。"
+          "t": "簡介",
+          "d": "現任探戈講師 / 住宿房東。\n在舒適且充滿藝術氛圍的空間支持您的探戈之旅。"
         },
         {
-          "t": "🤩 房東溝通（24小時即時回覆）",
-          "d": "包含凌晨在內的 24 小時均可隨時聯絡。如果有一點點不便，請不要忍耐，立即發訊息給我！\n萬一您提前入住卻發現缺少生活中必需的物品，請立即告訴我。我會當天立即購買並配送。"
+          "t": "諮詢",
+          "d": "有關住宿及探戈課程的諮詢，請通過 KakaoTalk 或 WhatsApp 聯繫。"
         }
       ]
     },
     "story": {
-      "title": "探戈住宿故事",
-      "subtitle": "\"只需帶著您自己\"… 為您介紹探戈住宿的 [無人島實驗]。",
-      "p1": "作為房東，我在準備這個空間時設定的唯一目標就是「無人島實驗」。打造一個讓他人只需帶一個行李箱入住，即使一個星期以上不踏出房門半步，也能享受完美舒適生活的空間。為了徹底解決我作為房客時經歷的「種種不便」，我精心策劃了這裡。",
-      "sol1Title": "入住大禮包：零不適感，迎賓禮盒",
-      "sol1Text": "再也不用為使用別人用過的毛巾或肥皂而感到介意了。我們為所有客人提供全新的毛巾、抹布、香皂、牙刷牙膏等媲美飯店級洗漱用品。抵達的第一天，您完全不需要跑去便利商店。",
-      "sol2Title": "飲水無憂！配備最新淨水器",
-      "sol2Text": "讓您從搬運沉重礦泉水瓶的痛苦中解脫出來。配備頂尖淨水器，隨時讓您開懷暢飲乾淨清涼的純淨水。",
-      "sol3Title": "絕不妥協的清潔度（專業洗衣 Laundrygo）",
-      "sol3Text": "所有寢具（被子、床單、床墊套、枕套）和地毯均備有兩套，每次交由專業無接觸洗衣機構（Laundrygo）進行高溫殺균和烘乾。在連肉眼看不見的蟎蟲都被徹底消滅的鬆軟寢具中，體驗深度安穩的睡眠。",
-      "closing": "我期待在這個世上最舒適的個人「無人島」上，迎接真正享受放鬆的你們。",
-      "hostName": "👋 我은跳阿根廷探戈的男人，Stone。",
+      "title": "Tango Stay 故事",
+      "subtitle": "“人來即可” —— 介紹 Tango Stay 的 [無人島實驗]",
+      "p1": "作為房東準備這個空間時設置的唯一目標，就是“無人島實驗”。即使只提一個皮箱入職，不邁出大門一步也能過上一周以上完美舒適生活的空間。這是為了完美解決我作為客人曾經歷過的“無數不便”而策劃的。",
+      "sol1Title": "Stay Pack: 零不快感，歡迎禮包",
+      "sol1Text": "告別別人用過的毛巾或肥皂。為每位客人都提供酒店洗護級別的“新”毛巾、抹布、肥皂和牙刷套餐。第一天完全不需要跑去便利店。",
+      "sol2Title": "不用擔心喝水！安裝最新淨水器",
+      "sol2Text": "從搬運沈重礦泉水的痛苦中解脫出來吧。安裝了頂級淨水器，隨時都能喝到潔淨涼爽的水。",
+      "sol3Title": "無妥協的清潔 (專業洗滌 Laundrygo)",
+      "sol3Text": "所有臥具和地毯都準備了兩套以上，且每次都通過專業非面對面洗滌公司（Laundrygo）進行高溫殺菌和乾燥。請在完美殺菌、蓬鬆的臥具中體驗深度睡眠吧。",
+      "closing": "期待在世界上最舒適的專屬“無人島”享受真正放鬆的您。",
+      "hostName": "👋 我是跳阿根廷探戈的男人，Stone。",
       "hostBio": ""
     },
     "footer": {
-      "term": "服務條款",
-      "privacy": "隱私權政策",
-      "termTitle": "[服務條款]",
-      "privacyTitle": "[隱私權政策]",
-      "termText": "第一條 (目的)\n本條款旨在規定探戈住宿在提供住宿服務時，房東與房客之間的權利、義務及責任事項。\n\n第二條 (服務的提供與變更)\n1. 探戈住宿向房客提供明確標記的住宿空間及所有附屬設施（包含免費消耗品）。\n2. 若損壞住宿設施內的物品，房東有權向房客要求按實際費用賠償。\n\n第三條 (房客的義務)\n1. 嚴禁房客在住宿內吸菸、大聲喧嘩（22時之後）等給他人造成滋擾的行為。\n2. 違者將被強制要求退房，並可能被收取高額的特殊清潔費。",
-      "privacyText": "1. 收集的個人資訊項目\n探戈住宿為了順利進行住宿預訂及房東與房客之間的溝通，正在收集以下個人資訊。\n- 收集項目：預訂者姓名、聯絡方式(電話號碼)、預訂日程\n\n2. 個人資訊的收集與使用目的\n- 提供住宿公共大門及客房智慧門鎖的密碼\n- 支付及預訂確認、為管理入住品質而進行的客服回覆\n\n3. 個人資訊的保存期限\n- 原則上，個人資訊的收集及使用目的達成後（退房後1個月），將立即徹底銷毀該資訊。"
+      "term": "使用條款",
+      "privacy": "隱私政策",
+      "termTitle": "TangoStay 使用條款",
+      "privacyTitle": "隱私政策",
+      "termText": "第一條 (目的)\n本條款旨在規定利用 TangoStay 提供的預約服務時...",
+      "privacyText": "TangoStay 非常珍視用戶的個人信息..."
     }
   },
-  "startTime": "Start Time",
-  "endTime": "End Time",
+  "startTime": "開始時間",
+  "endTime": "結束時間",
   "media": {
-    "title": "Media",
-    "edit": "Edit Media",
+    "title": "媒體",
+    "edit": "修改視頻",
     "type": {
       "youtube": "YouTube",
-      "demonstration": "Demo",
-      "general": "General"
+      "demonstration": "演示",
+      "general": "一般"
     },
-    "filterAll": "All",
-    "addBtn": "Register",
-    "like": "Like",
-    "comment": "Comment",
-    "views": "Views",
-    "noAccess": "Demonstration video for class participants only.",
+    "filterAll": "按課程查看 (全部)",
+    "addBtn": "登記",
+    "like": "點贊",
+    "comment": "評論",
+    "views": "查看次數",
+    "noAccess": "只有課程申請者可以查看",
     "placeholder": {
-      "title": "Enter title",
-      "url": "YouTube ID or Video URL",
-      "desc": "Enter description",
-      "class": "Select Class (Optional)",
-      "comment": "Leave a comment..."
+      "title": "請輸入標題",
+      "url": "YouTube ID 或視頻 URL",
+      "desc": "請輸入說明",
+      "class": "選擇相關課程（可選）",
+      "comment": "留下您的評論..."
     },
-    "uploading": "Uploading...",
-    "deleteConfirm": "Delete this?",
-    "saveSuccess": "Saved.",
-    "deleteSuccess": "Deleted."
+    "uploading": "上傳中...",
+    "deleteConfirm": "確定要刪除嗎？",
+    "saveSuccess": "已保存。",
+    "deleteSuccess": "已刪除。"
   },
   "story": {
     "campaign": {
-      "title": "Core Campaign",
+      "title": "全體參與",
       "slogan": "Happy Space, Warm People",
-      "sloganKo": "Happy Space, Warm People"
+      "sloganKo": "幸福的空間，溫暖的人們"
     },
     "hero": {
-      "title": "The Playground We Dream of,\nA Sanctuary for All",
-      "subtitle": "A Freestyle Tango community where we grow together with respect"
+      "title": "我們夢想的游樂場，\n大家的避風港",
+      "subtitle": "彼此尊重、共同成長的 Freestyle Tango 社區"
     },
     "ethics": {
-      "title": "Community Core Values",
-      "respectTitle": "Attitude First (Respect)",
-      "respectDesc": "The premise that we must respect each other is too clear. Otherwise, club activities may be restricted.",
-      "teachingTitle": "No Teaching",
-      "teachingDesc": "One-sided teaching among students can hinder the progress of both yourself and others. We welcome exchange of opinions, but please resolve technical issues through the instructors.",
-      "teachingDetail": "It is important to accurately understand the teacher's intentions. Regardless of experience, please refrain from one-sided teaching."
+      "title": "社區核心價值",
+      "respectTitle": "態度第一 (Respect)",
+      "respectDesc": "互相尊重是一個非常明確的命題。否則，俱樂部活動可能會受到限制。",
+      "teachingTitle": "禁止私人教學 (No Teaching)",
+      "teachingDesc": "學生之間單方面的教導會妨礙雙方的發展。歡迎交流意見，但技術問題請諮詢講師團隊。",
+      "teachingDetail": "準確理解老師的意圖非常重要。無論資歷如何，請避免單方面的私人教學。"
     },
     "projects": {
-      "title": "Strategic Projects",
+      "title": "戰略項目",
       "azit": {
         "title": "Project 'Azit'",
-        "desc": "Our own sanctuary where we can comfortably talk and enjoy food and drinks before and after classes."
+        "desc": "課後可以輕鬆交流並享受美食美酒的專屬聚會空間。"
       },
       "camp": {
         "title": "Project 'Camp'",
-        "desc": "A pension space that can be a sanctuary for us outside the city on weekends and holidays."
+        "desc": "週末和長假，遠離喧囂的城市，在這裡享受大自然的休憩。"
       },
       "nuevo": {
-        "title": "Project Professional Performance Team 'Nuevo Company'",
-        "desc": "Operation of a professional performance team and activation of yoga rooms and cultural centers for wellness."
+        "title": "Project 職業演出團 'Nuevo Company'",
+        "desc": "運營職業演出團，並激活瑜伽室、文化中心等健康生活。"
       },
       "orchestra": {
-        "title": "Project 'House Ochestra'",
-        "desc": "Freestyle's own house orchestra for salon recitals and live milongas."
+        "title": "Project 'House Orchestra'",
+        "desc": "為沙龍音樂會和現場米隆加準備的專屬室內管弦樂團。"
       }
     },
     "roadmap": {
-      "title": "Sustainable Future",
+      "title": "可持續的未來",
       "cooperative": {
-        "title": "Cooperative Transition",
-        "desc": "A system where members share ownership of the club and jointly operate and make decisions."
+        "title": "向合作社轉型",
+        "desc": "由成員共同擁有並參與管理的決策系統。"
       },
       "donation": {
-        "title": "Establishing a Donation Culture",
-        "desc": "A culture that supports new members and helps the club grow through scholarships and volunteering."
+        "title": "建立捐贈文化",
+        "desc": "通過獎學金制度和武術家誌願者活動支持新成員。"
       },
       "instructor": {
-        "title": "Internal Instructor Training",
-        "desc": "A system to nurture the next generation of leaders from within our community."
+        "title": "內部講師培養",
+        "desc": "任何人都可以深入研究特定主題並親自開設課程的系統。"
       }
     },
     "guidelines": {
-      "title": "General Guide",
-      "cleaning": "Wipe up spills immediately.",
-      "shoes": "Only dedicated shoes or bare feet are allowed inside.",
-      "toilet": "Only toilet paper in the toilet (No hand towels, wet wipes).",
-      "trash": "Sort trash and dispose of it in bins when leaving.",
-      "power": "Use the main switch next to the door when entering/leaving.",
+      "title": "利用規範 (General Guide)",
+      "cleaning": "若將飲料灑在地板上，請立即擦拭乾淨。",
+      "shoes": "除專用舞鞋或赤腳外，禁止進入室內。",
+      "toilet": "便池內僅限放入紙巾 (嚴禁放入濕巾、紙巾)。",
+      "trash": "退場時請將垃圾分類放入垃圾桶。",
+      "power": "入場和退場時，請使用門側的總開關。",
       "facilities": {
         "wifi": "WiFi: freestyle1234",
-        "pc": "PC PW: 7788",
-        "lockers": "Items cannot be stored outside personal lockers."
+        "pc": "PC 密碼: 7788",
+        "lockers": "禁止在個人儲物櫃以外存放物品。"
       }
     }
   },
   "coaching": {
-    "title": "Coaching Management",
-    "newCoaching": "New Coaching",
-    "empty": "No coaching items found.",
-    "student": "Student",
-    "instructor": "Instructor",
-    "progress": "Progress",
-    "status": "Status",
-    "ongoing": "Ongoing",
-    "solved": "Solved",
-    "solvedBadge": "Solved",
-    "itemTitle": "Title",
-    "itemDesc": "Description",
-    "selectStudent": "Select Student",
-    "searchStudentPlaceholder": "Search name or phone...",
-    "searchSearching": "Searching...",
-    "searchNoResults": "No results found.",
-    "creating": "Creating...",
-    "updates": "Activity Logs",
-    "activityAdd": "Add Activity",
-    "addComment": "Add a comment...",
-    "uploadMedia": "Add Photo/Video",
-    "updateProgress": "Update Progress",
-    "saveUpdate": "Save Log",
-    "noUpdates": "No logs yet.",
-    "confirmStatusChange": "更改狀態？",
-    "reopen": "Reopen",
-    "errorSave": "Error saving update."
+    "title": "教練管理",
+    "newCoaching": "登記新教練",
+    "empty": "暫無登記的教練項。",
+    "student": "學生",
+    "instructor": "擔當講師",
+    "progress": "進度",
+    "status": "狀態",
+    "ongoing": "進行中",
+    "solved": "問題解決",
+    "solvedBadge": "已解決",
+    "itemTitle": "教練標題",
+    "itemDesc": "教練說明",
+    "selectStudent": "選擇學生",
+    "searchStudentPlaceholder": "搜索姓名或電話號碼",
+    "searchSearching": "搜索中...",
+    "searchNoResults": "搜索結果為空。",
+    "creating": "正在登記...",
+    "updates": "活動記錄",
+    "activityAdd": "添加活動",
+    "comment": "Comment",
+    "placeholderComment": "Write a comment...",
+    "media": "Media",
+    "addComment": "填寫評論...",
+    "uploadMedia": "添加圖片/視頻",
+    "updateProgress": "更新進度",
+    "saveUpdate": "保存記錄",
+    "noUpdates": "暫無記錄。",
+    "confirmStatusChange": "確定要更改狀態嗎？",
+    "reopen": "重啟",
+    "editActivity": "Edit Activity",
+    "deleteActivity": "Delete Activity",
+    "confirmDelete": "Are you sure you want to delete this?",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "errorSave": "保存過程中發生錯誤。"
   }
 };

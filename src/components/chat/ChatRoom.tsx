@@ -68,7 +68,9 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
   const audioChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const cleanUserPhone = user.phone.replace(/[^0-9]/g, '');
+  const cleanUserPhone = (user.phone === 'admin' || user.phone.length < 6) 
+    ? user.phone 
+    : user.phone.replace(/[^0-9]/g, '');
   const REACTION_EMOJIS = ['👍', '❤️', '🥰', '😂', '😮', '😢', '😡'];
   const isSystemRoom = roomId === COMMUNITY_ROOM_ID || roomId === NOTICE_ROOM_ID;
   const isPublicRoom = roomId === COMMUNITY_ROOM_ID || roomId === NOTICE_ROOM_ID; // Added for read count logic
@@ -154,7 +156,10 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
     if (inviteSearchTerm.trim()) {
       searchUsers(inviteSearchTerm).then(results => {
         // Filter out already participants
-        const filtered = results.filter(u => !currentParticipants.map(p => p.replace(/[^0-9]/g, '')).includes(u.phone));
+        const filtered = results.filter(u => {
+          const cleanP = (u.phone === 'admin' || u.phone.length < 6) ? u.phone : u.phone.replace(/[^0-9]/g, '');
+          return !currentParticipants.map(participant => (participant === 'admin' || participant.length < 6) ? participant : participant.replace(/[^0-9]/g, '')).includes(cleanP);
+        });
         setInviteSearchResults(filtered);
       });
     } else {
@@ -471,7 +476,8 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
   const handleInvite = async (targetUser: { nickname: string; phone: string }) => {
     try {
       await inviteUserToChatRoom(roomId, targetUser, user.nickname);
-      setCurrentParticipants(prev => [...prev, targetUser.phone.replace(/[^0-9]/g, '')]);
+      const cleanPhone = (targetUser.phone === 'admin' || targetUser.phone.length < 6) ? targetUser.phone : targetUser.phone.replace(/[^0-9]/g, '');
+      setCurrentParticipants(prev => [...prev, cleanPhone]);
       setIsInviting(false);
       setInviteSearchTerm('');
       alert(language === 'ko' ? `${targetUser.nickname}님을 초대했습니다.` : `Invited ${targetUser.nickname}`);
@@ -531,8 +537,12 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
             {participants && participants.length === 2 ? (
               // 1:1 Direct Message Header
               (() => {
-                const otherPhone = participants.find(p => p.replace(/[^0-9]/g, '') !== cleanUserPhone);
-                const other = otherPhone ? memberInfo[otherPhone.replace(/[^0-9]/g, '')] : null;
+                const otherPhone = participants.find(p => {
+                  const cleanP = (p === 'admin' || p.length < 6) ? p : p.replace(/[^0-9]/g, '');
+                  return cleanP !== cleanUserPhone;
+                });
+                const cleanOtherPhone = otherPhone ? ((otherPhone === 'admin' || otherPhone.length < 6) ? otherPhone : otherPhone.replace(/[^0-9]/g, '')) : null;
+                const other = cleanOtherPhone ? memberInfo[cleanOtherPhone] : null;
                 const name = other?.nickname || roomName;
                 return (
                   <>
@@ -578,7 +588,8 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
                   <div className={styles.stackedAvatars}>
                     {participants && participants.length > 0 ? (
                       participants.slice(0, 3).map((phone, idx) => {
-                        const info = memberInfo[phone.replace(/[^0-9]/g, '')];
+                        const cleanP = (phone === 'admin' || phone.length < 6) ? phone : phone.replace(/[^0-9]/g, '');
+                        const info = memberInfo[cleanP];
                         const name = info?.nickname || '?';
                         return info?.photoURL ? (
                           <img 
@@ -676,19 +687,23 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
               <div className={`${styles.messageWrapper} ${isOwn ? styles.own : styles.other} ${isConsecutive(idx) ? styles.consecutive : ''}`}>
                 {!isOwn && (
                   <div className={styles.avatarImgWrapper}>
-                    {memberInfo[msg.senderId.replace(/[^0-9]/g, '')]?.photoURL ? (
-                      <img 
-                        src={memberInfo[msg.senderId.replace(/[^0-9]/g, '')].photoURL} 
-                        className={styles.msgAvatar} 
-                        alt="" 
-                        onClick={() => setSelectedViewerImage(memberInfo[msg.senderId.replace(/[^0-9]/g, '')].photoURL)}
-                        style={{ cursor: 'pointer' }}
-                      />
-                    ) : (
-                      <div className={styles.msgAvatarPlaceholder}>
-                        {msg.senderName[0]}
-                      </div>
-                    )}
+                    {(() => {
+                      const cleanSenderId = (msg.senderId === 'admin' || msg.senderId.length < 6) ? msg.senderId : msg.senderId.replace(/[^0-9]/g, '');
+                      const info = memberInfo[cleanSenderId];
+                      return info?.photoURL ? (
+                        <img 
+                          src={info.photoURL} 
+                          className={styles.msgAvatar} 
+                          alt="" 
+                          onClick={() => setSelectedViewerImage(info.photoURL!)}
+                          style={{ cursor: 'pointer' }}
+                        />
+                      ) : (
+                        <div className={styles.msgAvatarPlaceholder}>
+                          {msg.senderName[0]}
+                        </div>
+                      );
+                    })()}
                   </div>
                 )}
                 <div className={styles.messageContent}>

@@ -12,7 +12,8 @@ import {
   checkIfLiked, 
   checkClassAccess, 
   incMediaView,
-  deleteMedia
+  deleteMedia,
+  remapStorageUrl
 } from '@/lib/db';
 import { hasRole } from '@/utils/auth';
 
@@ -146,7 +147,7 @@ const MediaDetail: React.FC<MediaDetailProps> = ({ item, onClose, t, user, isAdm
       );
     }
 
-    if (item.type === 'image') {
+    if (item.type === 'image' || ((item.type === 'lucy' || item.type === 'general') && /\.(jpg|jpeg|png|webp|gif)/i.test(finalUrl))) {
       return (
         <div className={styles.imageWrapper}>
           <img 

@@ -30,9 +30,12 @@ import {
  * Firestore 쿼리에 타임아웃을 적용하는 헬퍼 함수
  * 인덱스가 없을 때 12초 이상 대기하는 현상을 방지합니다.
  */
-const withTimeout = <T>(promise: Promise<T>, timeoutMs: number = 6000): Promise<T> => {
+const withTimeout = <T>(promise: Promise<T>, timeoutMs: number = 7000): Promise<T> => {
   return Promise.race([
-    promise,
+    promise.catch(err => {
+      // If the promise fails (e.g. missing index), propagate the error immediately
+      throw err;
+    }),
     new Promise<T>((_, reject) => 
       setTimeout(() => reject(new Error('FIRESTORE_TIMEOUT')), timeoutMs)
     )
@@ -47,22 +50,27 @@ export const remapStorageUrl = (url: any): any => {
   if (!url || typeof url !== 'string' || !url.includes('firebasestorage.googleapis.com')) return url;
   
   let remapped = url;
+  let isOldBucket = false;
   
   // 1. Replace legacy bucket domains/ids with the new Seoul bucket domain
   OLD_BUCKETS.forEach(bucket => {
     if (remapped.includes(bucket)) {
       remapped = remapped.replace(new RegExp(bucket, 'g'), NEW_BUCKET_DOMAIN);
+      isOldBucket = true;
     }
   });
   
-  // 2. STRIP LEGACY TOKENS: The old tokens are invalid in the new project.
-  // We keep essential params like alt=media but strip &token=... or ?token=...
-  if (remapped.includes('token=')) {
-    // Standard case: ?alt=media&token=xyz -> ?alt=media
-    // Edge case: ?token=xyz -> (remove params entirely)
-    const urlObj = new URL(remapped);
-    urlObj.searchParams.delete('token');
-    remapped = urlObj.toString();
+  // 2. STRIP TOKENS ONLY FOR REMAPPED OLD BUCKETS
+  // The old tokens are invalid in the new project.
+  // New tokens for the new project SHOULD persist.
+  if (isOldBucket && remapped.includes('token=')) {
+    try {
+      const urlObj = new URL(remapped);
+      urlObj.searchParams.delete('token');
+      remapped = urlObj.toString();
+    } catch (e) {
+      console.warn("Failed to parse URL for token removal:", remapped);
+    }
   }
   
   return remapped;
@@ -247,6 +255,7 @@ export interface CoachingUpdate {
   progress: number;
   comment: string;
   mediaUrls: string[];
+  senderPhone: string;
   createdAt: string;
 }
 
@@ -271,17 +280,22 @@ export const getClasses = async (): Promise<TangoClass[]> => {
     } else {
       console.warn("Error fetching classes with orderBy:", error);
     }
-    const qSimple = query(collection(db, COLLECTION_NAME));
-    const querySnapshot = await getDocs(qSimple);
-    const results = querySnapshot.docs.map(docSnap => {
-      const data = docSnap.data();
-      return {
-        id: docSnap.id,
-        ...data,
-        imageUrl: remapStorageUrl(data.imageUrl)
-      } as TangoClass;
-    });
-    return results.sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+    try {
+      const qSimple = query(collection(db, COLLECTION_NAME));
+      const querySnapshot = await getDocs(qSimple);
+      const results = querySnapshot.docs.map(docSnap => {
+        const data = docSnap.data();
+        return {
+          id: docSnap.id,
+          ...data,
+          imageUrl: remapStorageUrl(data.imageUrl)
+        } as TangoClass;
+      });
+      return results.sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+    } catch (fallbackError) {
+      console.warn("Fallback query in getClasses failed:", fallbackError);
+      return [];
+    }
   }
 };
 
@@ -398,7 +412,7 @@ export const getAllRegistrationsByPhone = async (phone: string): Promise<Registr
 };
 
 export const updateRegistrationPhoto = async (phone: string, photoURL: string) => {
-  const cleanPhone = phone.replace(/[^0-9]/g, '');
+  const cleanPhone = (phone || '').replace(/[^0-9]/g, '');
   
   // 1. Update in registrations
   const q = query(
@@ -421,7 +435,7 @@ export const updateRegistrationPhoto = async (phone: string, photoURL: string) =
 
 export const toggleUserPinnedRoom = async (phone: string, roomId: string, isPinned: boolean) => {
   try {
-    const cleanPhone = phone.replace(/[^0-9]/g, '');
+    const cleanPhone = (phone || '').replace(/[^0-9]/g, '');
     const userRef = doc(db, 'users', cleanPhone);
     
     // Check if user exists first or just try update
@@ -442,7 +456,7 @@ export const toggleUserPinnedRoom = async (phone: string, roomId: string, isPinn
 };
 
 export const updateUserProfile = async (phone: string, data: Partial<User>) => {
-  const cleanPhone = phone.replace(/[^0-9]/g, '');
+  const cleanPhone = (phone || '').replace(/[^0-9]/g, '');
   
   // 1. Update in registrations (nickname, photoURL, role - but NOT isInstructor/staffRole as they are global user roles)
   const q = query(
@@ -540,61 +554,100 @@ export const deleteMilongaReservation = async (id: string) => {
 const MILONGA_INFO_COLLECTION = 'milonga_info';
 
 export const getMilongaInfo = async (date?: string): Promise<MilongaInfo | null> => {
-  if (date) {
-    const q = query(collection(db, MILONGA_INFO_COLLECTION), where('activeDate', '==', date), limit(1));
+  try {
+    if (date) {
+      const q = query(collection(db, MILONGA_INFO_COLLECTION), where('activeDate', '==', date), limit(1));
+      const querySnapshot = await withTimeout(getDocs(q));
+      if (!querySnapshot.empty) {
+        const docSnap = querySnapshot.docs[0];
+        const data = docSnap.data();
+        return { 
+          ...data,
+          id: docSnap.id, 
+          posterUrl: remapStorageUrl(data.posterUrl),
+          sourcePhotoUrl: remapStorageUrl(data.sourcePhotoUrl)
+        } as unknown as MilongaInfo;
+      }
+      return null;
+    }
+
+    // Next upcoming or latest
+    const today = new Date().toISOString().split('T')[0];
+    const q = query(
+      collection(db, MILONGA_INFO_COLLECTION), 
+      where('activeDate', '>=', today),
+      orderBy('activeDate', 'asc'),
+      limit(1)
+    );
     const querySnapshot = await withTimeout(getDocs(q));
     if (!querySnapshot.empty) {
       const docSnap = querySnapshot.docs[0];
       const data = docSnap.data();
-      return { 
+      return {
         ...data,
-        id: docSnap.id, 
+        id: docSnap.id,
         posterUrl: remapStorageUrl(data.posterUrl),
         sourcePhotoUrl: remapStorageUrl(data.sourcePhotoUrl)
       } as unknown as MilongaInfo;
     }
+
+    // If no future milonga, get the absolute latest one
+    const qLatest = query(
+      collection(db, MILONGA_INFO_COLLECTION),
+      orderBy('activeDate', 'desc'),
+      limit(1)
+    );
+    const latestSnapshot = await withTimeout(getDocs(qLatest));
+    if (!latestSnapshot.empty) {
+      const docSnap = latestSnapshot.docs[0];
+      const data = docSnap.data();
+      return {
+        ...data,
+        id: docSnap.id,
+        posterUrl: remapStorageUrl(data.posterUrl),
+        sourcePhotoUrl: remapStorageUrl(data.sourcePhotoUrl)
+      } as unknown as MilongaInfo;
+    }
+
     return null;
-  }
+  } catch (error) {
+    console.warn("getMilongaInfo failed, falling back to basic query:", error);
+    try {
+      const qFallback = query(collection(db, MILONGA_INFO_COLLECTION), limit(20));
+      const fallbackSnapshot = await withTimeout(getDocs(qFallback));
+      
+      let allDocs = fallbackSnapshot.docs.map(docSnap => {
+        const data = docSnap.data();
+        return {
+          ...data,
+          id: docSnap.id,
+          posterUrl: remapStorageUrl(data.posterUrl),
+          sourcePhotoUrl: remapStorageUrl(data.sourcePhotoUrl)
+        } as unknown as MilongaInfo;
+      });
 
-  // Next upcoming or latest
-  const today = new Date().toISOString().split('T')[0];
-  const q = query(
-    collection(db, MILONGA_INFO_COLLECTION), 
-    where('activeDate', '>=', today),
-    orderBy('activeDate', 'asc'),
-    limit(1)
-  );
-  const querySnapshot = await withTimeout(getDocs(q));
-  if (!querySnapshot.empty) {
-    const docSnap = querySnapshot.docs[0];
-    const data = docSnap.data();
-    return {
-      ...data,
-      id: docSnap.id,
-      posterUrl: remapStorageUrl(data.posterUrl),
-      sourcePhotoUrl: remapStorageUrl(data.sourcePhotoUrl)
-    } as unknown as MilongaInfo;
+      if (date) {
+        const exact = allDocs.find(d => d.activeDate === date);
+        if (exact) return exact;
+        return null;
+      }
+      
+      const today = new Date().toISOString().split('T')[0];
+      const upcoming = allDocs.filter(d => d.activeDate && d.activeDate >= today)
+                              .sort((a, b) => a.activeDate.localeCompare(b.activeDate));
+                              
+      if (upcoming.length > 0) return upcoming[0];
+      
+      if (allDocs.length > 0) {
+        const sortedAll = allDocs.sort((a, b) => (b.activeDate || '').localeCompare(a.activeDate || ''));
+        return sortedAll[0];
+      }
+      return null;
+    } catch (e) {
+      console.error("Fallback for getMilongaInfo also failed:", e);
+      return null;
+    }
   }
-
-  // If no future milonga, get the absolute latest one
-  const qLatest = query(
-    collection(db, MILONGA_INFO_COLLECTION),
-    orderBy('activeDate', 'desc'),
-    limit(1)
-  );
-  const latestSnapshot = await withTimeout(getDocs(qLatest));
-  if (!latestSnapshot.empty) {
-    const docSnap = latestSnapshot.docs[0];
-    const data = docSnap.data();
-    return {
-      ...data,
-      id: docSnap.id,
-      posterUrl: remapStorageUrl(data.posterUrl),
-      sourcePhotoUrl: remapStorageUrl(data.sourcePhotoUrl)
-    } as unknown as MilongaInfo;
-  }
-
-  return null;
 };
 
 
@@ -677,33 +730,38 @@ export const getStayReservationList = async (stayId?: string): Promise<FullStayR
       console.error("STAY_RESERVATION_LIST_TIMEOUT: Please create Firestore index for stay_reservations collection. Link usually looks like: https://console.firebase.google.com/project/freestyle-tango-seoul/firestore/indexes");
     }
     console.warn("getStayReservationList failed, falling back:", error);
-    // Fallback significantly limited to prevent 10s+ scan
-    const qFallback = query(collection(db, STAY_RES_COLLECTION), limit(250));
-    const snapshot = await withTimeout(getDocs(qFallback));
-    const list: FullStayReservation[] = [];
-    
-    const targetIds = stayId ? [stayId] : [];
-    if (stayId === 'hapjeong') targetIds.push('stayhapjeoung');
-    if (stayId === 'deokeun') targetIds.push('staydeokeun', '덕은', 'deogeun');
-
-    snapshot.forEach(d => {
-      const data = d.data();
-      if (data.status === 'cancelled') return;
+    try {
+      // Fallback significantly limited to prevent 10s+ scan
+      const qFallback = query(collection(db, STAY_RES_COLLECTION), limit(250));
+      const snapshot = await withTimeout(getDocs(qFallback));
+      const list: FullStayReservation[] = [];
       
-      let docStayId = data.stayId || 'hapjeong';
-      if (docStayId === 'stayhapjeoung') docStayId = 'hapjeong';
-      if (['staydeokeun', 'deokeun', '덕은', 'deogeun'].includes(docStayId)) docStayId = 'deokeun';
+      const targetIds = stayId ? [stayId] : [];
+      if (stayId === 'hapjeong') targetIds.push('stayhapjeoung');
+      if (stayId === 'deokeun') targetIds.push('staydeokeun', '덕은', 'deogeun');
 
-      if (stayId && !targetIds.includes(data.stayId || 'hapjeong')) return;
-      
-      list.push({ 
-        ...data,
-        id: d.id, 
-        stayId: docStayId, 
-        guestName: maskName(data.guestName) 
-      } as unknown as FullStayReservation);
-    });
-    return list.sort((a, b) => (b.checkIn || "").localeCompare(a.checkIn || ""));
+      snapshot.forEach(d => {
+        const data = d.data();
+        if (data.status === 'cancelled') return;
+        
+        let docStayId = data.stayId || 'hapjeong';
+        if (docStayId === 'stayhapjeoung') docStayId = 'hapjeong';
+        if (['staydeokeun', 'deokeun', '덕은', 'deogeun'].includes(docStayId)) docStayId = 'deokeun';
+
+        if (stayId && !targetIds.includes(data.stayId || 'hapjeong')) return;
+        
+        list.push({ 
+          ...data,
+          id: d.id, 
+          stayId: docStayId, 
+          guestName: maskName(data.guestName) 
+        } as unknown as FullStayReservation);
+      });
+      return list.sort((a, b) => (b.checkIn || "").localeCompare(a.checkIn || ""));
+    } catch (fallbackError) {
+      console.warn("Fallback query in getStayReservationList failed:", fallbackError);
+      return [];
+    }
   }
 };
 
@@ -893,13 +951,14 @@ const LIKES_COLLECTION = 'media_likes';
 
 export const getClassesByMonth = async (month: string): Promise<TangoClass[]> => {
   try {
+    console.log(`[DB] getClassesByMonth called for: ${month}`);
     const q = query(
       collection(db, COLLECTION_NAME), 
       where('targetMonth', '==', month),
       orderBy('time', 'asc')
     );
     const querySnapshot = await withTimeout(getDocs(q));
-    return querySnapshot.docs.map(docSnap => {
+    const results = querySnapshot.docs.map(docSnap => {
       const data = docSnap.data();
       return {
         ...data,
@@ -907,8 +966,15 @@ export const getClassesByMonth = async (month: string): Promise<TangoClass[]> =>
         imageUrl: remapStorageUrl(data.imageUrl || data.posterUrl)
       } as unknown as TangoClass;
     });
+    console.log(`[DB] getClassesByMonth SUCCESS: ${results.length} classes for ${month}`);
+    return results;
   } catch (error: any) {
-    console.error("[DB ERROR] getClassesByMonth failed, falling back:", error);
+    if (error.message === 'FIRESTORE_TIMEOUT') {
+      console.warn(`[DB] getClassesByMonth TIMEOUT for ${month}. This usually means a MISSING INDEX.`);
+    } else {
+      console.error(`[DB] getClassesByMonth ERROR:`, error.code, error.message);
+    }
+    
     // Fallback: Fetch all classes (usually small collection) and filter
     try {
       const qFallback = query(collection(db, COLLECTION_NAME), limit(300));
@@ -921,10 +987,13 @@ export const getClassesByMonth = async (month: string): Promise<TangoClass[]> =>
           imageUrl: remapStorageUrl(data.imageUrl || data.posterUrl)
         } as unknown as TangoClass;
       });
-      return results
+      const filtered = results
         .filter(c => c.targetMonth === month)
         .sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+      console.log(`[DB] getClassesByMonth FALLBACK SUCCESS: ${filtered.length} classes for ${month}`);
+      return filtered;
     } catch (fallbackError) {
+      console.error("[DB] getClassesByMonth ULTIMATE FAILURE:", fallbackError);
       return [];
     }
   }
@@ -932,6 +1001,7 @@ export const getClassesByMonth = async (month: string): Promise<TangoClass[]> =>
 
 export const getAllMilongas = async (month?: string): Promise<MilongaInfo[]> => {
   try {
+    console.log(`[DB] getAllMilongas called for month: ${month || 'ALL'}`);
     const colName = MILONGA_INFO_COLLECTION || 'milonga_info';
     let q;
     
@@ -949,7 +1019,7 @@ export const getAllMilongas = async (month?: string): Promise<MilongaInfo[]> => 
     }
 
     const querySnapshot = await withTimeout(getDocs(q));
-    return querySnapshot.docs.map(docSnap => {
+    const results = querySnapshot.docs.map(docSnap => {
       const data = docSnap.data();
       return {
         ...data,
@@ -958,8 +1028,15 @@ export const getAllMilongas = async (month?: string): Promise<MilongaInfo[]> => 
         sourcePhotoUrl: remapStorageUrl(data.sourcePhotoUrl)
       } as unknown as MilongaInfo;
     });
+    console.log(`[DB] getAllMilongas SUCCESS: ${results.length} milongas found.`);
+    return results;
   } catch (error: any) {
-    console.warn("[DB ERROR] getAllMilongas failed, falling back:", error);
+    if (error.message === 'FIRESTORE_TIMEOUT') {
+      console.warn(`[DB] getAllMilongas TIMEOUT for ${month}. This usually means a MISSING INDEX.`);
+    } else {
+      console.error(`[DB] getAllMilongas ERROR:`, error.code, error.message);
+    }
+    
     try {
       const colName = MILONGA_INFO_COLLECTION || 'milonga_info';
       const qFallback = query(collection(db, colName), limit(100));
@@ -976,28 +1053,68 @@ export const getAllMilongas = async (month?: string): Promise<MilongaInfo[]> => 
       if (month) {
         results = results.filter(m => m.activeDate && m.activeDate.startsWith(month));
       }
-      return results.sort((a, b) => (a.activeDate || '').localeCompare(b.activeDate || ''));
+      const sortedRes = results.sort((a, b) => (a.activeDate || '').localeCompare(b.activeDate || ''));
+      console.log(`[DB] getAllMilongas FALLBACK SUCCESS: ${sortedRes.length} milongas found.`);
+      return sortedRes;
     } catch (fallbackError) {
+      console.error("[DB] getAllMilongas ULTIMATE FAILURE:", fallbackError);
       return [];
     }
   }
 };
 
-export const getMedia = async (type?: string, classId?: string, milongaDate?: string, month?: string): Promise<MediaItem[]> => {
+// --- Media Performance Optimization ---
+
+const mediaCache: Record<string, { data: MediaItem[]; timestamp: number }> = {};
+const MEDIA_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+export const getMedia = async (
+  type?: string, 
+  classId?: string, 
+  milongaDate?: string, 
+  month?: string,
+  forceRefresh: boolean = false
+): Promise<MediaItem[]> => {
+  const cacheKey = JSON.stringify({ type, classId, milongaDate, month });
+  
+  if (!forceRefresh && mediaCache[cacheKey]) {
+    const cached = mediaCache[cacheKey];
+    if (Date.now() - cached.timestamp < MEDIA_CACHE_TTL) {
+      console.log(`[DB] getMedia returning CACHED data for:`, cacheKey);
+      return cached.data;
+    }
+  }
+
   try {
-    let q;
-    // Always use some limit and reliable ordering
+    console.log(`[DB] getMedia FETCHING: type=${type}, classId=${classId}, milongaDate=${milongaDate}, month=${month}`);
+    
+    let constraints: any[] = [orderBy('createdAt', 'desc'), limit(150)];
+
     if (type) {
-      q = query(collection(db, MEDIA_COLLECTION), where('type', '==', type), orderBy('createdAt', 'desc'), limit(100));
-    } else if (classId) {
-      q = query(collection(db, MEDIA_COLLECTION), where('relatedClassId', '==', classId), orderBy('createdAt', 'desc'), limit(100));
-    } else if (milongaDate) {
-      q = query(collection(db, MEDIA_COLLECTION), where('relatedMilongaDate', '==', milongaDate), orderBy('createdAt', 'desc'), limit(100));
-    } else {
-      q = query(collection(db, MEDIA_COLLECTION), orderBy('createdAt', 'desc'), limit(200));
+      constraints.push(where('type', '==', type));
+    }
+    if (classId) {
+      constraints.push(where('relatedClassId', '==', classId));
+    }
+    if (milongaDate) {
+      constraints.push(where('relatedMilongaDate', '==', milongaDate));
+    }
+    
+    // Server-side month filtering if ONLY month is provided (to avoid complex index requirements)
+    const isBasicQuery = !type && !classId && !milongaDate;
+    if (month && isBasicQuery) {
+      const nextMonth = (() => {
+        const [y, m] = month.split('-').map(Number);
+        const date = new Date(y, m, 1);
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      })();
+      constraints.push(where('createdAt', '>=', month));
+      constraints.push(where('createdAt', '<', nextMonth));
     }
 
+    const q = query(collection(db, MEDIA_COLLECTION), ...constraints);
     const querySnapshot = await withTimeout(getDocs(q));
+    
     let results = querySnapshot.docs.map(docSnap => {
       const data = docSnap.data();
       return {
@@ -1008,37 +1125,48 @@ export const getMedia = async (type?: string, classId?: string, milongaDate?: st
       } as unknown as MediaItem;
     });
 
-    // Simple month filtering can remain in-memory if query was broad, 
-    // or we could add more specific indexes if needed.
-    if (month) {
+    // Client-side filtering for month if not already handled by Firestore
+    if (month && !isBasicQuery) {
       results = results.filter(m => m.createdAt?.startsWith(month));
     }
 
+    // Update cache
+    mediaCache[cacheKey] = { data: results, timestamp: Date.now() };
+    
+    console.log(`[DB] getMedia SUCCESS: ${results.length} items found.`);
     return results;
   } catch (error: any) {
-    if (error.code === 'failed-precondition') {
-      console.warn("Missing Index for getMedia. Defaulting to simple query.");
-    }
+    console.warn(`[DB] getMedia query failed, trying fallback:`, error.message);
     
-    // Fallback: query without order by if index missing
-    const qSimple = query(collection(db, MEDIA_COLLECTION), limit(200));
-    const querySnapshot = await withTimeout(getDocs(qSimple));
-    let results = querySnapshot.docs.map(docSnap => {
-      const data = docSnap.data();
-      return {
-        ...data,
-        id: docSnap.id,
-        thumbnailUrl: remapStorageUrl(data.thumbnailUrl),
-        videoUrl: remapStorageUrl(data.videoUrl) 
-      } as unknown as MediaItem;
-    });
+    try {
+      // Fallback: simple query with client-side filtering
+      const qSimple = query(collection(db, MEDIA_COLLECTION), limit(200));
+      const querySnapshot = await withTimeout(getDocs(qSimple));
+      let results = querySnapshot.docs.map(docSnap => {
+        const data = docSnap.data();
+        return {
+          ...data,
+          id: docSnap.id,
+          thumbnailUrl: remapStorageUrl(data.thumbnailUrl),
+          videoUrl: remapStorageUrl(data.videoUrl) 
+        } as unknown as MediaItem;
+      });
 
-    if (month) results = results.filter(m => m.createdAt?.startsWith(month));
-    if (classId) results = results.filter(m => m.relatedClassId === classId);
-    if (milongaDate) results = results.filter(m => m.relatedMilongaDate === milongaDate);
-    if (type) results = results.filter(m => m.type === type);
+      if (month) results = results.filter(m => m.createdAt?.startsWith(month));
+      if (classId) results = results.filter(m => m.relatedClassId === classId);
+      if (milongaDate) results = results.filter(m => m.relatedMilongaDate === milongaDate);
+      if (type) results = results.filter(m => m.type === type);
 
-    return results.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+      const sortedRes = results.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+      
+      // Also cache fallback result
+      mediaCache[cacheKey] = { data: sortedRes, timestamp: Date.now() };
+      
+      return sortedRes;
+    } catch (fallbackError) {
+      console.error("[DB] getMedia ULTIMATE FAILURE:", fallbackError);
+      return [];
+    }
   }
 };
 
@@ -1195,7 +1323,7 @@ const USERS_COLLECTION = 'users';
 
 export const trackUserVisit = async (phone: string, nickname: string, photoURL?: string, role?: string, device?: string, staffRole?: string | string[]) => {
   if (!phone) return;
-  const cleanPhone = phone.replace(/[^0-9]/g, '');
+  const cleanPhone = (phone || '').replace(/[^0-9]/g, '');
   const docRef = doc(db, USERS_COLLECTION, cleanPhone);
   
   const data: any = {
@@ -1220,7 +1348,7 @@ export const trackUserVisit = async (phone: string, nickname: string, photoURL?:
 
 export const updateUserPulse = async (phone: string) => {
   if (!phone) return;
-  const cleanPhone = phone.replace(/[^0-9]/g, '');
+  const cleanPhone = (phone || '').replace(/[^0-9]/g, '');
   const docRef = doc(db, USERS_COLLECTION, cleanPhone);
   return await updateDoc(docRef, {
     dwellMinutes: increment(1),
@@ -1230,7 +1358,7 @@ export const updateUserPulse = async (phone: string) => {
 
 export const getUserByPhone = async (phone: string): Promise<User | null> => {
   if (!phone) return null;
-  const cleanPhone = phone.replace(/[^0-9]/g, '');
+  const cleanPhone = (phone || '').replace(/[^0-9]/g, '');
   try {
     const docRef = doc(db, USERS_COLLECTION, cleanPhone);
     const docSnap = await withTimeout(getDoc(docRef));
@@ -1275,7 +1403,7 @@ export const getUsers = async (search?: string): Promise<User[]> => {
 
 export const updateUserSettings = async (phone: string, settings: Partial<User['settings']>) => {
   if (!phone) return;
-  const cleanPhone = phone.replace(/[^0-9]/g, '');
+  const cleanPhone = (phone || '').replace(/[^0-9]/g, '');
   const docRef = doc(db, USERS_COLLECTION, cleanPhone);
   
   // Update only the settings field
@@ -1330,7 +1458,7 @@ export const getCoachingItems = async (params: { studentPhone?: string, instruct
         // Handle both singular and plural (legacy compatibility)
         mediaUrl: remapStorageUrl(data.mediaUrl),
         mediaUrls: Array.isArray(data.mediaUrls) ? data.mediaUrls.map(remapStorageUrl) : []
-      } as CoachingItem;
+      } as unknown as CoachingItem;
     });
     
     // Final filter and sort
@@ -1377,7 +1505,7 @@ export const getCoachingUpdates = async (coachingItemId: string): Promise<Coachi
         ...data,
         mediaUrl: remapStorageUrl(data.mediaUrl),
         mediaUrls: Array.isArray(data.mediaUrls) ? data.mediaUrls.map(remapStorageUrl) : []
-      } as CoachingUpdate;
+      } as unknown as CoachingUpdate;
     });
   } catch (error) {
     console.warn("Could not fetch coaching updates with index:", error);
@@ -1390,7 +1518,7 @@ export const getCoachingUpdates = async (coachingItemId: string): Promise<Coachi
         ...data,
         mediaUrl: remapStorageUrl(data.mediaUrl),
         mediaUrls: Array.isArray(data.mediaUrls) ? data.mediaUrls.map(remapStorageUrl) : []
-      } as CoachingUpdate;
+      } as unknown as CoachingUpdate;
     });
     return results.sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
   }
@@ -1419,4 +1547,62 @@ export const addCoachingUpdate = async (coachingItemId: string, data: Omit<Coach
   });
   
   return docRef;
+};
+
+export const updateCoachingUpdate = async (updateId: string, coachingItemId: string, data: Partial<CoachingUpdate>) => {
+  const docRef = doc(db, COACHING_UPDATES_COLLECTION, updateId);
+  await updateDoc(docRef, { ...data });
+
+  // If progress changed, update the main item
+  if (data.progress !== undefined || data.comment !== undefined) {
+    const itemRef = doc(db, COACHING_COLLECTION, coachingItemId);
+    const itemSnap = await getDoc(itemRef);
+    if (itemSnap.exists()) {
+      const currentUpdates = await getCoachingUpdates(coachingItemId);
+      
+      // Recalculate milestones from all updates
+      const newMilestones = currentUpdates
+        .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+        .map(u => {
+          const d = new Date(u.createdAt);
+          return { progress: u.progress, date: `${d.getMonth() + 1}/${d.getDate()}` };
+        });
+      
+      const latestUpdate = currentUpdates.sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+      
+      await updateDoc(itemRef, {
+        progress: latestUpdate?.progress || 0,
+        lastComment: latestUpdate?.comment || '',
+        status: (latestUpdate?.progress || 0) === 100 ? 'solved' : 'ongoing',
+        updatedAt: new Date().toISOString(),
+        milestones: newMilestones
+      });
+    }
+  }
+};
+
+export const deleteCoachingUpdate = async (updateId: string, coachingItemId: string) => {
+  const docRef = doc(db, COACHING_UPDATES_COLLECTION, updateId);
+  await deleteDoc(docRef);
+
+  // Recalculate main item state
+  const itemRef = doc(db, COACHING_COLLECTION, coachingItemId);
+  const currentUpdates = await getCoachingUpdates(coachingItemId);
+  
+  const newMilestones = currentUpdates
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+    .map(u => {
+      const d = new Date(u.createdAt);
+      return { progress: u.progress, date: `${d.getMonth() + 1}/${d.getDate()}` };
+    });
+  
+  const latestUpdate = currentUpdates.sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+  
+  await updateDoc(itemRef, {
+    progress: latestUpdate?.progress || 0,
+    lastComment: latestUpdate?.comment || '',
+    status: (latestUpdate?.progress || 0) === 100 ? 'solved' : 'ongoing',
+    updatedAt: new Date().toISOString(),
+    milestones: newMilestones
+  });
 };

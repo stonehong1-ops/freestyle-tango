@@ -1,12 +1,24 @@
-- [x] Firestore 복합 인덱스 배포 (tango_classes, media, registrations 등)
-- [x] `src/lib/db.ts` 쿼리 최적화 및 Fallback 제거
-    - [x] `getClassesByMonth`, `getExtraSchedules` 서버 측 필터링 적용
-    - [x] `getMedia`, `getStayReservationList` Limit 및 최적화
-    - [x] `getRegistrations`, `getAllMilongaReservations` 대량 데이터 조회 제안
+- [/] i18n 구조 완전 동기화 (ko.ts 기준 9개 언어)
+    - [ ] vi.ts 구조 수정
+- [x] i18n 구조 완전 동기화 (ko.ts 기준 9개 언어)
+    - [x] vi.ts 구조 수정
+    - [x] zh-CN.ts 구조 수정
+    - [x] zh-TW.ts 구조 수정
+    - [x] es.ts 구조 수정
+    - [x] fr.ts 구조 수정
+    - [x] it.ts 구조 수정
+    - [x] tr.ts 구조 수정
+- [x] Firestore 복합 인덱스 생성 확인 (chat_rooms: participants array-contains + type ascending)
+- [x] 프로덕션 빌드 및 배포
+    - [x] `npm run test:locales` 검증
+    - [x] `npm run build` 검증
+    - [x] `vercel --prod` 배포
+    - [x] `firebase deploy` 실행 (Firestore 규칙 개방성 유지 확인)
+- [x] 브라우저 콘솔 로그 모니터링
+- [x] `getMedia`, `getStayReservationList` Limit 및 최적화
+- [x] `getRegistrations`, `getAllMilongaReservations` 대량 데이터 조회 제안
 - [x] `chat.ts` 및 채팅 로딩 성능 개선
-    - [x] `initializeSystemRooms` 로컬 캐싱 적용 (중복 Write 차단)
-    - [x] `ChatList.tsx` useEffect 의존성 최적화
-- [x] 빌드 검증 및 최종 배포
-    - [x] 인덱스 배포 완료
+- [x] `initializeSystemRooms` 로컬 캐싱 적용 (중복 Write 차단)
+- [x] `ChatList.tsx` useEffect 의존성 최적화
     - [x] `npm run build` 성공
 - [ ] 완료 보고서(Walkthrough) 작성

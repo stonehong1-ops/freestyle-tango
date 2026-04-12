@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { CoachingItem, CoachingUpdate, getCoachingUpdates, addCoachingUpdate, updateCoachingItem, getUsers } from '@/lib/db';
+import { CoachingItem, CoachingUpdate, getCoachingUpdates, addCoachingUpdate, updateCoachingItem, getUsers, updateCoachingUpdate, deleteCoachingUpdate } from '@/lib/db';
 import { uploadFile } from '@/lib/storage';
 import styles from './CoachingDetail.module.css';
 import { useLanguage } from '@/contexts/LanguageContext';
+import FullscreenModal from '@/components/common/FullscreenModal';
 
 interface Props {
   item: CoachingItem;
@@ -27,6 +28,12 @@ export default function CoachingDetail({ item, onBack, currentUser, isAdmin }: P
   const [studentInfo, setStudentInfo] = useState<any>(null);
   const [instructorInfo, setInstructorInfo] = useState<any>(null);
   const [showAddActivityModal, setShowAddActivityModal] = useState(false);
+  const [selectedUpdate, setSelectedUpdate] = useState<CoachingUpdate | null>(null);
+  const [showOptionsSheet, setShowOptionsSheet] = useState(false);
+  const [showEditSheet, setShowEditSheet] = useState(false);
+  const [editProgress, setEditProgress] = useState(0);
+  const [editComment, setEditComment] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const isInstructor = currentUser?.phone?.replace(/[^0-9]/g, '') === item.instructorPhone;
   const canUpdate = isInstructor || isAdmin;
@@ -91,6 +98,7 @@ export default function CoachingDetail({ item, onBack, currentUser, isAdmin }: P
         progress: currentProgress,
         comment: newComment,
         mediaUrls,
+        senderPhone: currentUser?.phone?.replace(/[^0-9]/g, '') || ''
       });
 
       setNewComment('');
@@ -122,6 +130,83 @@ export default function CoachingDetail({ item, onBack, currentUser, isAdmin }: P
     }
   };
 
+  const handleChat = async (targetPhone: string, targetNickname: string) => {
+    if (!currentUser?.phone) return;
+    try {
+      const { getOrCreatePrivateRoom } = await import('@/lib/chat');
+      const myPhone = currentUser.phone.replace(/[^0-9]/g, '');
+      const otherPhone = targetPhone.replace(/[^0-9]/g, '');
+      
+      const roomId = await getOrCreatePrivateRoom(
+        [
+          { nickname: currentUser.nickname, phone: myPhone },
+          { nickname: targetNickname, phone: otherPhone }
+        ],
+        myPhone
+      );
+
+      if (roomId) {
+        window.dispatchEvent(new CustomEvent('ft_open_chat', {
+          detail: {
+            roomId: roomId,
+            roomName: targetNickname,
+            participants: [myPhone, otherPhone]
+          }
+        }));
+      }
+    } catch (error) {
+      console.error("Chat Error:", error);
+      alert("채팅방을 열 수 없습니다.");
+    }
+  };
+
+  const handleOpenOptions = (update: CoachingUpdate) => {
+    // Only allow owner or admin to edit/delete
+    const userPhone = currentUser?.phone?.replace(/[^0-9]/g, '');
+    if (!isAdmin && update.senderPhone !== userPhone) return;
+
+    setSelectedUpdate(update);
+    setShowOptionsSheet(true);
+  };
+
+  const handleStartEdit = () => {
+    if (!selectedUpdate) return;
+    setEditProgress(selectedUpdate.progress);
+    setEditComment(selectedUpdate.comment);
+    setShowOptionsSheet(false);
+    setShowEditSheet(true);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!selectedUpdate) return;
+    setIsUpdating(true);
+    try {
+      await updateCoachingUpdate(selectedUpdate.id, item.id, {
+        progress: editProgress,
+        comment: editComment
+      });
+      setShowEditSheet(false);
+      setSelectedUpdate(null);
+      loadUpdates();
+    } catch (error) {
+      alert("수정 실패");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleDeleteUpdate = async () => {
+    if (!selectedUpdate || !confirm(t.coaching.confirmDelete || "정말로 삭제하시겠습니까?")) return;
+    try {
+      await deleteCoachingUpdate(selectedUpdate.id, item.id);
+      setShowOptionsSheet(false);
+      setSelectedUpdate(null);
+      loadUpdates();
+    } catch (error) {
+      alert("삭제 실패");
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.premiumHeader}>
@@ -149,8 +234,21 @@ export default function CoachingDetail({ item, onBack, currentUser, isAdmin }: P
                 {studentInfo?.photoURL ? <img src={studentInfo.photoURL} alt="" /> : <span>{item.studentNickname[0]}</span>}
               </div>
               <div className={styles.userInfo}>
-                <span className={styles.roleLabel}>{t.coaching.student}</span>
-                <span className={styles.userName}>{item.studentNickname}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span className={styles.roleLabel}>{t.coaching.student}</span>
+                    <span className={styles.userName}>{item.studentNickname}</span>
+                  </div>
+                  {currentUser?.phone?.replace(/[^0-9]/g, '') !== item.studentPhone && (
+                    <button 
+                      className={styles.chatIconBtn}
+                      onClick={() => handleChat(item.studentPhone, item.studentNickname)}
+                      title="Chat"
+                    >
+                      💬
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
             
@@ -159,8 +257,21 @@ export default function CoachingDetail({ item, onBack, currentUser, isAdmin }: P
                 {instructorInfo?.photoURL ? <img src={instructorInfo.photoURL} alt="" /> : <span>{item.instructorNickname[0]}</span>}
               </div>
               <div className={styles.userInfo}>
-                <span className={styles.roleLabel}>{t.coaching.instructor}</span>
-                <span className={styles.userName}>{item.instructorNickname}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span className={styles.roleLabel}>{t.coaching.instructor}</span>
+                    <span className={styles.userName}>{item.instructorNickname}</span>
+                  </div>
+                  {currentUser?.phone?.replace(/[^0-9]/g, '') !== item.instructorPhone && (
+                    <button 
+                      className={styles.chatIconBtn}
+                      onClick={() => handleChat(item.instructorPhone, item.instructorNickname)}
+                      title="Chat"
+                    >
+                      💬
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -211,8 +322,18 @@ export default function CoachingDetail({ item, onBack, currentUser, isAdmin }: P
               {items.sort((a, b) => b.createdAt.localeCompare(a.createdAt)).map(u => (
                 <div key={u.id} className={styles.updateItem}>
                   <div className={styles.updateHeader}>
-                    <span className={styles.updateProgress}>{u.progress}%</span>
-                    <span className={styles.updateTime}>{u.createdAt.split('T')[1].split(':')[0]}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span className={styles.updateProgress}>{u.progress}%</span>
+                      <span className={styles.updateTime}>{u.createdAt.split('T')[1].split(':')[0]}</span>
+                    </div>
+                    {((currentUser?.phone?.replace(/[^0-9]/g, '') === u.senderPhone) || isAdmin) && (
+                      <button 
+                        className={styles.moreBtn}
+                        onClick={() => handleOpenOptions(u)}
+                      >
+                        ⋮
+                      </button>
+                    )}
                   </div>
                   <p className={styles.comment}>{u.comment}</p>
                   <div className={styles.mediaContainer}>
@@ -247,7 +368,9 @@ export default function CoachingDetail({ item, onBack, currentUser, isAdmin }: P
                 <div className={styles.sliderWrapper}>
                   <input 
                     type="range" 
-                    min="0" max="100" step="10" 
+                    min="0" 
+                    max="100" 
+                    step="10"
                     value={currentProgress} 
                     onChange={(e) => setCurrentProgress(parseInt(e.target.value))}
                     className={styles.rangeInput}
@@ -257,56 +380,137 @@ export default function CoachingDetail({ item, onBack, currentUser, isAdmin }: P
               </div>
 
               <div className={styles.field}>
-                <label>{t.coaching.itemDesc || '활동 내용'}</label>
+                <label>{t.coaching.comment}</label>
                 <textarea 
-                  placeholder={t.coaching.addComment}
+                  className={styles.modalTextarea}
+                  placeholder={t.coaching.placeholderComment}
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
-                  className={styles.modalTextarea}
                 />
               </div>
 
               <div className={styles.field}>
-                <label>📎 {t.coaching.uploadMedia}</label>
+                <label>{t.coaching.media}</label>
                 <div className={styles.mediaUploadArea}>
-                  {preview ? (
+                  {!preview ? (
+                    <label className={styles.uploadPlaceholder}>
+                      <span className={styles.plusIcon}>+</span>
+                      <span>{t.coaching.uploadMedia}</span>
+                      <input 
+                        type="file" 
+                        hidden 
+                        accept="image/*,video/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setSelectedFile(file);
+                            setPreview(URL.createObjectURL(file));
+                          }
+                        }}
+                      />
+                    </label>
+                  ) : (
                     <div className={styles.modalPreviewBox}>
                       {selectedFile?.type.startsWith('video') ? (
                         <video src={preview} />
                       ) : (
                         <img src={preview} alt="preview" />
                       )}
-                      <button className={styles.removePreview} onClick={() => { setSelectedFile(null); setPreview(null); }}>×</button>
+                      <button 
+                        className={styles.removePreview}
+                        onClick={() => {
+                          setSelectedFile(null);
+                          setPreview(null);
+                        }}
+                      >
+                        ✕
+                      </button>
                     </div>
-                  ) : (
-                    <label className={styles.uploadPlaceholder}>
-                      <span className={styles.plusIcon}>+</span>
-                      <span>{t.coaching.uploadMedia}</span>
-                      <input type="file" accept="image/*,video/*" onChange={handleFileChange} style={{ display: 'none' }} />
-                    </label>
                   )}
                 </div>
               </div>
             </div>
 
             <div className={styles.modalFooter}>
-              <button 
-                className={styles.cancelBtn} 
-                onClick={() => setShowAddActivityModal(false)}
-              >
-                {t.common?.cancel || '취소'}
-              </button>
+              <button className={styles.cancelBtn} onClick={() => setShowAddActivityModal(false)}>{t.coaching.cancel}</button>
               <button 
                 className={styles.confirmBtn} 
                 onClick={handleSaveUpdate}
-                disabled={isSaving || (!newComment.trim() && !selectedFile)}
+                disabled={isSaving || !newComment.trim()}
               >
-                {isSaving ? `${Math.round(uploadProgress)}%` : t.coaching.saveUpdate}
+                {isSaving ? '...' : t.coaching.confirm}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Options Sheet */}
+      <FullscreenModal
+        isOpen={showOptionsSheet}
+        onClose={() => setShowOptionsSheet(false)}
+        isBottomSheet
+        hideHeader
+      >
+        <div className={styles.sheetOptions}>
+          <button className={styles.sheetBtn} onClick={handleStartEdit}>
+            <span>✏️</span> {t.coaching.editActivity}
+          </button>
+          <button className={`${styles.sheetBtn} ${styles.delete}`} onClick={handleDeleteUpdate}>
+            <span>🗑️</span> {t.coaching.deleteActivity}
+          </button>
+          <button className={styles.sheetBtn} onClick={() => setShowOptionsSheet(false)} style={{ background: 'white', marginTop: '8px' }}>
+             {t.coaching.cancel}
+          </button>
+        </div>
+      </FullscreenModal>
+
+      {/* Edit Sheet */}
+      <FullscreenModal
+        isOpen={showEditSheet}
+        onClose={() => setShowEditSheet(false)}
+        isBottomSheet
+        title={t.coaching.editActivity}
+      >
+        <div className={styles.editForm}>
+          <div className={styles.field}>
+            <label>{t.coaching.progress}</label>
+            <div className={styles.sliderWrapper}>
+              <input 
+                type="range" 
+                min="0" 
+                max="100" 
+                step="10"
+                value={editProgress} 
+                onChange={(e) => setEditProgress(parseInt(e.target.value))}
+                className={styles.rangeInput}
+              />
+              <span className={styles.sliderValue}>{editProgress}%</span>
+            </div>
+          </div>
+
+          <div className={styles.field}>
+            <label>{t.coaching.comment}</label>
+            <textarea 
+              className={styles.modalTextarea}
+              value={editComment}
+              onChange={(e) => setEditComment(e.target.value)}
+              placeholder={t.coaching.placeholderComment}
+            />
+          </div>
+
+          <div className={styles.modalFooter}>
+            <button className={styles.cancelBtn} onClick={() => setShowEditSheet(false)}>{t.coaching.cancel}</button>
+            <button 
+              className={styles.confirmBtn} 
+              onClick={handleSaveEdit}
+              disabled={isUpdating || !editComment.trim()}
+            >
+              {isUpdating ? '...' : t.common.save}
+            </button>
+          </div>
+        </div>
+      </FullscreenModal>
     </div>
   );
 }

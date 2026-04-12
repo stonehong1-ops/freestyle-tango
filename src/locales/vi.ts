@@ -2,11 +2,11 @@ export default {
   "header": {
     "story": "Câu chuyện TangoStay",
     "location": "Vị trí",
-    "guide": "Chi tiết & Hướng dẫn",
+    "guide": "Hướng dẫn chi tiết",
     "contact": "Liên hệ",
-    "login": "Register",
-    "community": "Community",
-    "join": "Join"
+    "login": "Đăng nhập/Đăng ký",
+    "community": "Cộng đồng",
+    "join": "Tham gia"
   },
   "nav": {
     "home": "Class",
@@ -14,350 +14,431 @@ export default {
     "stay": "Stay",
     "class": "Class",
     "info": "Info",
-    "mypage": "MyPage",
+    "mypage": "My",
     "lucy": "Milonga",
-    "chat": "Chatting",
-    "guide": "Membership",
-    "classGuide": "Class Info",
+    "chat": "Chat",
+    "guide": "Guide",
+    "classGuide": "Guide",
     "fullSchedule": "Calendar",
     "media": "Media",
     "story": "Story"
   },
   "reserve": {
-    "closed": "Reservation Closed",
-    "title": "Thông tin đặt phòng",
-    "nameLabel": "Tên khách hàng",
-    "namePlace": "Vui lòng nhập tên của bạn",
-    "phoneLabel": "Số điện thoại",
-    "phonePlace": "010-0000-0000",
-    "guests": "Khách",
-    "reqLabel": "Yêu cầu đặc biệt",
-    "reqPlace": "Nhập các yêu cầu hoặc thắc mắc khác của bạn.",
+    "closed": "Đã đóng",
+    "title": "Yêu cầu đặt phòng Stay",
+    "nameLabel": "Biệt danh người đặt",
+    "namePlace": "Nhập biệt danh của bạn",
+    "phoneLabel": "Số điện thoại liên lạc",
+    "phonePlace": "Nhập số điện thoại của bạn",
+    "guests": "người",
+    "reqLabel": "Yêu cầu thêm",
+    "reqPlace": "Nhập các yêu cầu đặc biệt nếu có (tùy chọn)",
     "submitting": "Đang xử lý...",
-    "submitBtn": "Gửi yêu cầu đặt phòng",
-    "directBookingWarning": "Click the button below to complete. Your reservation will be cancelled if payment is not received within 1 hour.",
-    "smsTemplate": "[{stayName} Confirmation]\nName: {name}\nDate: {checkIn} ~ {checkOut}\nGuests: {guests}\nAmount: {amount} KRW\n\n[Payment]\n1. KR: KakaoBank 3333-03-7249602 (Hong Byong Seok)\n2. US: Acc 352665336763211 / Routing: 084009519 (ACH Free)\n3. International: SWIFT/BIC TRWIUS35XXX\n\n[Check-in]\nTime: 4 PM\nPassword: 9999\n\nThank you!",
-    "errorFill": "Vui lòng nhập đầy đủ tên, số điện thoại và số lượng khách.",
-    "errorFail": "Đã xảy ra lỗi trong quá trình đặt phòng.",
+    "submitBtn": "Hoàn tất đặt phòng",
+    "directBookingWarning": "Việc đặt phòng sẽ hoàn tất khi bạn nhấn nút bên dưới.\nNếu việc thanh toán không được thực hiện trong vòng 1 giờ, chủ nhà có thể hủy đặt phòng.",
+    "smsTemplate": "[Xác nhận đặt phòng {stayName}]\nTên: {name}\nNgày: {checkIn} ~ {checkOut}\nKhách: {guests}\nSố tiền: {amount} KRW\n\n[Hướng dẫn thanh toán]\n1. KR (Hàn Quốc): KakaoBank 3333-03-7249602 (Hong Byong Seok)\n2. US (Wise): Acc 352665336763211 / Routing: 084009519 (ACH Free)\n3. Quốc tế: SWIFT/BIC TRWIUS35XXX\n\n[Hướng dẫn nhận phòng]\nGiờ: 16:00\nMã số: 9999\n\nXin cảm ơn!",
+    "errorFill": "Vui lòng nhập biệt danh và số điện thoại liên lạc.",
+    "errorFail": "Đã xảy ra lỗi trong quá trình đặt phòng. Vui lòng thử lại.",
     "save": "Lưu",
     "cancel": "Hủy"
   },
   "complete": {
-    "title": "Yêu cầu đặt phòng đã được gửi! 🎉",
-    "desc": "Thông tin thanh toán và hướng dẫn nhận phòng sẽ được gửi đến số điện thoại của bạn sớm.",
-    "homeBtn": "Quay lại trang chủ",
-    "guestSmsBtn": "Nhận thông tin đặt phòng (SMS)"
+    "title": "Đặt phòng hoàn tất",
+    "desc": "Yêu cầu đặt phòng của bạn đã được gửi. Chúng tôi sẽ gửi tin nhắn xác nhận sau khi xác minh thanh toán.",
+    "homeBtn": "Về trang chủ",
+    "guestSmsBtn": "Tư vấn qua SMS"
   },
   "home": {
-    "studioName": "FreestyleTango",
+    "studioName": "Freestyle Tango",
     "info": {
-      "subtitle": "Freestyle Tango Membership Guide",
-      "intro": "Like a fresh rose with mother's milk\nLooking like a mix of colors\nWhite, yellow, red roses\n\nSpring where flower buds bloom\nIn the eternal time of autumn leaves\nTo everyone who sweats\nCultivating body and mind\n\nFreestyle will be\nA shelter and a guide.",
-      "highlight": "180,000 KRW for all classes!",
-      "benefitsTitle": "Membership Benefits",
+      "subtitle": "Hướng dẫn thành viên Freestyle Tango",
+      "intro": "",
+      "highlight": "180,000 KRW All-Pass",
+      "benefitsTitle": "Quyền lợi thành viên",
       "benefits": [
-        "Monthly Membership: 180k, all classes included / Intl workshop d.c",
-        "New member 6-month discount: 20% d.c 860k",
-        "Open floor access (16h/month)",
-        "Partner class application (for existing partners)",
-        "Benefits: Instructor/Staff discount 100k d.c, free 1:1 lesson for referrals"
+        "Thẻ tháng: 180k, tham gia tất cả các lớp học / Giảm giá hội thảo quốc tế",
+        "Ưu đãi 6 tháng cho thành viên mới: Giảm 20% (860k)",
+        "Sử dụng studio tự do trong giờ mở (16 giờ mỗi tháng)",
+        "Có thể yêu cầu bạn nhảy cho 2 lớp bổ sung (chỉ dành cho bạn nhảy hiện tại)",
+        "Ưu đãi: Giảm 100k hàng tháng cho giáo viên/nhân viên/đội Lucy, 1 buổi học riêng miễn phí cho thành viên mới/người giới thiệu"
       ],
-      "cultureTitle": "Community Culture",
+      "cultureTitle": "Văn hóa chúng tôi hướng tới",
       "cultureList": [
-        "Be nice to everyone (Happy space, Warm people)",
-        "Gender balance (aiming for 15:15)"
+        "Một cộng đồng tử tế, không tiêu cực (Happy Space, Warm People)",
+        "Tỷ lệ leader/follower cân bằng dựa trên 15 người (tăng theo cặp)"
       ],
-      "bankTitle": "Membership Fee Payment",
+      "bankTitle": "Tài khoản thanh toán",
       "bankName": "KakaoBank 3333-14-3159646 (Hong Byong Seok)",
-      "copyBtn": "Copy Account Number",
-      "copyHint": "Please contact us with your name after payment.",
-      "contactPhone": "Phone Inquiry",
+      "copyBtn": "Sao chép tài khoản",
+      "copyHint": "Vui lòng ghi biệt danh trong nội dung chuyển khoản và liên hệ với chúng tôi.",
+      "contactPhone": "Gọi điện",
       "contactKakao": "KakaoTalk",
       "contactWhatsapp": "WhatsApp",
-      "openChatBanner": "Join Freestyle Tango Open Chat",
-      "copySuccess": "Account number copied.",
-      "contactTitle": "Contact",
-      "contactSlogan": "Inquire about classes, facilities, and stays (24/7 inquiries welcome)",
-      "photoGallery": "Photo Gallery",
-      "facilityGallery": "Facility Guide"
+      "openChatBanner": "Truy cập trò chuyện mở Freestyle Tango",
+      "copySuccess": "Đã sao chép số tài khoản.",
+      "contactTitle": "Liên hệ với chúng tôi",
+      "contactSlogan": "Tư vấn lớp học, sử dụng cơ sở vật chất và lưu trú (24/7)",
+      "photoGallery": "Bộ sưu tập ảnh",
+      "facilityGallery": "Hướng dẫn cơ sở vật chất"
     },
     "admin": {
-      "addClass": "Add Class",
-      "addMilonga": "Add Milonga",
-      "editMilonga": "Edit Milonga",
-      "saveNotice": "Save Notice",
-      "editNotice": "Edit Notice",
-      "noticePlaceholder": "Enter notice (2-3 lines)",
-      "noticeEmpty": "No monthly notices registered. Click to add one.",
-      "saveSuccess": "Notice saved.",
-      "saveFail": "Save failed"
+      "addClass": "Thêm lớp học",
+      "addMilonga": "Thêm Milonga",
+      "editMilonga": "Sửa Milonga",
+      "saveNotice": "Lưu thông báo",
+      "editNotice": "Sửa thông báo",
+      "noticePlaceholder": "Nhập nội dung thông báo (2-3 dòng)",
+      "noticeEmpty": "Không có thông báo tháng này. Nhấn để thêm.",
+      "saveSuccess": "Đã lưu thông báo.",
+      "saveFail": "Lưu thất bại"
     },
     "chat": {
-      "title": "Chat",
-      "newRoom": "+ New Room",
-      "roomPlaceholder": "Chat Room",
-      "enterName": "Enter room name:",
-      "enterType": "Enter room type (public, notice, private, support):",
-      "leaveRoom": "Leave Room",
-      "renameRoom": "Rename Room",
-      "participants": "Participants",
-      "readCount": "Read",
-      "allRead": "All Read",
-      "noActiveChats": "No active chats."
+      "title": "Trò chuyện",
+      "newRoom": "+ Phòng mới",
+      "roomPlaceholder": "Phòng trò chuyện",
+      "enterName": "Nhập tên phòng:",
+      "enterType": "Nhập loại (public, notice, private, support):",
+      "leaveRoom": "Rời phòng",
+      "renameRoom": "Đổi tên phòng",
+      "participants": "Thành viên",
+      "readCount": "Đã xem",
+      "allRead": "Đã xem tất cả",
+      "noActiveChats": "Không có cuộc trò chuyện nào."
     },
     "export": {
-      "imageBtn": "📸 Save Promo Image (PNG)",
-      "error": "Error generating image."
+      "imageBtn": "📸 Lưu ảnh (PNG)",
+      "error": "Lỗi khi tạo ảnh."
     },
     "exit": {
-      "toast": "Press back again to exit"
+      "toast": "Nhấn lần nữa để thoát"
     },
     "stay": {
-      "viewMonthly": "View Monthly Status",
-      "monthlyTitle": "Monthly Reservation Status"
+      "viewMonthly": "Xem tình trạng tháng",
+      "monthlyTitle": "Tình trạng đặt phòng tổng quát"
     },
     "registration": {
-      "title": "Class Registration",
-      "classDetail": "Class Details",
-      "fullListTitle": "Full Registration Status",
-      "addClass": "Add Class",
-      "loading": "Loading...",
-      "noClasses": "No classes registered for {month}.",
-      "cartAdded": "Class added to cart! Proceed to final registration in [MyPage].",
-      "deleteConfirm": "Are you sure you want to delete this class?",
-      "deleteSuccess": "Deleted.",
-      "deleteFail": "Delete failed: {error}",
-      "saveSuccess": "Saved.",
-      "saveFail": "Save failed: {error}",
-      "pastMonthWarning": "Cannot apply for past classes.",
-      "selected": "✅ Selected",
+      "title": "Đăng ký lớp học",
+      "classDetail": "Chi tiết lớp học",
+      "fullListTitle": "Tình trạng đăng ký tổng quát",
+      "addClass": "Thêm lớp học",
+      "loading": "Đang tải...",
+      "noClasses": "Không có lớp học nào được đăng ký cho tháng {month}.",
+      "cartAdded": "Đã thêm đăng ký. Bạn có thể chỉnh sửa tại \"Trang của tôi\".",
+      "deleteConfirm": "Bạn có muốn xóa lớp học này không?",
+      "deleteSuccess": "Đã xóa.",
+      "deleteFail": "Lỗi: {error}",
+      "saveSuccess": "Đã lưu.",
+      "saveFail": "Lỗi: {error}",
+      "pastMonthWarning": "Không thể đăng ký các lớp học đã qua.",
+      "selected": "✅ Đã chọn",
       "leader": "Leader",
       "follower": "Follower",
-      "teacherLabel": "Instructor:",
+      "teacherLabel": "Giáo viên:",
       "priceLabel": "KRW",
-      "datesTitle": "Class Schedule (4 weeks)",
-      "noDates": "No schedule registered.",
-      "curriculumTitle": "Curriculum Details",
-      "previewTitle": "Preview Video",
-      "introTitle": "Class Intro",
-      "currentStatus": "Current Status",
-      "waiting": "Waiting for application",
-      "adminTitle": "Applicant List (Admin)",
-      "nickname": "Nickname",
-      "phone": "Phone",
-      "status": "Status",
-      "paid": "Paid",
-      "edit": "Edit",
-      "delete": "Delete",
-      "download": "Download",
-      "addToList": "Add to List",
-      "applied": "Applied",
-      "footerNote": "You can apply for all classes at once in MyPage later.",
+      "datesTitle": "Lịch học (4 tuần)",
+      "noDates": "Không có lịch trình.",
+      "curriculumTitle": "Giáo trình chi tiết",
+      "previewTitle": "Video xem trước",
+      "introTitle": "Giới thiệu lớp học",
+      "currentStatus": "Tình trạng hiện tại",
+      "waiting": "Đang đợi",
+      "adminTitle": "Danh sách chi tiết (Admin)",
+      "nickname": "Biệt danh",
+      "phone": "Liên lạc",
+      "status": "Trạng thái",
+      "paid": "Đã thanh toán",
+      "edit": "Sửa",
+      "delete": "Xóa",
+      "download": "Tải xuống",
+      "addToList": "Thêm vào danh sách",
+      "applied": "Đã đăng ký",
+      "footerNote": "Bạn có thể đăng ký tất cả tại \"Trang của tôi\"",
       "dayNames": [
-        "Sun",
-        "Mon",
-        "Tue",
-        "Wed",
-        "Thu",
-        "Fri",
-        "Sat"
+        "CN",
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "T7"
       ],
       "daysFull": [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Other"
+        "Chủ Nhật",
+        "Thứ Hai",
+        "Thứ Ba",
+        "Thứ Tư",
+        "Thứ Năm",
+        "Thứ Sáu",
+        "Thứ Bảy",
+        "Khác"
       ],
-      "monthLabel": "Month",
-      "dayLabel": "Day",
-      "viewFullStatus": "View Status",
-      "viewFullStatusHint": "(Only for applicants)",
-      "bittersweet": "For Milonga",
-      "fullStatusTitle": "Full Status for {month}",
-      "fullStatusSummary": "Leaders {leader} / Followers {follower}",
-      "noPermissionMessage": "Only for applicants.",
-      "role": "Role",
-      "classSelection": "Registration",
-      "noData": "No registration data."
+      "monthLabel": "Tháng",
+      "dayLabel": "Ngày",
+      "viewFullStatus": "Tình trạng đăng ký",
+      "viewFullStatusHint": "(Chỉ dành cho người đăng ký)",
+      "bittersweet": "Dành cho Milonga",
+      "fullStatusTitle": "Tình trạng đăng ký tháng {month}",
+      "fullStatusSummary": "Leader {leader} / Follower {follower}",
+      "noPermissionMessage": "Chỉ những người đã đăng ký mới có thể xem nút này.",
+      "role": "Vai trò",
+      "classSelection": "Chi tiết đăng ký",
+      "noData": "Không có dữ liệu."
     },
     "milonga": {
-      "bookingBtn": "🎟️ Book Milonga Table",
-      "eventTitle": "Event Info",
-      "eventSubtitle": "Make memories at Lucy",
-      "normalTable": "Table Booking",
-      "normalTableDesc": "Available for 2+ people.",
-      "event2plus1": "2+1 Event",
-      "event2plus1Desc": "One person free for every three people.",
-      "event3plus1": "3+1 Event",
-      "event3plus1Desc": "One person free for every four people.",
-      "noSchedule": "No milonga schedule registered.",
-      "checkBack": "Please check back later.",
-      "bookingStatus": "Booking Status",
-      "noReservations": "No bookings yet.",
-      "editTitle": "Edit Booking",
-      "editDesc": "You can modify your booking.",
-      "confirmPayBtn": "Request Payment Check",
-      "deleteConfirm": "Are you sure you want to delete this booking?",
-      "deleteSuccess": "Deleted.",
-      "error": "An error occurred.",
+      "bookingBtn": "🎟️ Đặt bàn Milonga",
+      "eventTitle": "Hướng dẫn sự kiện",
+      "eventSubtitle": "Khoảnh khắc kỳ diệu tại Lucy",
+      "normalTable": "Đặt bàn thường",
+      "normalTableDesc": "Bàn cho từ 2 người trở lên.",
+      "event2plus1": "Sự kiện 2+1",
+      "event2plus1Desc": "Đi 3 người, trả tiền 2 người.",
+      "event3plus1": "Sự kiện 3+1",
+      "event3plus1Desc": "Đi 4 người, trả tiền 3 người.",
+      "noSchedule": "Không có lịch Milonga.",
+      "checkBack": "Vui lòng kiểm tra lại sau.",
+      "bookingStatus": "Tình trạng đặt chỗ",
+      "noReservations": "Không có đặt chỗ nào.",
+      "editTitle": "Sửa đặt chỗ",
+      "editDesc": "Bạn có thể thay đổi chi tiết.",
+      "confirmPayBtn": "Yêu cầu xác nhận thanh toán",
+      "deleteConfirm": "Bạn có muốn xóa đặt chỗ này không?",
+      "deleteSuccess": "Đã xóa.",
+      "error": "Đã xảy ra lỗi.",
       "options": [
-        "15k KRW per person",
-        "Event (Free)"
+        "1 người 15k KRW",
+        "Sự kiện (Miễn phí)"
       ],
-      "optionPrompt": "Select an option.",
-      "cancel": "Cancel",
-      "submit": "OK",
-      "datePending": "Schedule Pending",
-      "newTitle": "New Booking",
-      "dateLabel": "Date",
-      "optionLabel": "Option",
-      "nicknamePlaceholder": "Enter nickname",
-      "phoneLabel": "Phone",
-      "requestsLabel": "Requests",
-      "requestsPlaceholder": "Additional requests (Optional)",
-      "submitting": "Processing...",
-      "saveEdit": "Save Changes",
-      "saveNew": "Book",
-      "noPoster": "Poster is being prepared."
+      "optionPrompt": "Chọn một tùy chọn.",
+      "cancel": "Hủy",
+      "submit": "Xác nhận",
+      "datePending": "Chờ ngày",
+      "newTitle": "Đặt chỗ mới",
+      "dateLabel": "Ngày",
+      "optionLabel": "Tùy chọn",
+      "nicknamePlaceholder": "Biệt danh của bạn",
+      "phoneLabel": "Điện thoại",
+      "requestsLabel": "Lưu ý",
+      "requestsPlaceholder": "Yêu cầu đặc biệt (tùy chọn)",
+      "submitting": "Đang xử lý...",
+      "saveEdit": "Hoàn tất sửa",
+      "saveNew": "Đặt ngay",
+      "noPoster": "Không có poster."
     },
     "membership": {
-      "title": "Membership Guide",
-      "desc": "Check the benefits of Freestyle Tango membership.",
-      "type1": "1 Month Free Pass",
+      "title": "Hướng dẫn thành viên",
+      "desc": "Khám phá các quyền lợi của Freestyle Tango.",
+      "type1": "Thẻ tự do 1 tháng",
       "type1Price": "180,000 KRW",
-      "type2": "3+1 Event",
+      "type2": "Sự kiện 3+1",
       "type2Price": "120,000 KRW",
-      "type3": "6 Months Membership",
+      "type3": "Thành viên 6 tháng",
       "type3Price": "860,000 KRW",
-      "close": "Close"
+      "close": "Đóng"
     },
     "registrationStatus": {
-      "editTitle": "Edit Registration",
-      "newTitle": "Apply for {month} Classes",
-      "cancelEdit": "Cancel Edit",
-      "desc": "Select classes to apply.",
-      "selectPrompt": "Please select a class",
-      "typeSelectorTitle": "Select Type",
-      "typeIndividual": "Individual / 1 Month",
-      "typeMembership6": "6 Months Membership",
-      "editSubmit": "Save Changes",
-      "newSubmit": "Apply"
+      "editTitle": "Sửa đăng ký",
+      "newTitle": "Đăng ký học tháng {month}",
+      "cancelEdit": "Hủy",
+      "desc": "Chọn các lớp học bạn muốn tham gia.",
+      "selectPrompt": "Chọn một lớp học",
+      "typeSelectorTitle": "Loại đăng ký",
+      "typeIndividual": "Cá nhân / 1 tháng",
+      "typeMembership6": "6 tháng",
+      "editSubmit": "Sửa",
+      "newSubmit": "Đăng ký"
     },
     "payment": {
-      "title": "Payment Options",
-      "desc": "Select the payment option matching your registration.",
-      "placeholder": "Select an option",
+      "title": "Chọn tùy chọn thanh toán",
+      "desc": "Vui lòng chọn tùy chọn thanh toán phù hợp với đăng ký của bạn.",
+      "placeholder": "Chọn",
       "options": [
-        "Individual",
-        "1 Month",
-        "6 Months (1st)",
-        "6 Months (2nd)",
-        "6 Months (3rd)",
-        "6 Months (4th)",
-        "6 Months (5th)",
-        "6 Months (6th)"
+        "Cá nhân",
+        "1 tháng",
+        "6 tháng (Lần 1)",
+        "6 tháng (Lần 2)",
+        "6 tháng (Lần 3)",
+        "6 tháng (Lần 4)",
+        "6 tháng (Lần 5)",
+        "6 tháng (Lần 6)"
       ],
-      "optionPrompt": "Please select a payment option.",
-      "cancel": "Cancel",
-      "submit": "Confirm"
+      "optionPrompt": "Chọn tùy chọn thanh toán.",
+      "cancel": "Hủy",
+      "submit": "Hoàn tất"
     },
     "history": {
-      "title": "My History",
-      "loading": "Loading...",
-      "empty": "No history found.",
-      "appliedLabel": "Registered for {month}",
-      "statusPaid": "Paid",
-      "statusWaiting": "Waiting for Payment",
-      "appliedDate": "Applied: {date}",
-      "paidMsg": "{type} / {amount} KRW Paid",
-      "paidDate": "Confirmed: {date}",
-      "confirmPayBtn": "Request Payment Check",
-      "edit": "Edit",
-      "delete": "Delete",
-      "deleteConfirm": "Are you sure you want to delete this history?",
-      "alreadyRegistered": "Already registered. Please use edit function.",
-      "deleteSuccess": "Deleted.",
-      "confirmSuccess": "Completed.",
-      "error": "An error occurred."
+      "title": "Đăng ký của tôi",
+      "loading": "Đang tải...",
+      "empty": "Không tìm thấy đăng ký.",
+      "appliedLabel": "Đăng ký tháng {month}",
+      "statusPaid": "Thanh toán đã xác nhận",
+      "statusWaiting": "Chờ thanh toán",
+      "appliedDate": "Ngày: {date}",
+      "paidMsg": "Đã thanh toán {type} / {amount} KRW",
+      "paidDate": "Ngày xác nhận: {date}",
+      "confirmPayBtn": "Yêu cầu xác nhận thanh toán",
+      "edit": "Sửa",
+      "delete": "Xóa",
+      "deleteConfirm": "Bạn có muốn xóa đăng ký này không?",
+      "alreadyRegistered": "Đã đăng ký. Vui lòng sử dụng chức năng sửa.",
+      "deleteSuccess": "Đã xóa.",
+      "confirmSuccess": "Đã hoàn tất.",
+      "error": "Lỗi."
     },
     "success": {
-      "welcome": "Thank you for applying.",
-      "completed": "Please transfer to the account below and click 'Request Payment Check' in MyPage.",
-      "info": "For other inquiries, contact us via the channels below.",
-      "bankLabel": "Account",
+      "welcome": "Cảm ơn bạn đã đăng ký.",
+      "completed": "Vui lòng thanh toán vào tài khoản bên dưới và nhấn nút \"Yêu cầu xác nhận thanh toán\" tại Trang của tôi.",
+      "info": "Liên hệ với chúng tôi nếu có thắc mắc.",
+      "bankLabel": "Tài khoản ngân hàng",
       "bankNumber": "KakaoBank 3333-14-3159646 (Hong Byong Seok)",
-      "copyBtn": "Copy",
-      "copySuccess": "Copied.",
-      "done": "OK"
+      "copyBtn": "Sao chép",
+      "copySuccess": "Đã sao chép.",
+      "done": "Xác nhận"
     }
   },
   "mypage": {
     "title": "Trang của tôi",
-    "loginPrompt": "Login required.",
-    "loginBtn": "Login",
-    "logoutBtn": "Logout",
-    "membership": "Thông tin hội viên",
+    "loginPrompt": "Bạn cần đăng nhập.",
+    "loginBtn": "Đăng nhập",
+    "logoutBtn": "Đăng xuất",
+    "membership": "Hướng dẫn thành viên",
     "profile": {
-      "nickname": "Nickname",
-      "phone": "Phone",
-      "role": "Role"
+      "nickname": "Biệt danh",
+      "phone": "Liên lạc",
+      "role": "Vai trò"
     },
     "tabs": {
-      "registration": "Apr. News/Apply",
-      "history": "History",
-      "wallet": "Wallet & Coupons",
-      "coaching": "Coaching",
-      "profile": "My Info",
-      "admin": "Admin"
+      "registration": "Đăng ký tháng {month}",
+      "history": "Trạng thái",
+      "wallet": "Ví",
+      "coaching": "Huấn luyện",
+      "profile": "Hồ sơ",
+      "admin": "Quản trị"
     },
-    "walletDesc": "List of your active coupons.",
+    "alerts": {
+      "registration_failed": "Lỗi đăng ký thông báo.\nChi tiết: {detail}",
+      "permission_denied": "Quyền thông báo bị từ chối. Vui lòng cho phép trong cài đặt trình duyệt.",
+      "update_error": "Lỗi cập nhật: {detail}",
+      "confirm_logout": "Bạn có muốn đăng xuất không?",
+      "only_for_active_users": "Chỉ dành cho các thành viên tích cực trong tháng này.",
+      "wait_7_days": "Bạn phải đợi 7 ngày giữa hai lần nhận coupon.",
+      "already_issued": "Coupon đã được nhận.",
+      "sold_out": "Đã hết ({total}).",
+      "confirm_issue": "Bạn có muốn nhận coupon này không?",
+      "issue_success": "Đã cấp coupon.",
+      "issue_failed": "Lỗi: {message}",
+      "confirm_cancel": "Bạn có muốn trả lại coupon này không?",
+      "cancel_success": "Đã trả lại coupon thành công.",
+      "cancel_failed": "Lỗi: {message}",
+      "general_error": "Đã xảy ra lỗi. Vui lòng thử lại.",
+      "expired_coupon": "Coupon đã hết hạn.",
+      "confirm_use": "Bạn có muốn sử dụng coupon không?",
+      "only_self": "Bạn chỉ có thể xem trang của chính mình."
+    },
+    "payment": {
+      "status_paid": "Đã thanh toán",
+      "status_pending": "Chờ xác nhận",
+      "history_title": "Đăng ký tháng {month}",
+      "date_label": "Ngày",
+      "no_history": "Không có lịch sử."
+    },
+    "notices": {
+      "title": "📢 Hướng dẫn Coupon",
+      "list": [
+        "Bạn có thể nhận coupon sau khi xác nhận thanh toán.",
+        "Các coupon đã nhận có thể được trả lại.",
+        "Vui lòng kiểm tra ngày hết hạn.",
+        "Nhấn nút \"Sử dụng\" ngay trước khi dùng."
+      ],
+      "no_coupons": "Không có coupon."
+    },
+    "labels": {
+      "get_coupon": "Nhận Coupon",
+      "used": "Đã dùng",
+      "expired": "Hết hạn",
+      "use_now": "Dùng ngay",
+      "issued": "Đã cấp",
+      "free": "Miễn phí",
+      "ticket": "Vé",
+      "off": "Giảm",
+      "won_off": "KRW Giảm",
+      "ten_thousand_off": "10k KRW Giảm",
+      "status_available": "Có thể nhận",
+      "status_can_use": "Có thể dùng",
+      "duration_limited": "Có hiệu lực trong {duration} tháng sau khi cấp",
+      "duration_unlimited": "Không thời hạn",
+      "count_unit": "người",
+      "role_leader": "Leader",
+      "role_follower": "Follower",
+      "phone": "Điện thoại",
+      "push_notif": "Thông báo đẩy",
+      "edit_profile": "Sửa hồ sơ"
+    },
+    "admin_menu": {
+      "member": {
+        "title": "Quản lý thành viên",
+        "desc": "Quản lý danh sách và thông tin thành viên"
+      },
+      "coaching": {
+        "title": "Quản lý huấn luyện",
+        "desc": "Theo dõi tình trạng huấn luyện tổng quát"
+      },
+      "checklist": {
+        "title": "Danh sách kiểm tra Stay",
+        "desc": "Kế hoạch đặt phòng và danh sách kiểm tra"
+      },
+      "sms": {
+        "title": "Cài đặt SMS Stay",
+        "desc": "Tin nhắn đặt phòng và hướng dẫn"
+      },
+      "coupon": {
+        "title": "Quản lý coupon",
+        "desc": "Cấp và theo dõi tình trạng coupon"
+      }
+    },
+    "walletDesc": "Các coupon bạn đang sở hữu.",
     "wallet": {
-      "title": "My Wallet & Coupons",
-      "noCoupons": "No coupons found.",
-      "useCoupon": "Use Now",
-      "usedCoupon": "Used",
+      "title": "Ví & Coupon của tôi",
+      "noCoupons": "Bạn không có coupon nào.",
+      "useCoupon": "Dùng ngay",
+      "usedCoupon": "Đã dùng",
       "membershipCoupon": {
-        "title": "1-Month Membership 5% Discount",
-        "desc": "5% discount for 3rd-week class application (10,000 KRW off)",
-        "target": "For Membership Members"
+        "title": "Coupon thành viên tháng",
+        "desc": "Có thể sử dụng để đăng ký lớp học",
+        "target": "Dành cho thành viên"
       },
       "milongaCoupon": {
-        "title": "Milonga Luci 1-Time Free Pass",
-        "desc": "1-time free entry coupon for class registrants",
-        "target": "For Class Registrants"
+        "title": "Vé vào cửa Milonga Lucy 1 lần",
+        "desc": "1 buổi Milonga miễn phí khi đăng ký học",
+        "target": "Dành cho người đăng ký"
       },
-      "usageConfirm": "Would you like to use this coupon?\nUsed coupons cannot be restored.",
-      "usageSuccess": "Coupon successfully used."
+      "usageConfirm": "Bạn có muốn sử dụng không?\nHành động này không thể hoàn tác.",
+      "usageSuccess": "Đã sử dụng coupon."
     }
   },
   "admin": {
     "member": {
-      "searchPlaceholder": "Search nickname or number",
-      "searchBtn": "Search",
-      "engagement": "Engagement",
-      "joinDate": "Join Date",
-      "recentVisit": "Recent Visit",
-      "loading": "Loading data...",
-      "noResults": "No members found.",
-      "instructor": "Instructor",
-      "pushStatus": "Notifications",
-      "lastRegMonth": "Last Applied",
+      "searchPlaceholder": "Biệt danh hoặc số điện thoại",
+      "searchBtn": "Tìm",
+      "engagement": "Hoạt động",
+      "joinDate": "Tham gia",
+      "recentVisit": "Truy cập cuối",
+      "loading": "Đang tải...",
+      "noResults": "Không tìm thấy.",
+      "instructor": "Giáo viên",
+      "pushStatus": "Thông báo",
+      "lastRegMonth": "Tháng đăng ký cuối",
       "topPercent": "Top {percent}%",
-      "grantInstructor": "Grant Instructor",
-      "revokeInstructor": "Revoke Instructor",
+      "grantInstructor": "Cấp quyền giáo viên",
+      "revokeInstructor": "Hủy quyền",
       "leader": "Leader",
       "follower": "Follower",
-      "errorToggle": "Error changing permissions."
+      "errorToggle": "Không thể thay đổi quyền."
     }
   },
   "info": {
     "tabs": {
-      "location": "Location",
-      "membership": "Membership",
+      "location": "Vị trí",
+      "membership": "Thành viên",
       "story": "Story"
     }
   },
@@ -369,138 +450,123 @@ export default {
     "Thu": "T5",
     "Fri": "T6",
     "Sat": "T7",
-    "blockedAlert": "[Đã đặt hết]\nKhách:",
-    "period": "Thời gian:",
-    "invalidRange": "Khoảng thời gian đã chọn bao gồm các ngày đã được đặt. Vui lòng chọn lại.",
-    "viewList": "Xem danh sách",
-    "available": "Còn trống",
-    "booked": "Đã đặt",
-    "selected": "Đã chọn",
-    "days": "Đêm",
+    "blockedAlert": "Ngày này đã kín chỗ.",
+    "period": "Giai đoạn Admin:",
+    "invalidRange": "Khoảng ngày không hợp lệ.",
+    "viewList": "Xem bảng tổng quát",
+    "available": "Trống",
+    "booked": "Kín chỗ",
+    "selected": "Đang chọn",
+    "days": "đêm",
     "won": "KRW",
-    "hintSelectOut": "Vui lòng chọn ngày trả phòng!",
-    "hintSelectDates": "Chọn ngày trên lịch để tính giá chính xác.",
-    "finalPriceTitle": "Tổng số tiền thanh toán",
-    "baseFee": "Giá thuê cơ bản",
-    "guestFee": "Phí thêm người",
-    "weekendFee": "Phí cuối tuần & lễ",
-    "cleaningFee": "Phí vệ sinh",
-    "longStayDiscount": "Giảm giá ở dài hạn",
-    "proceedBtn": "Tiếp tục đặt phòng",
-    "stay": "Chỗ ở",
-    "guestSelectLabel": "Số lượng khách",
+    "hintSelectOut": "Chọn ngày trả phòng.",
+    "hintSelectDates": "Chọn ngày nhận/trả phòng.",
+    "finalPriceTitle": "Tổng số tiền",
+    "baseFee": "Giá phòng",
+    "guestFee": "Phí khách thêm",
+    "weekendFee": "Phụ phí cuối tuần",
+    "cleaningFee": "Phí dọn dẹp",
+    "longStayDiscount": "Giảm giá ở lâu",
+    "proceedBtn": "Tiến hành đặt phòng",
+    "stay": "Stay",
+    "guestSelectLabel": "Số người",
     "guestOptions": [
-      "1 khách (Cơ bản)",
-      "2 khách (+10k/đêm)",
-      "3 khách (+20k/đêm)",
-      "4 khách (Tối đa, +30k/đêm)"
+      "1 người",
+      "2 người",
+      "3 người",
+      "4 người"
     ],
     "checkin": "Nhận phòng",
     "checkout": "Trả phòng",
-    "clearBtn": "Chọn lại ngày",
-    "feeGuideTitle": "Hướng dẫn giá"
+    "clearBtn": "Xóa",
+    "feeGuideTitle": "Hướng dẫn giá",
+    "reserveBtn": "Đặt phòng ngay"
   },
   "location": {
-    "naver": "Mở Naver Map",
-    "kakao": "Mở Kakao Map"
+    "naver": "Bản đồ Naver",
+    "kakao": "Bản đồ Kakao"
   },
   "stays": {
-    "viewMonthlyStatus": "View Monthly Status",
-    "monthlyStatusTitle": "Monthly Reservation Status",
+    "viewMonthlyStatus": "Xem tình trạng tháng",
+    "monthlyStatusTitle": "Tình trạng đặt phòng tổng quát",
     "hapjeong": {
       "name": "Hapjeong",
       "hero": {
-        "subtitle": "Cách ga Hapjeong 1 phút, công viên Hangang trong tầm đi bộ, một nơi ở yên tĩnh & ấm cúng cho riêng bạn"
+        "subtitle": "Không gian nghỉ ngơi nghệ thuật với tầm nhìn sông Hàn"
       },
       "location": {
-        "title": "Vị trí",
-        "addressLabel": "Địa chỉ:",
-        "address": "13 Yanghwa-ro, Mapo-gu, Seoul",
-        "bldgLabel": "Tòa nhà:",
+        "title": "Hướng dẫn vị trí",
+        "addressLabel": "Địa chỉ",
+        "address": "Yanghwa-ro 13, Mapo-gu, Seoul",
+        "bldgLabel": "Tòa nhà",
         "bldg": "Hapjeong Square Riverview"
       },
       "guide": {
-        "title": "Chi tiết & Hướng dẫn",
-        "subtitle": "\"Chúng tôi đã trang bị mọi thứ để bạn có thể bắt đầu cuộc sống hàng ngày mà không cần chuẩn bị gì\"",
+        "title": "Hướng dẫn chi nhánh Hapjeong",
+        "subtitle": "Một điểm nghỉ chân nghệ thuật giữa lòng Seoul",
         "highlights": {
-          "title": "✨ Điểm nổi bật của phòng",
+          "title": "Đặc điểm",
           "list": [
             {
-              "t": "Công trình mới xây cao cấp với tầm nhìn thoáng đãng",
-              "d": "Tận hưởng tầm nhìn tuyệt đẹp ra sông Hàn từ căn hộ mới nhất và sạch nhất trong khu vực Hapjeong/Hongdae."
+              "t": "Vị trí",
+              "d": "Cách ga Hapjeong 1 phút đi bộ"
             },
             {
-              "t": "Vệ sinh tuyệt đối",
-              "d": "Chăn ga gối đệm và thảm trải sàn được giặt sạch chuyên nghiệp bởi Laundrygo mỗi lần. Vệ sinh hơi nước trong nhà, và tất cả khăn tắm/khăn lau được thay thế mới 100%."
+              "t": "Tầm nhìn",
+              "d": "Tầm nhìn riêng biệt ra sông Hàn"
             },
             {
-              "t": "Nội thất thư giãn cao cấp",
-              "d": "Hai chiếc giường rộng rãi (Queen, Super Single), sofa ấm cúng và ghế massage thư giãn hiệu suất cao."
-            },
-            {
-              "t": "Giải trí phong phú",
-              "d": "Phòng khách có Samsung Moving Style Smart TV 2026, cùng một chiếc TV bổ sung trong phòng ngủ."
+              "t": "Không khí",
+              "d": "Thiết kế nội thất được các nghệ sĩ yêu thích"
             }
           ],
-          "quote": "\"Hãy tận hưởng ghế massage trong khi ngắm nhìn cảnh đêm sông Hàn~\""
+          "quote": "Một không gian đặc biệt nơi Tango hòa quyện vào cuộc sống thường nhật."
         },
         "transport": {
-          "title": "📍 Vị trí & Giao thông thuận tiện (Gửi xe miễn phí)",
+          "title": "Giao thông",
           "list": [
             {
-              "t": "Vị trí đắc địa",
-              "d": "1 phút đi bộ đến ga Hapjeong. Truy cập nhanh đến Hongdae/Sinchon bằng đi bộ/tàu điện/xe buýt (10 phút đi bộ đến Hongdae)."
+              "t": "Tàu điện",
+              "d": "Tuyến số 2/6, Ga Hapjeong lối ra số 7"
             },
             {
-              "t": "Trung tâm giao thông",
-              "d": "Điểm hội tụ của tất cả các tuyến xe buýt di chuyển khắp Seoul. (Ga Mangwon, ga Hongdae đều liền kề)"
-            },
-            {
-              "t": "Chỗ đậu xe thuận tiện",
-              "d": "Mang theo xe của bạn và đậu xe miễn phí. (Chủ nhà chi trả toàn bộ phí gửi xe hàng tháng 30,000 KRW)"
-            },
-            {
-              "t": "Lái xe & Taxi",
-              "d": "Chỉ mất 1 phút để vào đường cao tốc ven sông Gangbyeon đi Gangnam, Ilsan, Yeouido."
+              "t": "Xe buýt",
+              "d": "Cách trạm dừng Hapjeong 1 phút đi bộ"
             }
           ]
         },
         "facilities": {
-          "title": " Couch Tiện nghi & Cơ sở vật chất (Vật dụng tiêu hao miễn phí)",
-          "base": "Thiết bị gia dụng/Nội thất cơ bản",
-          "baseDesc": "Tủ lạnh, Máy giặt, Điều hòa, Smart TV (2), Wi-Fi Giga, Bồn rửa, Bếp từ, Giường Queen & Super Single",
-          "add": "Cơ sở vật chất bổ sung",
-          "addDesc": "Khóa cửa an toàn, Văn phòng quản lý/CCTV, Bàn ăn, Máy lọc nước, Sofa, Bàn làm việc lớn, Tủ quần áo rộng rãi, Tủ giày",
-          "freeTitle": "✨ Tất cả vật dụng tiêu hao được cung cấp miễn phí!!!",
-          "freeDesc": "Mì gói, cơm ăn liền, giấy vệ sinh, khăn giấy, bộ bàn chải/kem đánh răng, dầu gội/dầu xả, sữa tắm, nước rửa tay được cung cấp sẵn.\nThoải mái sử dụng giá phơi đồ, bột giặt, nước xả vải, và túi đựng rác/túi tái chế!"
+          "title": "Cơ sở vật chất",
+          "base": "Cơ bản",
+          "baseDesc": "Giường Queen, Máy lạnh, Wi-Fi",
+          "add": "Bếp/Đồ dùng gia đình",
+          "addDesc": "Tủ lạnh, Bếp, Máy giặt",
+          "freeTitle": "Cung cấp miễn phí",
+          "freeDesc": "Nước, Khăn tắm, Dầu gội/Xà phòng, Máy sấy tóc"
         },
         "attractions": {
-          "title": "🛍️ Lối sống & Điểm tham quan xung quanh",
+          "title": "Địa điểm lân cận",
           "list": [
             {
-              "t": "Khu vực Hapjeong / Hongdae",
-              "d": "Liền kề những nhà hàng và quán cà phê tốt nhất ở Hapjeong và những con phố sôi động ở Hongdae."
+              "t": "Mua sắm",
+              "d": "Gần Mecenatpolis, Delight Square"
             },
             {
-              "t": "Siêu thị tiện lợi",
-              "d": "Wang Mart cách 1 phút cho việc mua sắm nhanh. Siêu thị Homeplus Mega Mart cách 5 phút đi bộ cho mọi thứ khác."
-            },
-            {
-              "t": "Thư giãn tại sông Hàn bất cứ lúc nào",
-              "d": "1 phút đi bộ đến lối vào công viên Hangang. Kết nối chặt chẽ với công viên hồ Mangwon."
+              "t": "Văn hóa",
+              "d": "Gần Hapjeong-dong, Mangwon-dong"
             }
           ]
         }
       },
       "calendar": {
-        "title": "Tình trạng đặt phòng",
-        "feeGuideTitle": "Price List",
+        "title": "Tình trạng Hapjeong",
+        "feeGuideTitle": "Hướng dẫn giá",
         "feeGuideLines": [
-          "80,000 KRW mỗi đêm (1 Khách)",
-          "+10,000 KRW mỗi khách thêm (Tối đa 4)",
-          "+10,000 KRW vào Cuối tuần & Ngày lễ",
-          "30,000 KRW phí dọn dẹp",
-          "Giảm giá 20,000 KRW cho các kỳ lưu trú từ 7 đêm trở lên"
+          "80,000 KRW mỗi đêm",
+          "Thêm người 10,000 KRW (Tối đa 4)",
+          "Phụ phí cuối tuần/lễ +10,000 KRW",
+          "Giảm giá cho kỳ nghỉ dài",
+          "Phí dọn dẹp 30,000 KRW"
         ]
       },
       "gallery": {
@@ -514,306 +580,430 @@ export default {
           "Tầm nhìn"
         ],
         "descriptions": [
-          "Phòng khách, Bàn làm việc (Bàn trang điểm), Bàn ăn cho 2 người",
-          "Căn hộ cao cấp với trần nhà cao",
-          "Bố cục hoàn hảo để nghỉ ngơi và ăn uống",
-          "Samsung Smart TV M7 2026 / Bàn làm việc & Bàn trang điểm",
-          "Miễn phí các kênh TV Premium & OTT (Có thể đăng nhập cá nhân)",
-          "Loa thông minh Kakao Park",
-          "Bộ chăn ga gối đệm cao cấp IKEA (Cỡ Queen)",
-          "TV trong phòng ngủ",
-          "Ghế massage thư giãn (Hiệu suất cao)",
-          "Giường đơn Ace với bộ chăn ga gối đệm IKEA",
-          "Sức chứa 3 khách (Có thể sử dụng sofa phòng khách)",
-          "Máy lọc nước, dụng cụ nấu ăn, gia vị, đồ dùng một lần được trang bị đầy đủ",
-          "Tủ lạnh & Máy giặt Samsung",
-          "Bồn rửa mặt, nhà vệ sinh và phòng tắm vòi sen riêng biệt",
-          "Cung cấp dầu gội, dầu xả, sữa tắm",
-          "Có sẵn bồn cầu thông minh (Bidet)",
-          "Tầm nhìn ra sông Hàn & làn gió sông mát rượi",
-          "1 phút đến công viên Hangang",
-          "Tầm nhìn ra sông Hàn & tầm nhìn thành phố"
+          "Toàn cảnh phòng khách Hapjeong",
+          "Sofa và bàn thoải mái",
+          "Nội thất phong cách",
+          "Ánh sáng",
+          "Ánh sáng tự nhiên",
+          "Không gian sống rộng rãi",
+          "Phòng ngủ",
+          "Chăn ga thoải mái",
+          "Không gian ngủ yên tĩnh",
+          "Toàn cảnh phòng ngủ",
+          "Tủ quần áo và không gian lưu trữ",
+          "Bếp đầy đủ tiện nghi",
+          "Khu vực bếp ngăn nắp",
+          "Phòng tắm sạch sẽ",
+          "Đồ dùng phòng tắm",
+          "Khu vực tắm vòi sen",
+          "Tầm nhìn sông Hàn",
+          "Cảnh đêm tuyệt đẹp",
+          "Không gian thoáng đãng với tầm nhìn"
         ]
       }
     },
     "deokeun": {
-      "name": "Deokeun",
+      "name": "Deokeun (Sangam)",
       "hero": {
-        "subtitle": "Sắp ra mắt"
+        "subtitle": "Cơ sở vật chất hiện đại và không gian nghỉ ngơi yên bình"
       },
       "location": {
-        "title": "",
-        "addressLabel": "",
-        "address": "",
-        "bldgLabel": "",
-        "bldg": ""
+        "title": "Location",
+        "addressLabel": "Address",
+        "address": "Jeil-ro 110, Goyang-si",
+        "bldgLabel": "Building",
+        "bldg": "Hillstate Eco Deokeun"
       },
       "guide": {
-        "title": "",
-        "subtitle": "",
+        "title": "Hướng dẫn chi nhánh Deokeun",
+        "subtitle": "Một căn phòng yên tĩnh và thoải mái",
         "highlights": {
-          "title": "",
-          "list": [],
-          "quote": ""
+          "title": "Đặc điểm",
+          "list": [
+            {
+              "t": "Mới",
+              "d": "Không gian thoải mái trong tòa nhà mới"
+            },
+            {
+              "t": "Yên tĩnh",
+              "d": "Cách xa tiếng ồn thành phố"
+            },
+            {
+              "t": "Thiết bị",
+              "d": "Thiết bị gia dụng hiện đại"
+            }
+          ],
+          "quote": "Lựa chọn tốt nhất cho những ai tìm kiếm sự nghỉ ngơi sâu sắc."
         },
         "transport": {
-          "title": "",
-          "list": []
+          "title": "Giao thông",
+          "list": [
+            {
+              "t": "Xe hơi",
+              "d": "5 phút đến Sangam-dong"
+            },
+            {
+              "t": "Xe buýt",
+              "d": "3 phút đi bộ đến trạm Deokeun"
+            }
+          ]
         },
         "facilities": {
-          "title": "",
-          "base": "",
-          "baseDesc": "",
-          "add": "",
-          "addDesc": "",
-          "freeTitle": "",
-          "freeDesc": ""
+          "title": "Tiện nghi",
+          "base": "Cơ bản",
+          "baseDesc": "Giường thoải mái, Máy lạnh/Sưởi, Smart TV",
+          "add": "Bếp",
+          "addDesc": "Lò vi sóng, Máy nướng bánh mì",
+          "freeTitle": "Miễn phí",
+          "freeDesc": "Viên nén cà phê, Nước, Đồ dùng vệ sinh"
         },
         "attractions": {
-          "title": "",
-          "list": []
+          "title": "Thiên nhiên",
+          "list": [
+            {
+              "t": "Thiên nhiên",
+              "d": "Gần công viên Noeul & Haneul"
+            },
+            {
+              "t": "Công việc",
+              "d": "Gần Sangam DMC"
+            }
+          ]
         }
       },
       "calendar": {
-        "title": "",
+        "title": "Tình trạng Deokeun",
         "feeGuideTitle": "Price List",
-        "feeGuideLines": []
+        "feeGuideLines": [
+          "60,000 KRW mỗi đêm",
+          "Thêm người 10,000 KRW",
+          "Phụ phí cuối tuần +10,000 KRW",
+          "Phí dọn dẹp 30,000 KRW"
+        ]
       },
       "gallery": {
-        "more": "",
-        "categories": [],
-        "descriptions": []
+        "more": "Ảnh",
+        "categories": [
+          "Tất cả",
+          "Phòng khách",
+          "Phòng ngủ",
+          "Bếp",
+          "Phòng tắm",
+          "Tầm nhìn"
+        ],
+        "descriptions": [
+          "Toàn cảnh Deokeun",
+          "Khu vực phòng ngủ",
+          "Lối vào",
+          "Bàn làm việc",
+          "Nội thất thoải mái",
+          "Smart TV",
+          "Tủ quần áo rộng",
+          "Máy lọc không khí",
+          "Bếp sạch sẽ",
+          "Dụng cụ bếp",
+          "Bộ đồ ăn",
+          "Dịch vụ cà phê",
+          "Dịch vụ đồ ăn nhẹ",
+          "Đồ dùng phòng tắm",
+          "Bồn cầu thông minh",
+          "Toàn cảnh khu vực tắm",
+          "Bộ sơ cứu",
+          "Phòng tập gym",
+          "Khu vực sân hiên"
+        ]
       }
     },
     "hongdae": {
       "name": "Hongdae",
       "hero": {
-        "subtitle": "Sắp ra mắt"
+        "subtitle": "Nghỉ chân tại Hongdae - trái tim của tuổi trẻ và nghệ thuật"
       },
       "location": {
-        "title": "",
-        "addressLabel": "",
-        "address": "",
-        "bldgLabel": "",
-        "bldg": ""
+        "title": "Location",
+        "addressLabel": "Address",
+        "address": "Seogyo-dong, Mapo-gu, Seoul",
+        "bldgLabel": "Building",
+        "bldg": "Stay Hongdae"
       },
       "guide": {
-        "title": "",
-        "subtitle": "",
+        "title": "Thông tin chi tiết & Hướng dẫn",
+        "subtitle": "\"Mọi thứ đã sẵn sàng, chỉ cần bạn đến\"",
         "highlights": {
-          "title": "",
-          "list": [],
-          "quote": ""
+          "title": "✨ Chi tiết Stay",
+          "list": [
+            {
+              "t": "Trung tâm Hongdae",
+              "d": "Vị trí tốt nhất để trải nghiệm văn hóa Hongdae."
+            },
+            {
+              "t": "Sạch sẽ tuyệt đối",
+              "d": "Chăn ga được giặt chuyên nghiệp mỗi lần."
+            },
+            {
+              "t": "Nội thất sang trọng",
+              "d": "2 giường Queen/Super Single và ghế massage."
+            },
+            {
+              "t": "Giải trí",
+              "d": "Smart TV Samsung MovingStyle mẫu 2026."
+            }
+          ],
+          "quote": "Nghỉ ngơi thực sự sau năng lượng của Hongdae."
         },
         "transport": {
-          "title": "",
-          "list": []
+          "title": "📍 Vị trí & Giao thông",
+          "list": [
+            {
+              "t": "Gần ga",
+              "d": "Tuyến số 2, AREX, Gyeongui."
+            },
+            {
+              "t": "Nhiều tuyến xe buýt",
+              "d": "Giao thông toàn Seoul và sân bay."
+            },
+            {
+              "t": "Khoảng cách đi bộ",
+              "d": "Hongdae, Hapjeong, Yeonnam-dong trong tầm đi bộ."
+            }
+          ]
         },
         "facilities": {
-          "title": "",
-          "base": "",
-          "baseDesc": "",
-          "add": "",
-          "addDesc": "",
-          "freeTitle": "",
-          "freeDesc": ""
+          "title": "Tiện nghi & Miễn phí",
+          "base": "Điện máy/Nội thất",
+          "baseDesc": "Tủ lạnh, Máy giặt, AC, 2 Smart TV, Giường Queen",
+          "add": "Bổ sung",
+          "addDesc": "An ninh CCTV, Bàn, Máy lọc nước, Sofa",
+          "freeTitle": "✨ Tất cả vật dụng tiêu hao miễn phí!",
+          "freeDesc": "Ramen, Cơm hộp, Khăn tắm, Bộ bàn chải... mọi thứ đã sẵn sàng.\nNước giặt, xả và túi rác miễn phí."
         },
         "attractions": {
-          "title": "",
-          "list": []
+          "title": "🛍️ Xung quanh có gì?",
+          "list": [
+            {
+              "t": "Phố đi bộ",
+              "d": "Các buổi biểu diễn đường phố và cửa hàng."
+            },
+            {
+              "t": "Công viên Yeonnam",
+              "d": "Lý tưởng để picnic và đi dạo."
+            },
+            {
+              "t": "Điểm đến ẩm thực",
+              "d": "Hàng trăm nhà hàng và quán cà phê nổi tiếng."
+            }
+          ]
         }
       },
       "calendar": {
-        "title": "",
+        "title": "Tình trạng Hongdae",
         "feeGuideTitle": "Price List",
-        "feeGuideLines": []
+        "feeGuideLines": [
+          "80,000 KRW mỗi đêm",
+          "Giá ưu đãi nhân dịp khai trương"
+        ]
       },
       "gallery": {
-        "more": "",
-        "categories": [],
-        "descriptions": []
+        "more": "View More",
+        "categories": [
+          "All",
+          "Living",
+          "Bedroom",
+          "Kitchen",
+          "Bath",
+          "View"
+        ],
+        "descriptions": [
+          "Bộ sưu tập đang chuẩn bị...",
+          "Thiết kế không gian thoải mái",
+          "Nội thất phong cách"
+        ]
       }
     }
   },
   "common": {
-    "save": "Save",
-    "cancel": "Cancel",
-    "loading": "Loading...",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "loading": "Đang tải...",
     "contact": {
-      "title": "Liên hệ",
-      "desc": "Vui lòng liên hệ bất cứ lúc nào nếu bạn có thắc mắc.",
+      "title": "Tư vấn",
+      "desc": "Luôn sẵn sàng phục vụ bạn.",
       "call": "Gọi điện",
-      "callDesc": "010-7209-2468 (Stone)",
-      "sms": "Tin nhắn",
-      "smsDesc": "Đảm bảo phản hồi nhanh",
-      "kakao": "Chat Kakao",
-      "kakaoDesc": "ID: stonehong@kakao.com",
+      "callDesc": "Direct Call",
+      "sms": "SMS",
+      "smsDesc": "Inquire via SMS",
+      "kakao": "KakaoTalk",
+      "kakaoDesc": "KakaoTalk Channel",
       "whatsapp": "WhatsApp",
-      "whatsappDesc": "Dành cho khách quốc tế",
-      "fb": "FB Messenger",
-      "fbDesc": "Tin nhắn Facebook"
+      "whatsappDesc": "WhatsApp Inquiry",
+      "fb": "Messenger",
+      "fbDesc": "Facebook Message"
     },
     "hostGuide": {
-      "title": "🛡️ Quy định phòng & Liên lạc với chủ nhà",
+      "title": "Về chủ nhà",
       "list": [
         {
-          "t": "🔓 Nhận phòng / Trả phòng (Linh hoạt)",
-          "d": "Tự nhận phòng không tiếp xúc. Mật khẩu và thông tin phòng được gửi qua tin nhắn vào ngày nhận phòng.\nTiêu chuẩn: Nhận phòng 15:00 / Trả phòng 11:00 (Có thể điều chỉnh để thuận tiện cho bạn!)"
+          "t": "Chủ nhà",
+          "d": "Stone Hong"
         },
         {
-          "t": "🏠 Quy định nghiêm ngặt",
-          "d": "Tuyệt đối KHÔNG HÚT THUỐC trong toàn bộ tòa nhà. Phí dọn dẹp đặc biệt sẽ được áp dụng nếu vi phạm.\nVui lòng phân loại rác và rửa bát đĩa trước khi trả phòng.\nVì đây là căn hộ mới xây, vui lòng hạn chế tiếng ồn lớn sau 22:00."
-        },
-        {
-          "t": "🤩 Liên lạc với chủ nhà 24/7",
-          "d": "Liên hệ với tôi bất cứ lúc nào, kể cả sáng sớm! Đừng ngần ngại nhắn tin nếu bạn thấy không thoải mái.\nNếu bạn thiếu bất kỳ vật dụng thiết yếu nào trong thời gian lưu trú, hãy cho tôi biết. Tôi sẽ mua và giao chúng ngay trong ngày."
+          "t": "Hồ sơ",
+          "d": "Giáo viên Tango / Chủ nhà Stay.\nChúng tôi hỗ trợ hành trình Tango của bạn trong một không gian nghệ thuật."
         }
       ]
     },
     "story": {
-      "title": "Câu chuyện TangoStay",
-      "subtitle": "\"Chỉ cần mang theo chính mình\"... Giới thiệu [Thử nghiệm Đảo hoang] của TangoStay.",
-      "p1": "Mục tiêu duy nhất của tôi khi tạo ra không gian này với tư cách là chủ nhà là \"Thử nghiệm Đảo hoang\". Một không gian nơi bạn có thể bước vào chỉ với một chiếc vali duy nhất và sống thoải mái hoàn hảo trong hơn một tuần mà không cần bước ra ngoài. Tôi thiết kế không gian này để giải quyết triệt để vô số bất tiện mà tôi từng gặp phải với tư cách là khách lưu trú.",
-      "sol1Title": "Gói lưu trú: KHÔNG lo ngại, Hộp quà chào mừng",
-      "sol1Text": "Đừng lo lắng về việc sử dụng khăn tắm hay xà phòng của người khác. Chúng tôi cung cấp cho mỗi vị khách khăn tắm, khăn lau bếp, xà phòng và bộ bàn chải đánh răng mới tinh - chất lượng tiện nghi khách sạn, tất cả đều mới. Không cần phải chạy đến cửa hàng tiện lợi trong ngày đầu tiên.",
-      "sol2Title": "Không còn lo lắng về nước! Máy lọc nước cao cấp",
-      "sol2Text": "Giải phóng bản thân khỏi việc phải mang vác những chai nước nặng nề. Một máy lọc nước hiện đại đã được lắp đặt, cung cấp nước mát, sạch không giới hạn bất cứ lúc nào.",
-      "sol3Title": "Vệ sinh tuyệt đối (Giặt là chuyên nghiệp Laundrygo)",
-      "sol3Text": "Tất cả chăn ga gối đệm (ruột chăn, vỏ chăn, tấm lót, vỏ gối) và thảm trải sàn đều được chuẩn bị sẵn hai bộ và được giặt là chuyên nghiệp, khử trùng ở nhiệt độ cao bởi Laundrygo cho mỗi vị khách mới. Hãy trải nghiệm giấc ngủ sâu trên bộ chăn ga sạch sẽ không tì vết.",
-      "closing": "Tôi mong được chào đón bạn đến với \"Đảo hoang\" của tôi, nơi thoải mái nhất để thực sự thư giãn.",
-      "hostName": "👋 Tôi là Stone, vũ công Tango Argentina.",
-      "hostBio": "Tôi theo học chuyên ngành Quản trị Kinh doanh và Trí tuệ Nhân tạo, đồng thời từng làm người lập kế hoạch chính cho nhiều ứng dụng nổi tiếng mà bạn có thể sử dụng hàng ngày."
+      "title": "Câu chuyện Tango Stay",
+      "subtitle": "\"Chỉ cần đến\" - [Thử nghiệm đảo hoang]",
+      "p1": "Một trong những mục tiêu duy nhất của tôi khi chuẩn bị không gian này là \"Thử nghiệm đảo hoang\". Ngay cả khi bạn chỉ đến với một chiếc vali, đây là không gian bạn có thể sống thoải mái trong hơn một tuần mà không cần bước ra ngoài. Nó được thiết kế để giải quyết \"vô số rắc rối\" mà tôi đã trải qua với tư cách là một người khách.",
+      "sol1Title": "Stay Pack: Không phiền toái",
+      "sol1Text": "Không còn dùng chung khăn tắm hay xà phòng. Khăn tắm, xà phòng và bàn chải mới đạt chuẩn khách sạn cho mỗi khách.",
+      "sol2Title": "Không cần mua nước!",
+      "sol2Text": "Không còn phải mang vác những chai nước nặng nề. Máy lọc nước chất lượng cao nhất đã được lắp đặt.",
+      "sol3Title": "Sạch sẽ tuyệt đối (Laundrygo)",
+      "sol3Text": "Tất cả chăn ga gối đệm được công ty chuyên nghiệp (Laundrygo) tiệt trùng và sấy khô sau mỗi lần sử dụng.",
+      "closing": "Chúng tôi mong bạn sẽ trải nghiệm sự nghỉ ngơi thực sự trên \"hòn đảo hoang\" riêng của mình.",
+      "hostName": "👋 Tôi là Stone, người đàn ông nhảy Argentine Tango.",
+      "hostBio": ""
     },
     "footer": {
-      "term": "Điều khoản dịch vụ",
-      "privacy": "Chính sách bảo mật",
-      "termTitle": "[Điều khoản dịch vụ]",
-      "privacyTitle": "[Chính sách bảo mật]",
-      "termText": "Điều 1 (Mục đích)\nMục đích của các điều khoản này là quy định các quyền, nghĩa vụ và trách nhiệm giữa chủ nhà và khách lưu trú liên quan đến dịch vụ lưu trú do TangoStay cung cấp.\n\nĐiều 2 (Cung cấp dịch vụ)\n1. TangoStay cung cấp cho khách lưu trú nơi ở đã chỉ định và tất cả các cơ sở phụ trợ (bao gồm cả vật dụng tiêu hao miễn phí).\n2. Chủ nhà có thể yêu cầu khách bồi thường thiệt hại thực tế đối với bất kỳ thiệt hại nào về tài sản trong nơi ở.\n\nĐiều 3 (Nghĩa vụ của khách)\n1. Khách bị cấm hút thuốc hoặc gây tiếng ồn lớn (sau 22:00) có thể làm phiền người khác.\n2. Các vi phạm có thể dẫn đến việc buộc phải rời đi và chịu phí dọn dẹp đặc biệt.",
-      "privacyText": "1. Thông tin cá nhân được thu thập\nTangoStay thu thập các thông tin cá nhân sau đây để việc đặt phòng và liên lạc được suôn sẻ.\n- Các mục được thu thập: Tên, Số liên lạc, Lịch đặt phòng\n\n2. Mục đích thu thập và sử dụng\n- Hướng dẫn mật khẩu cho tòa nhà và khóa cửa phòng\n- Xác nhận thanh toán và đặt phòng, phản hồi khách hàng để quản lý chất lượng lưu trú\n\n3. Thời hạn lưu trữ\n- Về nguyên tắc, thông tin sẽ được hủy ngay sau khi mục đích đã đạt được (1 tháng sau khi trả phòng)."
+      "term": "Điều khoản",
+      "privacy": "Bảo mật",
+      "termTitle": "Điều khoản sử dụng",
+      "privacyTitle": "Chính sách bảo mật",
+      "termText": "Article 1 (Purpose)...",
+      "privacyText": "TangoStay values your personal information..."
     }
   },
-  "startTime": "Start Time",
-  "endTime": "End Time",
+  "startTime": "Bắt đầu",
+  "endTime": "Kết thúc",
   "media": {
-    "title": "Media",
-    "edit": "Edit Media",
+    "title": "Truyền thông",
+    "edit": "Sửa video",
     "type": {
       "youtube": "YouTube",
       "demonstration": "Demo",
-      "general": "General"
+      "general": "Chung"
     },
-    "filterAll": "All",
-    "addBtn": "Register",
-    "like": "Like",
-    "comment": "Comment",
-    "views": "Views",
-    "noAccess": "Demonstration video for class participants only.",
+    "filterAll": "Tất cả lớp học",
+    "addBtn": "Thêm",
+    "like": "Thích",
+    "comment": "Bình luận",
+    "views": "Lượt xem",
+    "noAccess": "Chỉ người đăng ký mới có thể xem",
     "placeholder": {
-      "title": "Enter title",
-      "url": "YouTube ID or Video URL",
-      "desc": "Enter description",
-      "class": "Select Class (Optional)",
-      "comment": "Leave a comment..."
+      "title": "Tiêu đề",
+      "url": "YouTube ID hoặc URL",
+      "desc": "Mô tả",
+      "class": "Lớp học liên quan (tùy chọn)",
+      "comment": "Viết bình luận..."
     },
-    "uploading": "Uploading...",
-    "deleteConfirm": "Delete this?",
-    "saveSuccess": "Saved.",
-    "deleteSuccess": "Deleted."
+    "uploading": "Đang tải...",
+    "deleteConfirm": "Bạn có muốn xóa không?",
+    "saveSuccess": "Đã lưu.",
+    "deleteSuccess": "Đã xóa."
   },
   "story": {
     "campaign": {
-      "title": "Core Campaign",
+      "title": "Tham gia",
       "slogan": "Happy Space, Warm People",
-      "sloganKo": "Happy Space, Warm People"
+      "sloganKo": "Không gian hạnh phúc, Những con người ấm áp"
     },
     "hero": {
-      "title": "The Playground We Dream of,\nA Sanctuary for All",
-      "subtitle": "A Freestyle Tango community where we grow together with respect"
+      "title": "Sân chơi mơ ước của chúng ta,\nNơi trú ẩn của tất cả",
+      "subtitle": "Cộng đồng Freestyle Tango tập trung vào sự tôn trọng và phát triển lẫn nhau"
     },
     "ethics": {
-      "title": "Community Core Values",
-      "respectTitle": "Attitude First (Respect)",
-      "respectDesc": "The premise that we must respect each other is too clear. Otherwise, club activities may be restricted.",
-      "teachingTitle": "No Teaching",
-      "teachingDesc": "One-sided teaching among students can hinder the progress of both yourself and others. We welcome exchange of opinions, but please resolve technical issues through the instructors.",
+      "title": "Giá trị cốt lõi",
+      "respectTitle": "Thái độ lên hàng đầu (Respect)",
+      "respectDesc": "Tôn trọng lẫn nhau là quy tắc bất di bất dịch.",
+      "teachingTitle": "Cấm dạy kèm riêng (No Teaching)",
+      "teachingDesc": "Nghiêm cấm việc học viên tự dạy nhau một chiều. Vui lòng tham khảo ý kiến giáo viên.",
       "teachingDetail": "It is important to accurately understand the teacher's intentions. Regardless of experience, please refrain from one-sided teaching."
     },
     "projects": {
-      "title": "Strategic Projects",
+      "title": "Dự án chiến lược",
       "azit": {
-        "title": "Project 'Azit'",
-        "desc": "Our own sanctuary where we can comfortably talk and enjoy food and drinks before and after classes."
+        "title": "Dự án 'Azit'",
+        "desc": "Không gian trò chuyện sau giờ học với đồ ăn và rượu vang."
       },
       "camp": {
-        "title": "Project 'Camp'",
-        "desc": "A pension space that can be a sanctuary for us outside the city on weekends and holidays."
+        "title": "Dự án 'Camp'",
+        "desc": "Những chuyến nghỉ ngơi cuối tuần hòa mình vào thiên nhiên."
       },
       "nuevo": {
-        "title": "Project Professional Performance Team 'Nuevo Company'",
-        "desc": "Operation of a professional performance team and activation of yoga rooms and cultural centers for wellness."
+        "title": "Dự án 'Nuevo Company'",
+        "desc": "Nhóm biểu diễn chuyên nghiệp & Các hoạt động Well-life."
       },
       "orchestra": {
-        "title": "Project 'House Ochestra'",
-        "desc": "Freestyle's own house orchestra for salon recitals and live milongas."
+        "title": "Dự án 'House Orchestra'",
+        "desc": "Dàn nhạc thính phòng cho các buổi Milonga trực tiếp."
       }
     },
     "roadmap": {
-      "title": "Sustainable Future",
+      "title": "Tương lai bền vững",
       "cooperative": {
-        "title": "Cooperative Transition",
-        "desc": "A system where members share ownership of the club and jointly operate and make decisions."
+        "title": "Chuyển đổi sang Hợp tác xã",
+        "desc": "Vận hành và sở hữu chung bởi các thành viên."
       },
       "donation": {
-        "title": "Establishing a Donation Culture",
-        "desc": "A culture that supports new members and helps the club grow through scholarships and volunteering."
+        "title": "Văn hóa quyên góp",
+        "desc": "Hệ thống học bổng cho thành viên mới."
       },
       "instructor": {
-        "title": "Internal Instructor Training",
-        "desc": "A system to nurture the next generation of leaders from within our community."
+        "title": "Đào tạo giáo viên nội bộ",
+        "desc": "Hệ thống nơi thành viên có thể trở thành chuyên gia và mở lớp."
       }
     },
     "guidelines": {
-      "title": "General Guide",
-      "cleaning": "Wipe up spills immediately.",
-      "shoes": "Only dedicated shoes or bare feet are allowed inside.",
-      "toilet": "Only toilet paper in the toilet (No hand towels, wet wipes).",
-      "trash": "Sort trash and dispose of it in bins when leaving.",
-      "power": "Use the main switch next to the door when entering/leaving.",
+      "title": "Hướng dẫn chung",
+      "cleaning": "Lau sạch đồ uống bị đổ ngay lập tức.",
+      "shoes": "Chỉ giày khiêu vũ hoặc chân trần.",
+      "toilet": "Chỉ giấy vệ sinh (cấm khăn ướt).",
+      "trash": "Phân loại rác khi rời đi.",
+      "power": "Sử dụng công tắc chính khi vào/ra.",
       "facilities": {
         "wifi": "WiFi: freestyle1234",
-        "pc": "PC PW: 7788",
-        "lockers": "Items cannot be stored outside personal lockers."
+        "pc": "PC: 7788",
+        "lockers": "Không để đồ đạc bên ngoài tủ đồ."
       }
     }
   },
   "coaching": {
-    "title": "Coaching Management",
-    "newCoaching": "New Coaching",
-    "empty": "No coaching items found.",
-    "student": "Student",
-    "instructor": "Instructor",
-    "progress": "Progress",
-    "status": "Status",
-    "ongoing": "Ongoing",
-    "solved": "Solved",
-    "solvedBadge": "Solved",
-    "itemTitle": "Title",
-    "itemDesc": "Description",
-    "selectStudent": "Select Student",
-    "searchStudentPlaceholder": "Search name or phone...",
-    "searchSearching": "Searching...",
-    "searchNoResults": "No results found.",
-    "creating": "Creating...",
-    "updates": "Activity Logs",
-    "activityAdd": "Add Activity",
-    "addComment": "Add a comment...",
-    "uploadMedia": "Add Photo/Video",
-    "updateProgress": "Update Progress",
-    "saveUpdate": "Save Log",
-    "noUpdates": "No logs yet.",
-    "confirmStatusChange": "Thay đổi trạng thái?",
-    "reopen": "Reopen",
-    "errorSave": "Error saving update."
+    "title": "Quản lý huấn luyện",
+    "newCoaching": "Mục huấn luyện mới",
+    "empty": "Không có huấn luyện nào được ghi lại.",
+    "student": "Học viên",
+    "instructor": "Giáo viên",
+    "progress": "Tiến độ",
+    "status": "Trạng thái",
+    "ongoing": "Đang diễn ra",
+    "solved": "Đã giải quyết",
+    "solvedBadge": "Xong",
+    "itemTitle": "Tiêu đề",
+    "itemDesc": "Mô tả",
+    "selectStudent": "Chọn học viên",
+    "searchStudentPlaceholder": "Tên hoặc SĐT",
+    "searchSearching": "Đang tìm...",
+    "searchNoResults": "Không tìm thấy kết quả.",
+    "creating": "Đang lưu...",
+    "updates": "Nhật ký hoạt động",
+    "activityAdd": "Thêm hoạt động",
+    "comment": "Comment",
+    "placeholderComment": "Write a comment...",
+    "media": "Media",
+    "addComment": "Ghi chú...",
+    "uploadMedia": "Thêm truyền thông",
+    "updateProgress": "Cập nhật tiến độ",
+    "saveUpdate": "Lưu nhật ký",
+    "noUpdates": "Không có nhật ký.",
+    "confirmStatusChange": "Bạn có muốn thay đổi trạng thái không?",
+    "reopen": "Mở lại",
+    "editActivity": "Edit Activity",
+    "deleteActivity": "Delete Activity",
+    "confirmDelete": "Are you sure you want to delete this?",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "errorSave": "Lỗi khi lưu."
   }
 };

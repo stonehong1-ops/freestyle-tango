@@ -57,8 +57,9 @@ const MediaTab: React.FC<MediaTabProps> = ({ t, isAdmin, user, requireIdentity }
       if (!silent) setLoading(true);
       console.log(`[MediaTab] Fetching media for month: ${targetMonth}`);
       
-      const data = await getMedia();
-      console.log(`[MediaTab] Received all recent media: ${data.length} items`);
+      // Pass targetMonth to getMedia to enable server-side filtering
+      const data = await getMedia(undefined, undefined, undefined, targetMonth);
+      console.log(`[MediaTab] Received media for ${targetMonth}: ${data.length} items`);
       
       const generalMedia = data.filter(m => !m.relatedMilongaDate);
       console.log(`[MediaTab] Filtered general media: ${generalMedia.length} items`);
@@ -78,10 +79,14 @@ const MediaTab: React.FC<MediaTabProps> = ({ t, isAdmin, user, requireIdentity }
   };
 
   useEffect(() => {
+    console.log(`[MediaTab] targetMonth changed: ${targetMonth}`);
     fetchMedia();
     fetchClasses();
 
-    const handleMediaUpdated = () => fetchMedia(true);
+    const handleMediaUpdated = () => {
+      console.log(`[MediaTab] Media updated event received`);
+      fetchMedia(true);
+    };
     window.addEventListener('ft_media_updated', handleMediaUpdated);
     return () => window.removeEventListener('ft_media_updated', handleMediaUpdated);
   }, [targetMonth]);

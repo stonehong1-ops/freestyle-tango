@@ -1,12 +1,12 @@
 export default {
   "header": {
-    "story": "TangoStay Hikayesi",
+    "story": "TangoStay Hikayeleri",
     "location": "Konum",
-    "guide": "Detaylar & Rehber",
+    "guide": "Detaylı Rehber",
     "contact": "İletişim",
-    "login": "Register",
-    "community": "Community",
-    "join": "Join"
+    "login": "Giriş/Kayıt",
+    "community": "Topluluk",
+    "join": "Aramıza Katıl"
   },
   "nav": {
     "home": "Class",
@@ -14,350 +14,431 @@ export default {
     "stay": "Stay",
     "class": "Class",
     "info": "Info",
-    "mypage": "MyPage",
+    "mypage": "My",
     "lucy": "Milonga",
-    "chat": "Chatting",
-    "guide": "Membership",
-    "classGuide": "Class Info",
+    "chat": "Chat",
+    "guide": "Guide",
+    "classGuide": "Guide",
     "fullSchedule": "Calendar",
     "media": "Media",
     "story": "Story"
   },
   "reserve": {
-    "closed": "Reservation Closed",
-    "title": "Rezervasyon Bilgileri",
-    "nameLabel": "Ad Soyad (Rumuz)",
-    "namePlace": "Lütfen adınızı veya rumuzunuzu girin",
-    "phoneLabel": "İletişim",
-    "phonePlace": "010-0000-0000",
-    "guests": "Kişi",
-    "reqLabel": "Özel İstekler",
-    "reqPlace": "Varsa diğer soru ve taleplerinizi buraya yazabilirsiniz.",
+    "closed": "Kapalı",
+    "title": "Stay Rezervasyon Talebi",
+    "nameLabel": "Rezervasyon Yapanın Rumuzu",
+    "namePlace": "Rumuzunuzu girin",
+    "phoneLabel": "İletişim Numarası",
+    "phonePlace": "Telefon numaranızı girin",
+    "guests": "kişi",
+    "reqLabel": "Ek Notlar",
+    "reqPlace": "Varsa özel taleplerinizi girin (isteğe bağlı)",
     "submitting": "İşleniyor...",
-    "submitBtn": "Rezervasyon Yap",
-    "directBookingWarning": "Click the button below to complete. Your reservation will be cancelled if payment is not received within 1 hour.",
-    "smsTemplate": "[{stayName} Confirmation]\nName: {name}\nDate: {checkIn} ~ {checkOut}\nGuests: {guests}\nAmount: {amount} KRW\n\n[Payment]\n1. KR: KakaoBank 3333-03-7249602 (Hong Byong Seok)\n2. US: Acc 352665336763211 / Routing: 084009519 (ACH Free)\n3. International: SWIFT/BIC TRWIUS35XXX\n\n[Check-in]\nTime: 4 PM\nPassword: 9999\n\nThank you!",
-    "errorFill": "Lütfen ad, iletişim ve kişi sayısı bilgilerini doldurun.",
-    "errorFail": "Rezervasyon işlemi sırasında bir hata oluştu.",
+    "submitBtn": "Rezervasyonu Tamamla",
+    "directBookingWarning": "Aşağıdaki butona tıkladığınızda rezervasyon tamamlanacaktır.\nÖdeme 1 saat içinde yapılmazsa, ev sahibi rezervasyonu iptal edebilir.",
+    "smsTemplate": "[{stayName} Rezervasyon Onayı]\nİsim: {name}\nTarih: {checkIn} ~ {checkOut}\nKişi: {guests}\nTutar: {amount} KRW\n\n[Ödeme Rehberi]\n1. KR (Kore): KakaoBank 3333-03-7249602 (Hong Byong Seok)\n2. US (Wise): Acc 352665336763211 / Routing: 084009519 (ACH Free)\n3. Uluslararası: SWIFT/BIC TRWIUS35XXX\n\n[Giriş Rehberi]\nSaat: 16:00\nKod: 9999\n\nTeşekkürler!",
+    "errorFill": "Lütfen rumuzunuzu ve iletişim numaranızı girin.",
+    "errorFail": "Rezervasyon sırasında bir hata oluştu. Lütfen tekrar deneyin.",
     "save": "Kaydet",
     "cancel": "İptal"
   },
   "complete": {
-    "title": "Rezervasyon Alındı! 🎉",
-    "desc": "Ödeme ve giriş bilgileri kısa süre içinde iletişim numaranıza gönderilecektir.",
+    "title": "Rezervasyon Tamamlandı",
+    "desc": "Rezervasyon talebiniz gönderildi. Ödeme doğrulandıktan sonra size onay mesajı göndereceğiz.",
     "homeBtn": "Ana Sayfaya Dön",
-    "guestSmsBtn": "Rezervasyon Bilgisini Al (SMS)"
+    "guestSmsBtn": "SMS ile Danış"
   },
   "home": {
-    "studioName": "FreestyleTango",
+    "studioName": "Freestyle Tango",
     "info": {
-      "subtitle": "Freestyle Tango Membership Guide",
-      "intro": "Like a fresh rose with mother's milk\nLooking like a mix of colors\nWhite, yellow, red roses\n\nSpring where flower buds bloom\nIn the eternal time of autumn leaves\nTo everyone who sweats\nCultivating body and mind\n\nFreestyle will be\nA shelter and a guide.",
-      "highlight": "180,000 KRW for all classes!",
-      "benefitsTitle": "Membership Benefits",
+      "subtitle": "Freestyle Tango Üyelik Rehberi",
+      "intro": "",
+      "highlight": "180,000 KRW All-Pass",
+      "benefitsTitle": "Üyelik Avantajları",
       "benefits": [
-        "Monthly Membership: 180k, all classes included / Intl workshop d.c",
-        "New member 6-month discount: 20% d.c 860k",
-        "Open floor access (16h/month)",
-        "Partner class application (for existing partners)",
-        "Benefits: Instructor/Staff discount 100k d.c, free 1:1 lesson for referrals"
+        "Aylık Kart: 180k, tüm derslere katılım / Uluslararası seminer indirimleri",
+        "Yeni Üye 6 Aylık Teklif: %20 indirim (860k)",
+        "Stüdyonun serbest saatlerde kullanımı (ayda 16 saat)",
+        "Ek 2 ders için partner talep etme imkanı (sadece mevcut partnerler)",
+        "Avantajlar: Eğitmen/staff/Lucy ekibi için aylık 100k indirim, yeni üyeler/referanslar için 1 ücretsiz özel ders"
       ],
-      "cultureTitle": "Community Culture",
+      "cultureTitle": "Hedeflediğimiz Kültür",
       "cultureList": [
-        "Be nice to everyone (Happy space, Warm people)",
-        "Gender balance (aiming for 15:15)"
+        "Herkes için nazik, negatiflikten uzak bir topluluk (Mutlu Alan, Sıcak İnsanlar)",
+        "15 kişi baz alınarak dengelenmiş leader/follower oranı (çiftler halinde artış)"
       ],
-      "bankTitle": "Membership Fee Payment",
+      "bankTitle": "Ödeme Hesabı",
       "bankName": "KakaoBank 3333-14-3159646 (Hong Byong Seok)",
-      "copyBtn": "Copy Account Number",
-      "copyHint": "Please contact us with your name after payment.",
-      "contactPhone": "Phone Inquiry",
+      "copyBtn": "Hesabı Kopyala",
+      "copyHint": "Lütfen ödeme açıklamasında rumuzunuzu belirtin ve bizimle iletişime geçin.",
+      "contactPhone": "Ara",
       "contactKakao": "KakaoTalk",
       "contactWhatsapp": "WhatsApp",
-      "openChatBanner": "Join Freestyle Tango Open Chat",
-      "copySuccess": "Account number copied.",
-      "contactTitle": "Contact",
-      "contactSlogan": "Inquire about classes, facilities, and stays (24/7 inquiries welcome)",
-      "photoGallery": "Photo Gallery",
-      "facilityGallery": "Facility Guide"
+      "openChatBanner": "Freestyle Tango Açık Sohbetine Git",
+      "copySuccess": "Hesap numarası kopyalandı.",
+      "contactTitle": "Bize Ulaşın",
+      "contactSlogan": "Dersler, tesis kullanımı ve konaklama danışmanlığı (7/24)",
+      "photoGallery": "Fotoğraf Galerisi",
+      "facilityGallery": "Tesis Rehberi"
     },
     "admin": {
-      "addClass": "Add Class",
-      "addMilonga": "Add Milonga",
-      "editMilonga": "Edit Milonga",
-      "saveNotice": "Save Notice",
-      "editNotice": "Edit Notice",
-      "noticePlaceholder": "Enter notice (2-3 lines)",
-      "noticeEmpty": "No monthly notices registered. Click to add one.",
-      "saveSuccess": "Notice saved.",
-      "saveFail": "Save failed"
+      "addClass": "Ders Ekle",
+      "addMilonga": "Milonga Ekle",
+      "editMilonga": "Milongayı Düzenle",
+      "saveNotice": "Duyuruyu Kaydet",
+      "editNotice": "Duyuruyu Düzenle",
+      "noticePlaceholder": "Duyuru içeriğini girin (2-3 satır)",
+      "noticeEmpty": "Aylık duyuru yok. Eklemek için tıklayın.",
+      "saveSuccess": "Duyuru kaydedildi.",
+      "saveFail": "Kaydedilemedi"
     },
     "chat": {
-      "title": "Chat",
-      "newRoom": "+ New Room",
-      "roomPlaceholder": "Chat Room",
-      "enterName": "Enter room name:",
-      "enterType": "Enter room type (public, notice, private, support):",
-      "leaveRoom": "Leave Room",
-      "renameRoom": "Rename Room",
-      "participants": "Participants",
-      "readCount": "Read",
-      "allRead": "All Read",
-      "noActiveChats": "No active chats."
+      "title": "Sohbet",
+      "newRoom": "+ Yeni Oda",
+      "roomPlaceholder": "Sohbet Odası",
+      "enterName": "Oda adı girin:",
+      "enterType": "Tür girin (public, notice, private, support):",
+      "leaveRoom": "Odadan Ayrıl",
+      "renameRoom": "Odayı Yeniden Adlandır",
+      "participants": "Katılımcılar",
+      "readCount": "Okundu",
+      "allRead": "Hepsini Oku",
+      "noActiveChats": "Aktif sohbet yok."
     },
     "export": {
-      "imageBtn": "📸 Save Promo Image (PNG)",
-      "error": "Error generating image."
+      "imageBtn": "📸 Görseli Kaydet (PNG)",
+      "error": "Görsel oluşturulurken bir hata oluştu."
     },
     "exit": {
-      "toast": "Press back again to exit"
+      "toast": "Çıkmak için tekrar basın"
     },
     "stay": {
-      "viewMonthly": "View Monthly Status",
-      "monthlyTitle": "Monthly Reservation Status"
+      "viewMonthly": "Aylık Durumu Gör",
+      "monthlyTitle": "Genel Rezervasyon Durumu"
     },
     "registration": {
-      "title": "Class Registration",
-      "classDetail": "Class Details",
-      "fullListTitle": "Full Registration Status",
-      "addClass": "Add Class",
-      "loading": "Loading...",
-      "noClasses": "No classes registered for {month}.",
-      "cartAdded": "Class added to cart! Proceed to final registration in [MyPage].",
-      "deleteConfirm": "Are you sure you want to delete this class?",
-      "deleteSuccess": "Deleted.",
-      "deleteFail": "Delete failed: {error}",
-      "saveSuccess": "Saved.",
-      "saveFail": "Save failed: {error}",
-      "pastMonthWarning": "Cannot apply for past classes.",
-      "selected": "✅ Selected",
+      "title": "Ders Kaydı",
+      "classDetail": "Ders Detayı",
+      "fullListTitle": "Genel Kayıt Durumu",
+      "addClass": "Ders Ekle",
+      "loading": "Yükleniyor...",
+      "noClasses": "{month} ayı için kayıtlı ders yok.",
+      "cartAdded": "Kayıt eklendi. \"Hesabım\" sayfasından düzenleyebilirsiniz.",
+      "deleteConfirm": "Bu dersi silmek istiyor musunuz?",
+      "deleteSuccess": "Silindi.",
+      "deleteFail": "Hata: {error}",
+      "saveSuccess": "Kaydedildi.",
+      "saveFail": "Hata: {error}",
+      "pastMonthWarning": "Geçmiş derslere kayıt olamazsınız.",
+      "selected": "✅ Seçildi",
       "leader": "Leader",
       "follower": "Follower",
-      "teacherLabel": "Instructor:",
+      "teacherLabel": "Eğitmen:",
       "priceLabel": "KRW",
-      "datesTitle": "Class Schedule (4 weeks)",
-      "noDates": "No schedule registered.",
-      "curriculumTitle": "Curriculum Details",
-      "previewTitle": "Preview Video",
-      "introTitle": "Class Intro",
-      "currentStatus": "Current Status",
-      "waiting": "Waiting for application",
-      "adminTitle": "Applicant List (Admin)",
-      "nickname": "Nickname",
-      "phone": "Phone",
-      "status": "Status",
-      "paid": "Paid",
-      "edit": "Edit",
-      "delete": "Delete",
-      "download": "Download",
-      "addToList": "Add to List",
-      "applied": "Applied",
-      "footerNote": "You can apply for all classes at once in MyPage later.",
+      "datesTitle": "Ders Takvimi (4 hafta)",
+      "noDates": "Kayıtlı takvim yok.",
+      "curriculumTitle": "Detaylı Müfredat",
+      "previewTitle": "Önizleme Videosu",
+      "introTitle": "Ders Tanıtımı",
+      "currentStatus": "Mevcut Durum",
+      "waiting": "Beklemede",
+      "adminTitle": "Detaylı Liste (Admin)",
+      "nickname": "Rumuz",
+      "phone": "İletişim",
+      "status": "Durum",
+      "paid": "Ödendi",
+      "edit": "Düzenle",
+      "delete": "Sil",
+      "download": "İndir",
+      "addToList": "Listeye ekle",
+      "applied": "Kaydoldu",
+      "footerNote": "Tüm kayıtları \"Hesabım\" sayfasından tek seferde yapabilirsiniz",
       "dayNames": [
-        "Sun",
-        "Mon",
-        "Tue",
-        "Wed",
-        "Thu",
-        "Fri",
-        "Sat"
+        "Paz",
+        "Pzt",
+        "Sal",
+        "Çar",
+        "Per",
+        "Cum",
+        "Cmt"
       ],
       "daysFull": [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Other"
+        "Pazar",
+        "Pazartesi",
+        "Salı",
+        "Çarşamba",
+        "Perşembe",
+        "Cuma",
+        "Cumartesi",
+        "Diğer"
       ],
-      "monthLabel": "Month",
-      "dayLabel": "Day",
-      "viewFullStatus": "View Status",
-      "viewFullStatusHint": "(Only for applicants)",
-      "bittersweet": "For Milonga",
-      "fullStatusTitle": "Full Status for {month}",
-      "fullStatusSummary": "Leaders {leader} / Followers {follower}",
-      "noPermissionMessage": "Only for applicants.",
-      "role": "Role",
-      "classSelection": "Registration",
-      "noData": "No registration data."
+      "monthLabel": "Ay",
+      "dayLabel": "Gün",
+      "viewFullStatus": "Kayıt Durumu",
+      "viewFullStatusHint": "(Sadece kayıtlı olanlar)",
+      "bittersweet": "Milonga İçin",
+      "fullStatusTitle": "{month} Genel Kayıt Durumu",
+      "fullStatusSummary": "Leader {leader} / Follower {follower}",
+      "noPermissionMessage": "Bu butonu sadece kayıtlı olanlar görebilir.",
+      "role": "Rol",
+      "classSelection": "Kayıt Detayı",
+      "noData": "Veri yok."
     },
     "milonga": {
-      "bookingBtn": "🎟️ Book Milonga Table",
-      "eventTitle": "Event Info",
-      "eventSubtitle": "Make memories at Lucy",
-      "normalTable": "Table Booking",
-      "normalTableDesc": "Available for 2+ people.",
-      "event2plus1": "2+1 Event",
-      "event2plus1Desc": "One person free for every three people.",
-      "event3plus1": "3+1 Event",
-      "event3plus1Desc": "One person free for every four people.",
-      "noSchedule": "No milonga schedule registered.",
-      "checkBack": "Please check back later.",
-      "bookingStatus": "Booking Status",
-      "noReservations": "No bookings yet.",
-      "editTitle": "Edit Booking",
-      "editDesc": "You can modify your booking.",
-      "confirmPayBtn": "Request Payment Check",
-      "deleteConfirm": "Are you sure you want to delete this booking?",
-      "deleteSuccess": "Deleted.",
-      "error": "An error occurred.",
+      "bookingBtn": "🎟️ Milonga Masası Rezervasyonu",
+      "eventTitle": "Etkinlik Rehberi",
+      "eventSubtitle": "Lucy'de büyülü anlar",
+      "normalTable": "Masa Rezervasyonu",
+      "normalTableDesc": "2 kişi ve üzeri için masalar.",
+      "event2plus1": "2+1 Etkinliği",
+      "event2plus1Desc": "3 kişi gelin, 2 ödeyin.",
+      "event3plus1": "3+1 Etkinliği",
+      "event3plus1Desc": "4 kişi gelin, 3 ödeyin.",
+      "noSchedule": "Planlanmış milonga yok.",
+      "checkBack": "Daha sonra tekrar kontrol edin.",
+      "bookingStatus": "Rezervasyon Durumu",
+      "noReservations": "Rezervasyon yok.",
+      "editTitle": "Rezervasyonu Düzenle",
+      "editDesc": "Detaylarınızı değiştirebilirsiniz.",
+      "confirmPayBtn": "Ödeme Onay Talebi",
+      "deleteConfirm": "Bu rezervasyonu silmek istiyor musunuz?",
+      "deleteSuccess": "Silindi.",
+      "error": "Bir hata oluştu.",
       "options": [
-        "15k KRW per person",
-        "Event (Free)"
+        "1 kişi 15k KRW",
+        "Etkinlik (Ücretsiz)"
       ],
-      "optionPrompt": "Select an option.",
-      "cancel": "Cancel",
-      "submit": "OK",
-      "datePending": "Schedule Pending",
-      "newTitle": "New Booking",
-      "dateLabel": "Date",
-      "optionLabel": "Option",
-      "nicknamePlaceholder": "Enter nickname",
-      "phoneLabel": "Phone",
-      "requestsLabel": "Requests",
-      "requestsPlaceholder": "Additional requests (Optional)",
-      "submitting": "Processing...",
-      "saveEdit": "Save Changes",
-      "saveNew": "Book",
-      "noPoster": "Poster is being prepared."
+      "optionPrompt": "Bir seçenek belirleyin.",
+      "cancel": "İptal",
+      "submit": "Onayla",
+      "datePending": "Tarih bekleniyor",
+      "newTitle": "Yeni Rezervasyon",
+      "dateLabel": "Tarih",
+      "optionLabel": "Seçenek",
+      "nicknamePlaceholder": "Rumuzunuz",
+      "phoneLabel": "Telefon",
+      "requestsLabel": "Notlar",
+      "requestsPlaceholder": "Özel talepler (isteğe bağlı)",
+      "submitting": "İşleniyor...",
+      "saveEdit": "Düzenleme bitti",
+      "saveNew": "Rezervasyon Yap",
+      "noPoster": "Afiş mevcut değil."
     },
     "membership": {
-      "title": "Membership Guide",
-      "desc": "Check the benefits of Freestyle Tango membership.",
-      "type1": "1 Month Free Pass",
+      "title": "Üyelik Rehberi",
+      "desc": "Freestyle Tango avantajlarını keşfedin.",
+      "type1": "1 Aylık Serbest Kart",
       "type1Price": "180,000 KRW",
-      "type2": "3+1 Event",
+      "type2": "3+1 Etkinliği",
       "type2Price": "120,000 KRW",
-      "type3": "6 Months Membership",
+      "type3": "6 Aylık Üyelik",
       "type3Price": "860,000 KRW",
-      "close": "Close"
+      "close": "Kapat"
     },
     "registrationStatus": {
-      "editTitle": "Edit Registration",
-      "newTitle": "Apply for {month} Classes",
-      "cancelEdit": "Cancel Edit",
-      "desc": "Select classes to apply.",
-      "selectPrompt": "Please select a class",
-      "typeSelectorTitle": "Select Type",
-      "typeIndividual": "Individual / 1 Month",
-      "typeMembership6": "6 Months Membership",
-      "editSubmit": "Save Changes",
-      "newSubmit": "Apply"
+      "editTitle": "Kaydı Düzenle",
+      "newTitle": "{month} Dersi Kaydı",
+      "cancelEdit": "İptal",
+      "desc": "Almak istediğiniz dersleri seçin.",
+      "selectPrompt": "Bir ders seçin",
+      "typeSelectorTitle": "Kayıt Türü",
+      "typeIndividual": "Bireysel / 1 Aylık",
+      "typeMembership6": "6 Aylık",
+      "editSubmit": "Düzenle",
+      "newSubmit": "Kaydol"
     },
     "payment": {
-      "title": "Payment Options",
-      "desc": "Select the payment option matching your registration.",
-      "placeholder": "Select an option",
+      "title": "Ödeme Seçeneği Belirleyin",
+      "desc": "Lütfen kaydınıza uygun ödeme seçeneğini belirleyin.",
+      "placeholder": "Seçiniz",
       "options": [
-        "Individual",
-        "1 Month",
-        "6 Months (1st)",
-        "6 Months (2nd)",
-        "6 Months (3rd)",
-        "6 Months (4th)",
-        "6 Months (5th)",
-        "6 Months (6th)"
+        "Bireysel",
+        "1 Aylık",
+        "6 Aylık (1. ödeme)",
+        "6 Aylık (2. ödeme)",
+        "6 Aylık (3. ödeme)",
+        "6 Aylık (4. ödeme)",
+        "6 Aylık (5. ödeme)",
+        "6 Aylık (6. ödeme)"
       ],
-      "optionPrompt": "Please select a payment option.",
-      "cancel": "Cancel",
-      "submit": "Confirm"
+      "optionPrompt": "Ödeme seçeneğini belirleyin.",
+      "cancel": "İptal",
+      "submit": "Tamamla"
     },
     "history": {
-      "title": "My History",
-      "loading": "Loading...",
-      "empty": "No history found.",
-      "appliedLabel": "Registered for {month}",
-      "statusPaid": "Paid",
-      "statusWaiting": "Waiting for Payment",
-      "appliedDate": "Applied: {date}",
-      "paidMsg": "{type} / {amount} KRW Paid",
-      "paidDate": "Confirmed: {date}",
-      "confirmPayBtn": "Request Payment Check",
-      "edit": "Edit",
-      "delete": "Delete",
-      "deleteConfirm": "Are you sure you want to delete this history?",
-      "alreadyRegistered": "Already registered. Please use edit function.",
-      "deleteSuccess": "Deleted.",
-      "confirmSuccess": "Completed.",
-      "error": "An error occurred."
+      "title": "Kayıtlarım",
+      "loading": "Yükleniyor...",
+      "empty": "Kayıt bulunamadı.",
+      "appliedLabel": "{month} Kayıtları",
+      "statusPaid": "Ödeme Onaylandı",
+      "statusWaiting": "Ödeme Bekleniyor",
+      "appliedDate": "Tarih: {date}",
+      "paidMsg": "{type} / {amount} KRW Ödendi",
+      "paidDate": "Onay Tarihi: {date}",
+      "confirmPayBtn": "Ödeme Onayı İste",
+      "edit": "Düzenle",
+      "delete": "Sil",
+      "deleteConfirm": "Bu kaydı silmek istiyor musunuz?",
+      "alreadyRegistered": "Zaten kayıtlı. Düzenle fonksiyonunu kullanın.",
+      "deleteSuccess": "Silindi.",
+      "confirmSuccess": "Tamamlandı.",
+      "error": "Hata."
     },
     "success": {
-      "welcome": "Thank you for applying.",
-      "completed": "Please transfer to the account below and click 'Request Payment Check' in MyPage.",
-      "info": "For other inquiries, contact us via the channels below.",
-      "bankLabel": "Account",
+      "welcome": "Kaydolduğunuz için teşekkürler.",
+      "completed": "Aşağıdaki hesaba ödemeyi yapın ve Hesabım sayfasından \"Ödeme Onayı İste\" butonuna tıklayın.",
+      "info": "Sorularınız için bizimle iletişime geçin.",
+      "bankLabel": "Banka hesabı",
       "bankNumber": "KakaoBank 3333-14-3159646 (Hong Byong Seok)",
-      "copyBtn": "Copy",
-      "copySuccess": "Copied.",
-      "done": "OK"
+      "copyBtn": "Kopyala",
+      "copySuccess": "Kopyalandı.",
+      "done": "Onayla"
     }
   },
   "mypage": {
-    "title": "Sayfam",
-    "loginPrompt": "Login required.",
-    "loginBtn": "Login",
-    "logoutBtn": "Logout",
-    "membership": "Üyelik Bilgileri",
+    "title": "Hesabım",
+    "loginPrompt": "Giriş yapmanız gerekiyor.",
+    "loginBtn": "Giriş Yap",
+    "logoutBtn": "Çıkış Yap",
+    "membership": "Üyelik Rehberi",
     "profile": {
-      "nickname": "Nickname",
-      "phone": "Phone",
-      "role": "Role"
+      "nickname": "Rumuz",
+      "phone": "İletişim",
+      "role": "Rol"
     },
     "tabs": {
-      "registration": "Apr. News/Apply",
-      "history": "History",
-      "wallet": "Wallet & Coupons",
-      "coaching": "Coaching",
-      "profile": "My Info",
+      "registration": "{month} Kaydı",
+      "history": "Durum",
+      "wallet": "Cüzdan",
+      "coaching": "Koçluk",
+      "profile": "Profil",
       "admin": "Admin"
     },
-    "walletDesc": "List of your active coupons.",
+    "alerts": {
+      "registration_failed": "Bildirim kaydı hatası.\nDetay: {detail}",
+      "permission_denied": "Bildirim izni reddedildi. Tarayıcı ayarlarından izin verin.",
+      "update_error": "Güncelleme hatası: {detail}",
+      "confirm_logout": "Çıkış yapmak istiyor musunuz?",
+      "only_for_active_users": "Sadece bu ay aktif olan üyeler için.",
+      "wait_7_days": "İki kupon arasında 7 gün beklemelisiniz.",
+      "already_issued": "Kupon zaten alındı.",
+      "sold_out": "Hepsi tükendi ({total}).",
+      "confirm_issue": "Bu kuponu almak istiyor musunuz?",
+      "issue_success": "Kupon verildi.",
+      "issue_failed": "Hata: {message}",
+      "confirm_cancel": "Kuponu iade etmek istiyor musunuz?",
+      "cancel_success": "Kupon başarıyla iade edildi.",
+      "cancel_failed": "Hata: {message}",
+      "general_error": "Bir hata oluştu. Tekrar deneyin.",
+      "expired_coupon": "Kuponun süresi dolmuş.",
+      "confirm_use": "Kuponu kullanmak istiyor musunuz?",
+      "only_self": "Sadece kendi sayfanızı görebilirsiniz."
+    },
+    "payment": {
+      "status_paid": "Ödendi",
+      "status_pending": "Onay Bekliyor",
+      "history_title": "{month} Kaydı",
+      "date_label": "Tarih",
+      "no_history": "Geçmiş yok."
+    },
+    "notices": {
+      "title": "📢 Kupon Rehberi",
+      "list": [
+        "Ödeme onayından sonra kuponlarınızı alabilirsiniz.",
+        "Alınan kuponlar iade edilebilir.",
+        "Son kullanma tarihini kontrol edin.",
+        "Kullanmadan hemen önce \"Kullan\" butonuna tıklayın."
+      ],
+      "no_coupons": "Kupon yok."
+    },
+    "labels": {
+      "get_coupon": "Kuponu Al",
+      "used": "Kullanıldı",
+      "expired": "Süresi Doldu",
+      "use_now": "Şimdi Kullan",
+      "issued": "Verildi",
+      "free": "Ücretsiz",
+      "ticket": "Bilet",
+      "off": "İndirim",
+      "won_off": "KRW İndirim",
+      "ten_thousand_off": "10k KRW İndirim",
+      "status_available": "Alınabilir",
+      "status_can_use": "Kullanılabilir",
+      "duration_limited": "Verildikten sonra {duration} ay geçerli",
+      "duration_unlimited": "Süresiz",
+      "count_unit": "kişi",
+      "role_leader": "Leader",
+      "role_follower": "Follower",
+      "phone": "Telefon",
+      "push_notif": "Anlık Bildirim",
+      "edit_profile": "Profili Düzenle"
+    },
+    "admin_menu": {
+      "member": {
+        "title": "Üye Yönetimi",
+        "desc": "Üye listesini ve bilgilerini yönetin"
+      },
+      "coaching": {
+        "title": "Koçluk Yönetimi",
+        "desc": "Genel koçluk durumunu takip edin"
+      },
+      "checklist": {
+        "title": "Stay Kontrol Listesi",
+        "desc": "Rezervasyon planı ve kontrol listesi"
+      },
+      "sms": {
+        "title": "Stay SMS Ayarları",
+        "desc": "Rezervasyon ve rehber mesajları"
+      },
+      "coupon": {
+        "title": "Kupon Yönetimi",
+        "desc": "Kupon basımı ve durumu"
+      }
+    },
+    "walletDesc": "Sahip olduğunuz kuponlar.",
     "wallet": {
-      "title": "My Wallet & Coupons",
-      "noCoupons": "No coupons found.",
-      "useCoupon": "Use Now",
-      "usedCoupon": "Used",
+      "title": "Cüzdanım & Kuponlarım",
+      "noCoupons": "Kuponunuz yok.",
+      "useCoupon": "Şimdi kullan",
+      "usedCoupon": "Kullanıldı",
       "membershipCoupon": {
-        "title": "1-Month Membership 5% Discount",
-        "desc": "5% discount for 3rd-week class application (10,000 KRW off)",
-        "target": "For Membership Members"
+        "title": "Aylık Üyelik Kuponu",
+        "desc": "Ders kayıtlarında kullanılabilir",
+        "target": "Üyeler için"
       },
       "milongaCoupon": {
-        "title": "Milonga Luci 1-Time Free Pass",
-        "desc": "1-time free entry coupon for class registrants",
-        "target": "For Class Registrants"
+        "title": "Milonga Lucy 1 Girişlik Bilet",
+        "desc": "Ders kayıtlarına özel 1 ücretsiz milonga",
+        "target": "Kaydolanlar için"
       },
-      "usageConfirm": "Would you like to use this coupon?\nUsed coupons cannot be restored.",
-      "usageSuccess": "Coupon successfully used."
+      "usageConfirm": "Kullanmak istiyor musunuz?\nBu işlem geri alınamaz.",
+      "usageSuccess": "Kupon kullanıldı."
     }
   },
   "admin": {
     "member": {
-      "searchPlaceholder": "Search nickname or number",
-      "searchBtn": "Search",
-      "engagement": "Engagement",
-      "joinDate": "Join Date",
-      "recentVisit": "Recent Visit",
-      "loading": "Loading data...",
-      "noResults": "No members found.",
-      "instructor": "Instructor",
-      "pushStatus": "Notifications",
-      "lastRegMonth": "Last Applied",
-      "topPercent": "Top {percent}%",
-      "grantInstructor": "Grant Instructor",
-      "revokeInstructor": "Revoke Instructor",
+      "searchPlaceholder": "Rumuz veya numara",
+      "searchBtn": "Ara",
+      "engagement": "Aktivite",
+      "joinDate": "Katılım",
+      "recentVisit": "Son ziyaret",
+      "loading": "Yükleniyor...",
+      "noResults": "Bulunamadı.",
+      "instructor": "Eğitmen",
+      "pushStatus": "Bildirimler",
+      "lastRegMonth": "Son kayıt ayı",
+      "topPercent": "İlk %{percent}",
+      "grantInstructor": "Eğitmen Yetkisi Ver",
+      "revokeInstructor": "Yetkiyi Kaldır",
       "leader": "Leader",
       "follower": "Follower",
-      "errorToggle": "Error changing permissions."
+      "errorToggle": "Yetki değiştirilemedi."
     }
   },
   "info": {
     "tabs": {
-      "location": "Location",
-      "membership": "Membership",
+      "location": "Konum",
+      "membership": "Üyelik",
       "story": "Story"
     }
   },
@@ -369,451 +450,560 @@ export default {
     "Thu": "Per",
     "Fri": "Cum",
     "Sat": "Cmt",
-    "blockedAlert": "[Dolu]\nMisafir:",
-    "period": "Dönem:",
-    "invalidRange": "Seçilen tarih aralığında zaten rezerve edilmiş günler var. Lütfen tekrar deneyin.",
-    "viewList": "Listeyi Görüntüle",
+    "blockedAlert": "Bu tarih dolu.",
+    "period": "Admin Dönemi:",
+    "invalidRange": "Geçersiz aralık.",
+    "viewList": "Genel tabloyu gör",
     "available": "Uygun",
     "booked": "Dolu",
-    "selected": "Seçildi",
-    "days": "Gece",
+    "selected": "Seçili",
+    "days": "gece",
     "won": "KRW",
-    "hintSelectOut": "Lütfen bir çıkış tarihi seçin!",
-    "hintSelectDates": "Kesin tutarı hesaplamak için takvimden tarih seçin.",
-    "finalPriceTitle": "Toplam Ödeme Tutarı",
-    "baseFee": "Temel Gecelik Ücret",
-    "guestFee": "Ekstra Kişi Ücreti",
-    "weekendFee": "Hafta Sonu ve Tatil Farkı",
+    "hintSelectOut": "Çıkış tarihini seçin.",
+    "hintSelectDates": "Giriş/Çıkış tarihlerini seçin.",
+    "finalPriceTitle": "Toplam Tutar",
+    "baseFee": "Oda Ücreti",
+    "guestFee": "Ek Kişi Ücreti",
+    "weekendFee": "Hafta Sonu Farkı",
     "cleaningFee": "Temizlik Ücreti",
     "longStayDiscount": "Uzun Süreli Konaklama İndirimi",
-    "proceedBtn": "Rezervasyona Devam Et",
-    "stay": "Konaklama",
+    "proceedBtn": "Rezervasyon Yap",
+    "stay": "Stay",
     "guestSelectLabel": "Kişi Sayısı",
     "guestOptions": [
-      "1 Kişi (Temel)",
-      "2 Kişi (+10k/gece)",
-      "3 Kişi (+20k/gece)",
-      "4 Kişi (Maks, +30k/gece)"
+      "1 Kişi",
+      "2 Kişi",
+      "3 Kişi",
+      "4 Kişi"
     ],
     "checkin": "Giriş",
     "checkout": "Çıkış",
-    "clearBtn": "Tarihleri Temizle",
-    "feeGuideTitle": "Ücret Bilgilendirmesi"
+    "clearBtn": "Temizle",
+    "feeGuideTitle": "Fiyat Rehberi",
+    "reserveBtn": "Rezervasyon Yap"
   },
   "location": {
-    "naver": "Naver Map'te Aç",
-    "kakao": "Kakao Map'te Aç"
+    "naver": "Naver Harita",
+    "kakao": "Kakao Harita"
   },
   "stays": {
-    "viewMonthlyStatus": "View Monthly Status",
-    "monthlyStatusTitle": "Monthly Reservation Status",
+    "viewMonthlyStatus": "Aylık Durumu Gör",
+    "monthlyStatusTitle": "Genel Rezervasyon Durumu",
     "hapjeong": {
       "name": "Hapjeong",
       "hero": {
-        "subtitle": "Hapjeong İstasyonu'na 1 dk mesafede, Hangang Parkı yürüme mesafesinde, sessiz ve huzurlu konaklama yeriniz"
+        "subtitle": "Han Nehri manzaralı sanatsal bir dinlenme alanı"
       },
       "location": {
-        "title": "Konum",
-        "addressLabel": "Adres:",
-        "address": "13 Yanghwa-ro, Mapo-gu, Seul",
-        "bldgLabel": "Bina:",
+        "title": "Konum Rehberi",
+        "addressLabel": "Adres",
+        "address": "Yanghwa-ro 13, Mapo-gu, Seul",
+        "bldgLabel": "Bina",
         "bldg": "Hapjeong Square Riverview"
       },
       "guide": {
-        "title": "Detaylar & Rehber",
-        "subtitle": "\"Hazırlıksız günlük hayatınıza başlayabilmeniz için her şeyi donattık\"",
+        "title": "Hapjeong Şubesi Rehberi",
+        "subtitle": "Seul'ün kalbinde sanatsal bir mola",
         "highlights": {
-          "title": "✨ Odanın Önemli Özellikleri",
+          "title": "Özellikler",
           "list": [
             {
-              "t": "Panoramik Manzaralı Yeni Yapı Kalitesi",
-              "d": "Hapjeong/Hongdae bölgesindeki en yeni ve en temiz stüdyo daireden olağanüstü Han Nehri manzarasının tadını çıkarın."
+              "t": "Konum",
+              "d": "Hapjeong istasyonuna 1 dk yürüme mesafesi"
             },
             {
-              "t": "Tavizsiz Temizlik",
-              "d": "Yatak takımları ve halılar her seferinde Laundrygo tarafından profesyonelce yıkanır. İç mekan buharlı temizliği yapılır ve tüm havlu/mutfak bezleri %100 yenileriyle değiştirilir."
+              "t": "Manzara",
+              "d": "Han Nehri'ne özel manzara"
             },
             {
-              "t": "Premium Dinlenme Mobilyaları",
-              "d": "İki geniş yatak (Queen, Super Single), rahat kanepe ve yüksek performanslı yatırılabilir masaj koltuğu."
-            },
-            {
-              "t": "Zengin Eğlence",
-              "d": "Oturma odasında 2026 Samsung Moving Style Smart TV ve yatak odasında ek bir TV bulunmaktadır."
+              "t": "Atmosfer",
+              "d": "Sanatçıların sevdiği iç tasarım"
             }
           ],
-          "quote": "\"Han Nehri gece manzarasını seyrederken masaj koltuğunun keyfini çıkarın~\""
+          "quote": "Tangonun günlük yaşamla buluştuğu özel bir alan."
         },
         "transport": {
-          "title": "📍 Elverişli Konum & Ulaşım (Ücretsiz Otopark)",
+          "title": "Ulaşım",
           "list": [
             {
-              "t": "Çok Merkezi Konum",
-              "d": "Hapjeong İstasyonu'na 1 dk yürüme mesafesinde. Hongdae/Sinchon'a yürüme/metro/otobüs ile hızlı erişim (Hongdae'ye 10 dk yürüme mesafesi)."
+              "t": "Metro",
+              "d": "Hat 2/6, Hapjeong Durağı 7 nolu çıkış"
             },
             {
-              "t": "Ulaşım Merkezi",
-              "d": "Seul genelinde hareket eden tüm otobüslerin kesişim noktası. (Mangwon İstasyonu, Hongdae İstasyonu hepsi bitişik)"
-            },
-            {
-              "t": "Rahat Otopark",
-              "d": "Arabanızı getirin ve ücretsiz park edin. (30,000 KRW'lik aylık ücreti ev sahibi karşılar)"
-            },
-            {
-              "t": "Sürüş & Taksi",
-              "d": "Gangnam, Ilsan, Yeouido yönündeki Gangbyeon otoyoluna girmek sadece 1 dakika sürer."
+              "t": "Otobüs",
+              "d": "Hapjeong durağına 1 dk yürüme mesafesi"
             }
           ]
         },
         "facilities": {
-          "title": " Couch Olanaklar & Tesisler (Ücretsiz Sarf Malzemeleri)",
-          "base": "Temel Beyaz Eşya/Mobilya",
-          "baseDesc": "Buzdolabı, Çamaşır Makinesi, Klima, Smart TV (2 adet), Giga Wi-Fi, Lavabo, İndüksiyon ocak, Queen & Super Single yataklar",
-          "add": "Ek Tesisler",
-          "addDesc": "Güvenli Kapı Kilidi, CCTV/Yönetim Ofisi, Yemek Masası, Su Arıtma Cihazı, Kanepe, Geniş Çalışma Masası, Geniş Gardırop, Ayakkabılık",
-          "freeTitle": "✨ Tüm Sarf Malzemeleri Ücretsiz Sağlanır!!!",
-          "freeDesc": "Ramen, hazır pirinç, tuvalet kağıdı, kağınde mendil, diş fırçası/macunu setleri, şampuan/saç kremi, vücut şampuanı, el sabunu sağlanır.\nÇamaşır askısını, deterjanı, yumuşatıcıyı ve çöp/geri dönüşüm torbalarını özgürce ücretsiz kullanın!"
+          "title": "Tesisler",
+          "base": "Temel",
+          "baseDesc": "Queen yatak, Klima, Wi-Fi",
+          "add": "Mutfak/Ev Gereçleri",
+          "addDesc": "Buzdolabı, Ocak, Çamaşır makinesi",
+          "freeTitle": "Ücretsiz Sunulanlar",
+          "freeDesc": "Su, Havlu, Şampuan/Sabun, Saç kurutma makinesi"
         },
         "attractions": {
-          "title": "🛍️ Mahalle Yaşamı & Gezilecek Yerler",
+          "title": "Yakınlardaki Yerler",
           "list": [
             {
-              "t": "Hapjeong / Hongdae Bölgesi",
-              "d": "Hapjeong'daki en iyi restoran ve kafelerin ve Hongdae'nin canlı sokaklarının bitişiğinde."
+              "t": "Alışveriş",
+              "d": "Mecenatpolis, Delight Square yakın"
             },
             {
-              "t": "Elverişli Süpermarketler",
-              "d": "Hızlı alışverişler için Wang Mart 1 dk mesafededir. Diğer her şey için Homeplus Mega Mart 5 dk yürüme mesafesindedir."
-            },
-            {
-              "t": "İstediğiniz Zaman Han Nehri'ne Kaçın",
-              "d": "Hangang Parkı girişine 1 dk yürüme mesafesi. Mangwon Hangang Parkı ile doğrudan bağlantılı."
+              "t": "Kültür",
+              "d": "Hapjeong-dong, Mangwon-dong yakın"
             }
           ]
         }
       },
       "calendar": {
-        "title": "Rezervasyon Durumu",
-        "feeGuideTitle": "Price List",
+        "title": "Hapjeong Durumu",
+        "feeGuideTitle": "Ücret Rehberi",
         "feeGuideLines": [
-          "Gecelik 80,000 KRW (1 Kişi)",
-          "Her ek misafir için +10,000 KRW (Maks 4)",
-          "Hafta sonları ve tatillerde +10,000 KRW",
-          "30,000 KRW temizlik ücreti",
-          "7+ gece konaklamalar için 20,000 KRW indirim"
+          "Gecelik 80,000 KRW",
+          "Ek kişi 10,000 KRW (Max 4)",
+          "Hafta sonu/Resmi tatil farkı +10,000 KRW",
+          "Uzun konaklamalarda indirim",
+          "Temizlik ücreti 30,000 KRW"
         ]
       },
       "gallery": {
-        "more": "Daha fazla fotoğraf gör",
+        "more": "Daha fazla fotoğraf",
         "categories": [
           "Hepsi",
-          "Oturma Odası",
+          "Salon",
           "Yatak Odası",
           "Mutfak",
           "Banyo",
           "Manzara"
         ],
         "descriptions": [
-          "Oturma odası, Çalışma masası (Makyaj masası), 2 kişilik yemek masası",
-          "Yüksek tavanlı premium stüdyo daire",
-          "Dinlenme ve yemek için mükemmel düzen",
-          "2026 Samsung Smart TV M7 / Çalışma & Makyaj Masası",
-          "Ücretsiz Premium TV & OTT kanalları (Kişisel giriş yapılabilir)",
-          "Kakao Park Akıllı Hoparlör",
-          "IKEA Premium Yatak Takımı (Queen Boy)",
-          "Yatak odası TV'si",
-          "Yatırılabilir Masaj Koltuğu (Yüksek Performans)",
-          "IKEA yatak takımlı Ace Tek Kişilik Yatak",
-          "3 misafir kapasiteli (oturma odası kanepesi kullanılabilir)",
-          "Su arıtma cihazı, pişirme kapları, baharatlar, tek kullanımlık malzemeler tam donanımlı",
-          "Samsung Buzdolabı & Çamaşır Makinesi",
-          "Ayrı lavabo, tuvalet ve duş odası",
-          "Şampuan, saç kremi, vücut şampuanı sağlanır",
-          "Bide mevcuttur",
-          "Han Nehri manzarası & serin nehir esintisi",
-          "Hangang Parkı'na 1 dakika mesafe",
-          "Han Nehri ve şehir manzarası"
+          "Hapjeong salon genel görünüm",
+          "Rahat koltuk ve masa",
+          "Şık iç mekan",
+          "Aydınlatma",
+          "Doğal ışık",
+          "Geniş yaşam alanı",
+          "Yatak odası",
+          "Konforlu yatak takımı",
+          "Huzurlu uyku alanı",
+          "Yatak odası genel",
+          "Dolap ve saklama alanı",
+          "Donanımlı mutfak",
+          "Düzenli mutfak alanı",
+          "Temiz banyo",
+          "Banyo ürünleri",
+          "Duş alanı",
+          "Han Nehri manzarası",
+          "Harika gece manzarası",
+          "Manzaralı ferah alan"
         ]
       }
     },
     "deokeun": {
-      "name": "Deokeun",
+      "name": "Deokeun (Sangam)",
       "hero": {
-        "subtitle": "Yakında"
+        "subtitle": "Modern tesisler ve huzurlu bir dinlenme alanı"
       },
       "location": {
-        "title": "",
-        "addressLabel": "",
-        "address": "",
-        "bldgLabel": "",
-        "bldg": ""
+        "title": "Location",
+        "addressLabel": "Address",
+        "address": "Jeil-ro 110, Goyang-si",
+        "bldgLabel": "Building",
+        "bldg": "Hillstate Eco Deokeun"
       },
       "guide": {
-        "title": "",
-        "subtitle": "",
+        "title": "Deokeun Şubesi Rehberi",
+        "subtitle": "Sessiz ve konforlu bir oda",
         "highlights": {
-          "title": "",
-          "list": [],
-          "quote": ""
+          "title": "Özellikler",
+          "list": [
+            {
+              "t": "Yeni",
+              "d": "Yeni binada konforlu alan"
+            },
+            {
+              "t": "Sessiz",
+              "d": "Şehir gürültüsünden uzak"
+            },
+            {
+              "t": "Donanım",
+              "d": "Modern ev aletleri"
+            }
+          ],
+          "quote": "Derin bir dinlenme arayanlar için en iyi seçim."
         },
         "transport": {
-          "title": "",
-          "list": []
+          "title": "Ulaşım",
+          "list": [
+            {
+              "t": "Araç",
+              "d": "Sangam-dong'a 5 dk"
+            },
+            {
+              "t": "Otobüs",
+              "d": "Deokeun durağına 3 dk yürüme"
+            }
+          ]
         },
         "facilities": {
-          "title": "",
-          "base": "",
-          "baseDesc": "",
-          "add": "",
-          "addDesc": "",
-          "freeTitle": "",
-          "freeDesc": ""
+          "title": "Dotanımlar",
+          "base": "Temel",
+          "baseDesc": "Konforlu yatak, Klima/Isıtma, Smart TV",
+          "add": "Mutfak",
+          "addDesc": "Mikrodalga, Ekmek kızartma makinesi",
+          "freeTitle": "Ücretsizler",
+          "freeDesc": "Kahve kapsülleri, Su, Hijyen ürünleri"
         },
         "attractions": {
-          "title": "",
-          "list": []
+          "title": "Doğa",
+          "list": [
+            {
+              "t": "Doğa",
+              "d": "Noeul & Haneul Parkı yakın"
+            },
+            {
+              "t": "İş",
+              "d": "Sangam DMC yakınlığı"
+            }
+          ]
         }
       },
       "calendar": {
-        "title": "",
+        "title": "Deokeun Durumu",
         "feeGuideTitle": "Price List",
-        "feeGuideLines": []
+        "feeGuideLines": [
+          "Gecelik 60,000 KRW",
+          "Ek kişi 10,000 KRW",
+          "Hafta sonu farkı +10,000 KRW",
+          "Temizlik ücreti 30,000 KRW"
+        ]
       },
       "gallery": {
-        "more": "",
-        "categories": [],
-        "descriptions": []
+        "more": "Fotoğraflar",
+        "categories": [
+          "Hepsi",
+          "Salon",
+          "Yatak Odası",
+          "Mutfak",
+          "Banyo",
+          "Manzara"
+        ],
+        "descriptions": [
+          "Deokeun genel görünüm",
+          "Yatak odası alanı",
+          "Giriş",
+          "Çalışma masası",
+          "Konforlu iç mekan",
+          "Smart TV",
+          "Geniş dolap",
+          "Hava temizleme cihazı",
+          "Temiz mutfak",
+          "Mutfak gereçleri",
+          "Yemek takımı",
+          "Kahve servisi",
+          "Atıştırmalık servisi",
+          "Banyo ürünleri",
+          "Modern bide",
+          "Duş alanı genel",
+          "İlk yardım kiti",
+          "Spor salonu",
+          "Teras alanı"
+        ]
       }
     },
     "hongdae": {
       "name": "Hongdae",
       "hero": {
-        "subtitle": "Yakında"
+        "subtitle": "Gençlik ve sanatın kalbi Hongdae'de mola"
       },
       "location": {
-        "title": "",
-        "addressLabel": "",
-        "address": "",
-        "bldgLabel": "",
-        "bldg": ""
+        "title": "Location",
+        "addressLabel": "Address",
+        "address": "Seogyo-dong, Mapo-gu, Seul",
+        "bldgLabel": "Building",
+        "bldg": "Stay Hongdae"
       },
       "guide": {
-        "title": "",
-        "subtitle": "",
+        "title": "Detaylı Bilgi & Rehber",
+        "subtitle": "\"Her şey hazır, sadece siz gelin\"",
         "highlights": {
-          "title": "",
-          "list": [],
-          "quote": ""
+          "title": "✨ Stay Detayları",
+          "list": [
+            {
+              "t": "Hongdae Merkez",
+              "d": "Hongdae kültürünü yaşamak için en iyi konum."
+            },
+            {
+              "t": "Kusursuz Temizlik",
+              "d": "Nevresimler her seferinde profesyonelce yıkanır."
+            },
+            {
+              "t": "Lüks Mobilyalar",
+              "d": "2 Queen/Super Single yatak ve masaj koltuğu."
+            },
+            {
+              "t": "Eğlence",
+              "d": "2026 model Samsung MovingStyle Smart TV."
+            }
+          ],
+          "quote": "Hongdae'nin enerjisinden sonra gerçek dinlenme."
         },
         "transport": {
-          "title": "",
-          "list": []
+          "title": "📍 Konum & Ulaşım",
+          "list": [
+            {
+              "t": "İstasyon Yakınlığı",
+              "d": "Hat 2, AREX, Gyeongui."
+            },
+            {
+              "t": "Bol Otobüs Hattı",
+              "d": "Seul geneli ve havaalanına ulaşım."
+            },
+            {
+              "t": "Yürüme Mesafesi",
+              "d": "Hongdae, Hapjeong, Yeonnam-dong yürüme mesafesinde."
+            }
+          ]
         },
         "facilities": {
-          "title": "",
-          "base": "",
-          "baseDesc": "",
-          "add": "",
-          "addDesc": "",
-          "freeTitle": "",
-          "freeDesc": ""
+          "title": "Donanımlar & Ücretsizler",
+          "base": "Beyaz Eşya/Mobilya",
+          "baseDesc": "Buzdolabı, Çamaşır makinesi, AC, 2 Smart TV, Queen Yatak",
+          "add": "Ekstralar",
+          "addDesc": "Güvenlik CCTV, Masa, Su arıtma cihazı, Koltuk",
+          "freeTitle": "✨ Tüm Sarf Malzemeleri Ücretsiz!",
+          "freeDesc": "Ramen, Hazır pirinç, Havlu, Diş fırçası seti... her şey hazır.\nDeterjan, yumuşatıcı ve çöp poşeti ücretsiz."
         },
         "attractions": {
-          "title": "",
-          "list": []
+          "title": "🛍️ Çevrede Neler Var?",
+          "list": [
+            {
+              "t": "Yürüyüş Yolu",
+              "d": "Sokak gösterileri ve dükkanlar."
+            },
+            {
+              "t": "Yeonnam Parkı",
+              "d": "Piknik ve yürüyüş için ideal."
+            },
+            {
+              "t": "Gurme Durakları",
+              "d": "Yüzlerce ünlü restoran ve kafe."
+            }
+          ]
         }
       },
       "calendar": {
-        "title": "",
+        "title": "Hongdae Durumu",
         "feeGuideTitle": "Price List",
-        "feeGuideLines": []
+        "feeGuideLines": [
+          "Gecelik 80,000 KRW",
+          "Açılışa özel indirimli fiyat"
+        ]
       },
       "gallery": {
-        "more": "",
-        "categories": [],
-        "descriptions": []
+        "more": "View More",
+        "categories": [
+          "All",
+          "Living",
+          "Bedroom",
+          "Kitchen",
+          "Bath",
+          "View"
+        ],
+        "descriptions": [
+          "Galeri hazırlanıyor...",
+          "Konforlu alan tasarımı",
+          "Şık iç mekan"
+        ]
       }
     }
   },
   "common": {
-    "save": "Save",
-    "cancel": "Cancel",
-    "loading": "Loading...",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "loading": "Yükleniyor...",
     "contact": {
-      "title": "İletişim",
-      "desc": "Sorularınız olursa lütfen istediğiniz zaman ulaşın.",
-      "call": "Ara",
-      "callDesc": "010-7209-2468 (Stone)",
+      "title": "Danışma",
+      "desc": "Her zaman bize ulaşın.",
+      "call": "Arama",
+      "callDesc": "Direct Call",
       "sms": "SMS",
-      "smsDesc": "Hızlı yanıt garantisi",
-      "kakao": "Kakao Chat",
-      "kakaoDesc": "ID: stonehong@kakao.com",
+      "smsDesc": "Inquire via SMS",
+      "kakao": "KakaoTalk",
+      "kakaoDesc": "KakaoTalk Channel",
       "whatsapp": "WhatsApp",
-      "whatsappDesc": "Global Misafirler İçin",
-      "fb": "FB Messenger",
-      "fbDesc": "Facebook Mesajı"
+      "whatsappDesc": "WhatsApp Inquiry",
+      "fb": "Messenger",
+      "fbDesc": "Facebook Message"
     },
     "hostGuide": {
-      "title": "🛡️ Oda Kuralları & Ev Sahibi ile İletişim",
+      "title": "Ev Sahibi Hakkında",
       "list": [
         {
-          "t": "🔓 Giriş / Çıkış (Esnek)",
-          "d": "Temassız giriş. Şifre ve oda bilgileri giriş günü mesajla gönderilir.\nStandart: Giriş 15:00 / Çıkış 11:00 (Konforunuz için ayarlanabilir!)"
+          "t": "Ev Sahibi",
+          "d": "Stone Hong"
         },
         {
-          "t": "🏠 Kesin Kurallar",
-          "d": "Tüm binada KESİNLİKLE SİGARA İÇİLMEZ. İhlaller durumunda özel temizlik ücreti uygulanır.\nLütfen çıkış yapmadan önce çöpleri ayırın ve bulaşıkları yıkayın.\nYeni inşa edilmiş bir stüdyo olduğu için lütfen 22:00'den sonra yüksek sesten kaçının."
-        },
-        {
-          "t": "🤩 7/24 Ev Sahibi İletişimi",
-          "d": "Sabahın erken saatlerinde bile bana her zaman ulaşabilirsiniz! Rahatsız hissederseniz mesaj atmaktan çekinmeyin.\nKonaklamanız sırasında temel bir ihtiyacınız eksikse bana bildirin. Aynı gün satın alıp teslim edeceğim."
+          "t": "Profil",
+          "d": "Tango Eğitmeni / Stay Hostu.\nSanatsal bir alanda tango yolculuğunuzu destekliyoruz."
         }
       ]
     },
     "story": {
-      "title": "TangoStay Hikayesi",
-      "subtitle": "\"Sadece kendinizi getirin\"... TangoStay'in [Issız Ada Deneyi]'ni tanıtıyoruz.",
-      "p1": "Bir ev sahibi olarak bu alanı oluştururken tek hedefim \"Issız Ada Deneyi\" idi. Tek bir valizle girip dışarı hiç çıkmadan bir haftadan fazla süre boyunca mükemmel konforda yaşayabileceğiniz bir alan. Bu alanı, bir misafir olarak yaşadığım sayısız zorluğu tamamen çözmek için tasarladım.",
-      "sol1Title": "Konaklama Paketi: SIFIR rahatsızlık, Hoş geldin hediye boxı",
-      "sol1Text": "Artık başkasının kullandığı havlu veya sabun konusunda endişelenmeyin. Her misafirimize yepyeni havlular, mutfak bezleri, sabun ve diş fırçası setleri sağlıyoruz - otel konforunda, hepsi yepyeni. İlk gününüzde markete koşmanıza gerek yok.",
-      "sol2Title": "Artık Su Derdi Yok! Premium Su Arıtma Cihazı",
-      "sol2Text": "Ağır su şişelerini taşımaktan kendinizi kurtarın. Her an sınırsız temiz, serin su sağlayan son teknoloji bir su arıtma cihazı kurulmuştur.",
-      "sol3Title": "Tavizsiz Temizlik (Profesyonel Laundrygo Hizmeti)",
-      "sol3Text": "Tüm yatak takımları (yorgan, nevresim, çarşaf, yastık kılıfları) ve halılar ikişer set olarak hazırlanır ve her yeni misafir için Laundrygo tarafından profesyonelce yıkanıp yüksek sıcaklıkta sterilize edilir. Tertemiz yatak takımlarında derin bir uyku deneyimi yaşayın.",
-      "closing": "Sizi gerçekten dinlenmek için en konforlu yer olan \"Issız Ada\"ma davet etmek için sabırsızlanıyorum.",
-      "hostName": "👋 Ben Arjantinli Tango Dansçısı Stone.",
-      "hostBio": "İşletme ve Yapay Zeka alanlarında eğitim aldım ve muhtemelen her gün kullandığınız birçok ünlü uygulamanın baş planlamacısı olarak çalıştım.\n\nSon zamanlarda, tango eğitmeni ve araştırmacı olarak hayatımın geri kalanını adamak için kurumsal hayatı bıraktım."
+      "title": "Tango Stay Hikayesi",
+      "subtitle": "\"Sadece Gelin\" - [Issız Ada Deneyi]",
+      "p1": "Bu alanı hazırlarken tek hedeflerimden biri \"Issız Ada Deneyi\" idi. Sadece bir valizle gelseniz bile dışarı adım atmadan bir haftadan fazla konforlu yaşayabileceğiniz bir alan. Misafir olarak yaşadığım \"sayısız zorluğu\" çözmek için tasarlandı.",
+      "sol1Title": "Stay Pack: Sıfır Rahatsızlık",
+      "sol1Text": "Başkalarının kullandığı havlu veya sabunlara son. Her misafir için otel kalitesinde yeni havlu, sabun ve diş fırçası.",
+      "sol2Title": "Su Almaya Son!",
+      "sol2Text": "Ağır su şişeleri taşımaya son. En kaliteli su arıtma cihazı kurulu.",
+      "sol3Title": "Kusursuz Temizlik (Laundrygo)",
+      "sol3Text": "Tüm nevresimler profesyonel şirket (Laundrygo) tarafından her seferinde sterilize edilip kurutulur.",
+      "closing": "Kendi özel \"ıssız adanızda\" gerçek dinlenmeyi yaşamanızı bekleriz.",
+      "hostName": "👋 Ben Arjantin Tangosu yapan adam, Stone.",
+      "hostBio": ""
     },
     "footer": {
-      "term": "Kullanım Koşulları",
-      "privacy": "Gizlilik Politikası",
-      "termTitle": "[Kullanım Koşulları]",
-      "privacyTitle": "[Gizlilik Politikası]",
-      "termText": "Madde 1 (Amaç)\nBu koşulların amacı, TangoStay tarafından sağlanan konaklama hizmetlerine ilişkin ev sahibi ve misafir arasındaki hak, yükümlülük ve sorumlulukları belirlemektir.\n\nMadde 2 (Hizmet Sunumu)\n1. TangoStay, misafire belirtilen konaklama alanını ve tüm yan tesisleri (ücretsiz sarf malzemeleri dahil) sağlar.\n2. Ev sahibi, konaklama yeri içindeki mülke verilen her türlü zarar için misafirden gerçek zarar tazminatı talep edebilir.\n\nMadde 3 (Misafirin Yükümlülükleri)\n1. Misafirlerin konaklama yerinde sigara içmesi veya başkalarını rahatsız edebilecek yüksek ses çıkarması (22:00'den sonra) yasaktır.\n2. İhlaller, zorunlu tahliyeye ve özel temizlik ücretine neden olabilir.",
-      "privacyText": "1. Toplanan Kişisel Bilgiler\nTangoStay, sorunsuz rezervasyon ve iletişim için aşağıdaki kişisel bilgileri toplar.\n- Toplanan kalemler: İsim, İletişim numarası, Rezervasyon zamanı\n\n2. Toplama ve Kullanım Amacı\n- Bina ve oda kapı kilit şifreleri için rehberlik\n- Ödeme ve rezervasyon onayı, konaklama kalite yönetimi için müşteri yanıtı\n\n3. Saklama Süresi\n- Prensip olarak, bilgiler amaç gerçekleştikten sonra (çıkıştan 1 ay sonra) derhal imha edilir."
+      "term": "Şartlar",
+      "privacy": "Gizlilik",
+      "termTitle": "Kullanım Şartları",
+      "privacyTitle": "Gizlilik Politikası",
+      "termText": "Article 1 (Purpose)...",
+      "privacyText": "TangoStay values your personal information..."
     }
   },
-  "startTime": "Start Time",
-  "endTime": "End Time",
+  "startTime": "Başlangıç",
+  "endTime": "Bitiş",
   "media": {
-    "title": "Media",
-    "edit": "Edit Media",
+    "title": "Medya",
+    "edit": "Videoyu Düzenle",
     "type": {
       "youtube": "YouTube",
       "demonstration": "Demo",
-      "general": "General"
+      "general": "Genel"
     },
-    "filterAll": "All",
-    "addBtn": "Register",
-    "like": "Like",
-    "comment": "Comment",
-    "views": "Views",
-    "noAccess": "Demonstration video for class participants only.",
+    "filterAll": "Tüm dersler",
+    "addBtn": "Ekle",
+    "like": "Beğen",
+    "comment": "Yorum",
+    "views": "İzlenme",
+    "noAccess": "Sadece kayıtlı olanlar görebilir",
     "placeholder": {
-      "title": "Enter title",
-      "url": "YouTube ID or Video URL",
-      "desc": "Enter description",
-      "class": "Select Class (Optional)",
-      "comment": "Leave a comment..."
+      "title": "Başlık",
+      "url": "YouTube ID veya URL",
+      "desc": "Açıklama",
+      "class": "İlişkili ders (isteğe bağlı)",
+      "comment": "Yorum yapın..."
     },
-    "uploading": "Uploading...",
-    "deleteConfirm": "Delete this?",
-    "saveSuccess": "Saved.",
-    "deleteSuccess": "Deleted."
+    "uploading": "Yükleniyor...",
+    "deleteConfirm": "Silmek istiyor musunuz?",
+    "saveSuccess": "Kaydedildi.",
+    "deleteSuccess": "Silindi."
   },
   "story": {
     "campaign": {
-      "title": "Core Campaign",
+      "title": "Katılım",
       "slogan": "Happy Space, Warm People",
-      "sloganKo": "Happy Space, Warm People"
+      "sloganKo": "Mutlu Alan, Sıcak İnsanlar"
     },
     "hero": {
-      "title": "The Playground We Dream of,\nA Sanctuary for All",
-      "subtitle": "A Freestyle Tango community where we grow together with respect"
+      "title": "Hayalimizdeki Oyun Alanı,\nHepimizin Sığınağı",
+      "subtitle": "Karşılıklı saygı ve büyüme odaklı Freestyle Tango topluluğu"
     },
     "ethics": {
-      "title": "Community Core Values",
-      "respectTitle": "Attitude First (Respect)",
-      "respectDesc": "The premise that we must respect each other is too clear. Otherwise, club activities may be restricted.",
-      "teachingTitle": "No Teaching",
-      "teachingDesc": "One-sided teaching among students can hinder the progress of both yourself and others. We welcome exchange of opinions, but please resolve technical issues through the instructors.",
+      "title": "Temel Değerler",
+      "respectTitle": "Önce Tutum (Respect)",
+      "respectDesc": "Birbirimize saygı sarsılmaz bir kuraldır.",
+      "teachingTitle": "Özel Ders Yasağı (No Teaching)",
+      "teachingDesc": "Öğrenciler arası tek taraflı öğretim yasaktır. Lütfen eğitmenlere danışın.",
       "teachingDetail": "It is important to accurately understand the teacher's intentions. Regardless of experience, please refrain from one-sided teaching."
     },
     "projects": {
-      "title": "Strategic Projects",
+      "title": "Stratejik Projeler",
       "azit": {
-        "title": "Project 'Azit'",
-        "desc": "Our own sanctuary where we can comfortably talk and enjoy food and drinks before and after classes."
+        "title": "Proje 'Azit'",
+        "desc": "Ders sonrası gıda ve şarap eşliğinde sohbet alanı."
       },
       "camp": {
-        "title": "Project 'Camp'",
-        "desc": "A pension space that can be a sanctuary for us outside the city on weekends and holidays."
+        "title": "Proje 'Camp'",
+        "desc": "Hafta sonu doğada dinlenme kaçamakları."
       },
       "nuevo": {
-        "title": "Project Professional Performance Team 'Nuevo Company'",
-        "desc": "Operation of a professional performance team and activation of yoga rooms and cultural centers for wellness."
+        "title": "Proje 'Nuevo Company'",
+        "desc": "Profesyonel şov grubu & Well-life aktiviteleri."
       },
       "orchestra": {
-        "title": "Project 'House Ochestra'",
-        "desc": "Freestyle's own house orchestra for salon recitals and live milongas."
+        "title": "Proje 'House Orchestra'",
+        "desc": "Canlı milongalar için oda orkestrası."
       }
     },
     "roadmap": {
-      "title": "Sustainable Future",
+      "title": "Sürdürülebilir Gelecek",
       "cooperative": {
-        "title": "Cooperative Transition",
-        "desc": "A system where members share ownership of the club and jointly operate and make decisions."
+        "title": "Kooperatife Dönüşüm",
+        "desc": "Üyelerin ortak sahipliği ve yönetimi."
       },
       "donation": {
-        "title": "Establishing a Donation Culture",
-        "desc": "A culture that supports new members and helps the club grow through scholarships and volunteering."
+        "title": "Bağış Kültürü",
+        "desc": "Yeni üyeler için burs sistemi."
       },
       "instructor": {
-        "title": "Internal Instructor Training",
-        "desc": "A system to nurture the next generation of leaders from within our community."
+        "title": "İç Eğitmen Yetiştirme",
+        "desc": "Üyelerin uzmanlaşıp ders açabileceği sistem."
       }
     },
     "guidelines": {
-      "title": "General Guide",
-      "cleaning": "Wipe up spills immediately.",
-      "shoes": "Only dedicated shoes or bare feet are allowed inside.",
-      "toilet": "Only toilet paper in the toilet (No hand towels, wet wipes).",
-      "trash": "Sort trash and dispose of it in bins when leaving.",
-      "power": "Use the main switch next to the door when entering/leaving.",
+      "title": "Genel Rehber",
+      "cleaning": "Dökülen içecekleri hemen silin.",
+      "shoes": "Sadece dans ayakkabısı veya çıplak ayak.",
+      "toilet": "Sadece tuvalet kağıdı (ıslak mendil yasak).",
+      "trash": "Çıkarken çöpleri ayırın.",
+      "power": "Giriş/Çıkışta ana şalteri kullanın.",
       "facilities": {
         "wifi": "WiFi: freestyle1234",
-        "pc": "PC PW: 7788",
-        "lockers": "Items cannot be stored outside personal lockers."
+        "pc": "PC: 7788",
+        "lockers": "Dolap dışına eşya bırakmayın."
       }
     }
   },
   "coaching": {
-    "title": "Coaching Management",
-    "newCoaching": "New Coaching",
-    "empty": "No coaching items found.",
-    "student": "Student",
-    "instructor": "Instructor",
-    "progress": "Progress",
-    "status": "Status",
-    "ongoing": "Ongoing",
-    "solved": "Solved",
-    "solvedBadge": "Solved",
-    "itemTitle": "Title",
-    "itemDesc": "Description",
-    "selectStudent": "Select Student",
-    "searchStudentPlaceholder": "Search name or phone...",
-    "searchSearching": "Searching...",
-    "searchNoResults": "No results found.",
-    "creating": "Creating...",
-    "updates": "Activity Logs",
-    "activityAdd": "Add Activity",
-    "addComment": "Add a comment...",
-    "uploadMedia": "Add Photo/Video",
-    "updateProgress": "Update Progress",
-    "saveUpdate": "Save Log",
-    "noUpdates": "No logs yet.",
-    "confirmStatusChange": "Durumu değiştir?",
-    "reopen": "Reopen",
-    "errorSave": "Error saving update."
+    "title": "Koçluk Yönetimi",
+    "newCoaching": "Yeni Koçluk Maddesi",
+    "empty": "Kayıtlı koçluk yok.",
+    "student": "Öğrenci",
+    "instructor": "Eğitmen",
+    "progress": "İlerleme",
+    "status": "Durum",
+    "ongoing": "Devam Ediyor",
+    "solved": "Çözüldü",
+    "solvedBadge": "Çözüldü",
+    "itemTitle": "Başlık",
+    "itemDesc": "Açıklama",
+    "selectStudent": "Öğrenci Seç",
+    "searchStudentPlaceholder": "İsim veya tel.",
+    "searchSearching": "Aranıyor...",
+    "searchNoResults": "Sonuç bulunamadı.",
+    "creating": "Kaydediliyor...",
+    "updates": "Aktivite Kaydı",
+    "activityAdd": "Aktivite ekle",
+    "comment": "Comment",
+    "placeholderComment": "Write a comment...",
+    "media": "Media",
+    "addComment": "Yorum yaz...",
+    "uploadMedia": "Medya ekle",
+    "updateProgress": "İlerlemeyi güncelle",
+    "saveUpdate": "Kaydı sakla",
+    "noUpdates": "Kayıt yok.",
+    "confirmStatusChange": "Durumu değiştirmek istiyor musunuz?",
+    "reopen": "Yeniden aç",
+    "editActivity": "Edit Activity",
+    "deleteActivity": "Delete Activity",
+    "confirmDelete": "Are you sure you want to delete this?",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "errorSave": "Kaydederken hata oluştu."
   }
 };

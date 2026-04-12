@@ -6,12 +6,9 @@ const nextConfig: NextConfig = {
     return [
       { source: '/c', destination: '/' },
       { source: '/s', destination: '/' },
-      { source: '/stay', destination: '/' },
       { source: '/membership', destination: '/' },
       { source: '/status', destination: '/' },
-      { source: '/lucy', destination: '/' },
       { source: '/admin_status', destination: '/' },
-      { source: '/chat', destination: '/' },
     ];
   },
 };

@@ -2,7 +2,7 @@
 
 import React, { memo } from 'react';
 import styles from './Media.module.css';
-import { MediaItem, TangoClass } from '@/lib/db';
+import { MediaItem, TangoClass, remapStorageUrl } from '@/lib/db';
 import { formatRelativeTime } from '@/lib/utils';
 import { Language } from '@/locales';
 
@@ -17,6 +17,41 @@ interface MediaListProps {
   onDelete?: (item: MediaItem, e: React.MouseEvent) => void;
   language?: Language;
 }
+
+const VideoThumbnail = memo(({ src, title }: { src: string; title?: string }) => {
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+  const [isVisible, setIsVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (videoRef.current) {
+      observer.observe(videoRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <video
+      ref={videoRef}
+      src={isVisible ? `${src}#t=0.5` : undefined}
+      className={styles.thumbnail}
+      muted
+      playsInline
+      preload="metadata"
+      style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+    />
+  );
+});
 
 const MediaList: React.FC<MediaListProps> = ({ 
   media, 
@@ -95,61 +130,73 @@ const MediaList: React.FC<MediaListProps> = ({
               // 1. YouTube
               if (item.type === 'youtube') {
                 return (
-                  <img 
-                    src={getYTThumbnail(item.videoUrl)} 
-                    alt={item.title} 
-                    className={styles.thumbnail}
-                    loading="lazy"
-                    decoding="async"
-                  />
+                  <>
+                    <img 
+                      src={getYTThumbnail(item.videoUrl)} 
+                      alt={item.title} 
+                      className={styles.thumbnail}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <div className={styles.videoPlayOverlay}>
+                      <div className={styles.playIcon}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                      </div>
+                    </div>
+                  </>
                 );
               }
 
-              // 2. Explicit Thumbnail or Image type fallback (using videoUrl)
-              // Ignore legacy placeholder strings
-              const hasActualThumbnail = item.thumbnailUrl && 
-                                        !item.thumbnailUrl.includes('/api/placeholder/') && 
-                                        !item.thumbnailUrl.includes('placehold.co');
+              // 2. Resource Detection
+              const finalThumbnail = item.thumbnailUrl ? remapStorageUrl(item.thumbnailUrl) : null;
+              const finalVideoUrl = remapStorageUrl(item.videoUrl);
+              const isVideoExt = /\.(mp4|mov|webm|quicktime|m4v)/i.test(item.videoUrl || '');
+              const isImageExt = /\.(jpg|jpeg|png|webp|gif|avif)/i.test(item.videoUrl || '');
+              
+              const hasActualThumbnail = finalThumbnail && 
+                                        !finalThumbnail.includes('/api/placeholder/') && 
+                                        !finalThumbnail.includes('placehold.co');
                                         
-              const imageSrc = hasActualThumbnail ? item.thumbnailUrl : (item.type === 'image' ? item.videoUrl : null);
-              if (imageSrc) {
-                return (
-                  <img 
-                    src={imageSrc} 
-                    alt={item.title} 
-                    className={styles.thumbnail}
-                    loading="lazy"
-                    decoding="async"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      if (target.src !== placeholderUrl) {
-                        target.src = placeholderUrl;
-                      }
-                    }}
-                  />
-                );
+              // Only show play icon for actual videos
+              const isVideo = item.type === 'video' || item.type === 'demonstration' || (item.type === 'lucy' && isVideoExt) || (item.type === 'general' && isVideoExt);
+              
+              // Determine if we have a static image source
+              let imageSrc = null;
+              if (hasActualThumbnail) {
+                imageSrc = finalThumbnail;
+              } else if (isImageExt) {
+                imageSrc = finalVideoUrl;
               }
 
-              // 3. Video Frame Extraction (including 'general' type)
-              if (item.type === 'video' || item.type === 'demonstration' || item.type === 'general') {
-                return (
-                  <video 
-                    src={`${item.videoUrl}#t=0.5`} 
-                    className={styles.thumbnail} 
-                    preload="metadata" 
-                    muted 
-                    playsInline 
-                  />
-                );
-              }
-
-              // 4. Final Placeholder
               return (
-                <img 
-                  src={placeholderUrl} 
-                  alt={item.title} 
-                  className={styles.thumbnail} 
-                />
+                <>
+                  {imageSrc ? (
+                    <img 
+                      src={imageSrc} 
+                      alt={item.title} 
+                      className={styles.thumbnail}
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        if (target.src !== placeholderUrl) {
+                          target.src = placeholderUrl;
+                        }
+                      }}
+                    />
+                  ) : isVideo ? (
+                    <VideoThumbnail src={finalVideoUrl} title={item.title} />
+                  ) : (
+                    <img src={placeholderUrl} alt="No Image" className={styles.thumbnail} />
+                  )}
+                  {isVideo && (
+                    <div className={styles.videoPlayOverlay}>
+                      <div className={styles.playIcon}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                      </div>
+                    </div>
+                  )}
+                </>
               );
             })()}
             {t.media?.type?.[item.type] && (

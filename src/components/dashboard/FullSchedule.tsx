@@ -37,17 +37,19 @@ export default function FullSchedule({ isAdmin, requireIdentity }: FullScheduleP
   const fetchData = async (date: Date) => {
     setIsLoading(true);
     const monthStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    console.log(`[FullSchedule] Fetching data for: ${monthStr}`);
     try {
       const [clsData, milData, extData] = await Promise.all([
         getClassesByMonth(monthStr),
         getAllMilongas(monthStr),
         getExtraSchedules(monthStr)
       ]);
+      console.log(`[FullSchedule] Results for ${monthStr}: Classes=${clsData.length}, Milongas=${milData.length}, Extras=${extData.length}`);
       setClasses(clsData);
       setMilongas(milData);
       setExtras(extData);
     } catch (err) {
-      console.error('Error fetching schedule data:', err);
+      console.error('[FullSchedule] Error fetching schedule data:', err);
     } finally {
       setIsLoading(false);
     }

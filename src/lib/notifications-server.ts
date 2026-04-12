@@ -40,7 +40,7 @@ export async function sendNotification({
         .filter((data: any) => data.token && (!data.userId || !optOutPhones.has(data.userId)))
         .map((data: any) => data.token);
     } else {
-      const cleanPhones = targetPhones.map((p: string) => p.replace(/[^0-9]/g, ''));
+      const cleanPhones = targetPhones.map((p: string) => (p || '').replace(/[^0-9]/g, ''));
       const activePhones = cleanPhones.filter((p: string) => !optOutPhones.has(p));
       
       if (activePhones.length > 0) {

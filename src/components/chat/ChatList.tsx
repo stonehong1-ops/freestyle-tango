@@ -79,26 +79,7 @@ const SplitAvatar = ({ photos, names, type }: { photos: string[], names: string[
   );
 };
 
-const ChatHeader = ({ searchTerm, setSearchTerm, onSearch }: {
-  searchTerm: string;
-  setSearchTerm: (value: string) => void;
-  onSearch: () => void;
-}) => {
-  const { language } = useLanguage();
-  return (
-    <div className={styles.searchContainer}>
-      <h1 className={styles.title} style={{ margin: '0 0 16px 0', fontSize: '1.6rem', fontWeight: 800 }}>
-        {language === 'ko' ? '채팅' : 'Chats'}
-      </h1>
-      <div className={styles.searchBarWrapper} onClick={onSearch}>
-        <span className={styles.searchIcon}>🔍</span>
-        <div style={{ flex: 1, color: '#8b95a1', fontSize: '0.95rem' }}>
-          {language === 'ko' ? '대화 상대 검색...' : 'Search people...'}
-        </div>
-      </div>
-    </div>
-  );
-};
+
 
 export default function ChatList({ userPhone, isAdmin, onSelectRoom, selectedRoomId }: ChatListProps) {
   const { language } = useLanguage();
@@ -217,11 +198,7 @@ export default function ChatList({ userPhone, isAdmin, onSelectRoom, selectedRoo
 
   return (
     <div className={styles.container}>
-      <ChatHeader 
-        searchTerm={searchTerm} 
-        setSearchTerm={setSearchTerm} 
-        onSearch={() => setIsSearchModalOpen(true)}
-      />
+
 
       <div className={styles.roomList}>
         {sortedRooms.map((room) => (
