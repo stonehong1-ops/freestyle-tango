@@ -310,15 +310,7 @@ export default function MemberManagement({ registrations, onClose }: Props) {
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <div style={{ fontWeight: 800, color: '#191f28', fontSize: '1.1rem' }}>{user.nickname || 'Guest'}</div>
-                            {user.isInstructor && (
-                              <div style={{ 
-                                padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem', 
-                                background: '#e0f2f1', color: '#00796b', fontWeight: 800,
-                                border: '1px solid #b2dfdb'
-                              }}>
-                                {t.admin.member.instructor}
-                              </div>
-                            )}
+
                             {user.device && (
                               <div title={user.device} style={{ display: 'flex', alignItems: 'center', opacity: 0.7 }}>
                                 {user.device === 'ios' && (

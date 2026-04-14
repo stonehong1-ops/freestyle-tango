@@ -76,7 +76,21 @@ export async function sendNotification({
 
     // 4. 전송
     const response = await adminMessaging.sendEachForMulticast(messagePayload);
-    console.log(`[FCM SUMMARY] Success: ${response.successCount}, Failure: ${response.failureCount}`);
+    console.log(`[FCM SUMMARY] Target: ${targetPhones === 'all' ? 'All' : targetPhones.length}, Tokens: ${tokens.length}, Success: ${response.successCount}, Failure: ${response.failureCount}`);
+
+    // Firestore에 요약기록 (옵션)
+    if (targetPhones !== 'all') {
+      try {
+        await adminFirestore.collection('fcm_logs').add({
+          timestamp: new Date(),
+          title,
+          targetCount: targetPhones.length,
+          tokenCount: tokens.length,
+          successCount: response.successCount,
+          failureCount: response.failureCount
+        });
+      } catch (e) {}
+    }
 
     // 5. 만료된 토큰 정리 (비동기로 실행하여 응답 지연 최소화)
     if (response.failureCount > 0) {

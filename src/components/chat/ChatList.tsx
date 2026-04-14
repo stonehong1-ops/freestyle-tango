@@ -18,6 +18,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Language } from '@/locales';
 import { formatRelativeTime } from '@/lib/utils';
+import { hasRole } from '@/utils/auth';
 import useLongPress from '@/hooks/useLongPress';
 import FullscreenModal from '@/components/common/FullscreenModal';
 import styles from './ChatList.module.css';
@@ -302,7 +303,23 @@ export default function ChatList({ userPhone, isAdmin, onSelectRoom, selectedRoo
                 </div>
 
                 <div className={styles.searchInfo}>
-                  <span className={styles.searchNickname}>{user.nickname}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span className={styles.searchNickname}>{user.nickname}</span>
+                    {hasRole(user, 'instructor') && (
+                      <span style={{ 
+                        padding: '1px 6px', borderRadius: '4px', fontSize: '0.6rem', 
+                        background: '#e0f2f1', color: '#00796b', fontWeight: 800,
+                        border: '1px solid #b2dfdb'
+                      }}>INSTRUCTOR</span>
+                    )}
+                    {hasRole(user, 'staff') && (
+                      <span style={{ 
+                        padding: '1px 6px', borderRadius: '4px', fontSize: '0.6rem', 
+                        background: '#e8f3ff', color: '#3182f6', fontWeight: 800,
+                        border: '1px solid #cce5ff'
+                      }}>STAFF</span>
+                    )}
+                  </div>
                   <div className={styles.searchMeta}>
                     <span className={styles.searchRole}>
                       {user.role === 'leader' ? '리더' : (user.role === 'follower' ? '팔로어' : user.role || '회원')}

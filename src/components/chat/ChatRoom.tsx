@@ -648,7 +648,7 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
           </div>
 
           <div className={styles.headerActions}>
-            {participants && participants.length === 2 && participants.find(p => p !== cleanUserPhone) && (
+            {participants && (participants?.length || 0) === 2 && participants.find(p => p !== cleanUserPhone) && (
               <a 
                 href={`tel:${participants.find(p => p !== cleanUserPhone)}`} 
                 className={styles.actionBtn}
@@ -658,7 +658,7 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
                 </svg>
               </a>
             )}
-            {(!participants || participants.length > 2) && (
+            {(!participants || (participants?.length || 0) > 2) && (
               <button className={styles.actionBtn} onClick={handleOpenMembers}>
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -701,7 +701,7 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
                 {!isOwn && (
                   <div className={styles.avatarImgWrapper}>
                     {(() => {
-                      const cleanSenderId = (msg.senderId === 'admin' || msg.senderId.length < 6) ? msg.senderId : msg.senderId.replace(/[^0-9]/g, '');
+                      const cleanSenderId = (msg.senderId === 'admin' || (msg.senderId?.length || 0) < 6) ? msg.senderId : msg.senderId.replace(/[^0-9]/g, '');
                       const info = memberInfo[cleanSenderId];
                       return info?.photoURL ? (
                         <img 
@@ -724,7 +724,7 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
                   <div className={styles.bubbleRow}>
                     <div 
                       id={`msg-${msg.id}`}
-                      className={styles.bubble} 
+                      className={`${styles.bubble} ${(msg.type === 'image' || msg.type === 'video') ? styles.mediaBubble : ''}`} 
                       onContextMenu={(e) => {
                         e.preventDefault();
                         setMenuMsgId(msg.id);
@@ -780,7 +780,7 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
                           </p>
                       )}
 
-                      {msg.reactions && Object.keys(msg.reactions).length > 0 && (
+                      {msg.reactions && Object.keys(msg.reactions || {}).length > 0 && (
                         <div className={styles.reactionPills}>
                           {Object.entries(
                             Object.values(msg.reactions).reduce((acc: any, emoji: string) => {
@@ -796,8 +796,8 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
                       )}
                     </div>
                     <div className={styles.msgStatus}>
-                      {!isPublicRoom && currentParticipants.length > 0 && (currentParticipants.length - (msg.readBy?.length || 0)) > 0 && (
-                        <span className={styles.unreadCount}>{currentParticipants.length - (msg.readBy?.length || 0)}</span>
+                      {!isPublicRoom && (currentParticipants?.length || 0) > 0 && ((currentParticipants?.length || 0) - (msg.readBy?.length || 0)) > 0 && (
+                        <span className={styles.unreadCount}>{(currentParticipants?.length || 0) - (msg.readBy?.length || 0)}</span>
                       )}
                       {showTime && <span className={styles.time}>{formatTime(msg.timestamp)}</span>}
                     </div>
@@ -964,7 +964,7 @@ export default function ChatRoom({ roomId, roomName, user, participants, isAdmin
           <div className={styles.modalInner} onClick={e => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <div className={styles.modalTitleArea}>
-                <h4>{language === 'ko' ? '대화 참여자' : 'Participants'} ({currentParticipants.length})</h4>
+                <h4>{language === 'ko' ? '대화 참여자' : 'Participants'} ({(currentParticipants?.length || 0)})</h4>
                 {!isSystemRoom && (
                   <button className={styles.inviteAddBtn} onClick={() => setIsInviting(!isInviting)}>
                     {isInviting ? (language === 'ko' ? '취소' : 'Cancel') : '+ ' + (language === 'ko' ? '초대' : 'Invite')}

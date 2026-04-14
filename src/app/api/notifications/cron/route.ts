@@ -14,24 +14,33 @@ export async function GET(req: NextRequest) {
   const isForce = searchParams.get('force') === 'true';
 
   // [임시 진단용] 요청이 들어왔음을 Firestore에 즉시 기록 시도
+  const cronHeader = req.headers.get('x-vercel-cron');
   if (adminFirestore) {
     try {
       await adminFirestore.collection('cron_logs').add({
         type: 'cron_trigger_attempt',
         timestamp: FieldValue.serverTimestamp(),
         authHeader: authHeader ? 'present' : 'missing',
+        cronHeader: cronHeader ? 'present' : 'missing',
         isForce,
         envSecret: process.env.CRON_SECRET ? 'present' : 'missing',
-        adminInit: !!adminFirestore ? 'ok' : 'failed'
+        adminInit: !!adminFirestore ? 'ok' : 'failed',
+        userAgent: req.headers.get('user-agent')
       });
     } catch (e) {
       console.error('Failed to log trigger', e);
     }
   }
 
-  // Security check: Vercel Cron Secret (force=true 파라미터로 우회 허용 - 긴급 조치용)
-  if (!isForce && process.env.NODE_ENV === 'production' && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // Security check: Vercel Cron Secret 
+  // 1. Authorization: Bearer {CRON_SECRET} (Manual/Standard)
+  // 2. X-Vercel-Cron: 1 (Vercel Internal Trigger)
+  // 3. force=true (Emergency bypass)
+  const isCronInternal = cronHeader === '1';
+  const isValidAuth = authHeader === `Bearer ${process.env.CRON_SECRET}`;
+
+  if (!isForce && process.env.NODE_ENV === 'production' && !isValidAuth && !isCronInternal) {
+    return NextResponse.json({ error: 'Unauthorized', auth: authHeader ? 'wrong' : 'missing', cron: cronHeader || 'missing' }, { status: 401 });
   }
 
   try {

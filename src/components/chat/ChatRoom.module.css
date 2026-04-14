@@ -307,6 +307,34 @@
   border-bottom-left-radius: 4px;
 }
 
+.mediaBubble {
+  background: none !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.own .bubble.mediaBubble {
+  background: none !important;
+  background-image: none !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+.other .bubble.mediaBubble {
+  background: none !important;
+  background-image: none !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+.mediaBubble .mediaMessage {
+  margin: 0 !important;
+}
+
 /* Grouping Logic */
 .consecutive {
   margin-top: -0.75rem;

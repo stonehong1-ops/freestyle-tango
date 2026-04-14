@@ -474,9 +474,9 @@ export const updateUserProfile = async (phone: string, data: Partial<User>) => {
     updateDoc(doc(db, REG_COLLECTION, docSnap.id), regData)
   );
   
-  // 2. Update in users
+  // 2. Update in users (use setDoc with merge to handle cases where user doc doesn't exist)
   const userRef = doc(db, USERS_COLLECTION, cleanPhone);
-  const userPromise = updateDoc(userRef, { ...data, lastVisit: serverTimestamp() });
+  const userPromise = setDoc(userRef, { ...data, lastVisit: serverTimestamp() }, { merge: true });
   
   return await Promise.all([...regPromises, userPromise]);
 };

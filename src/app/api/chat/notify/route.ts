@@ -7,8 +7,11 @@ import { sendNotification } from '@/lib/notifications-server';
 export async function POST(req: NextRequest) {
   try {
     const { roomId, roomName, senderName, text, targetPhones } = await req.json();
+    
+    // [진단 로그] 
+    console.log(`[CHAT NOTIFY ATTEMPT] Room: ${roomId}, Targets: ${targetPhones?.length}`);
 
-    if (!targetPhones || targetPhones.length === 0) {
+    if (!targetPhones || !Array.isArray(targetPhones) || targetPhones.length === 0) {
       return NextResponse.json({ success: true, message: '대상자 없음' });
     }
 
