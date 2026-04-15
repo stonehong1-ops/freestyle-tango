@@ -458,27 +458,39 @@ export const toggleUserPinnedRoom = async (phone: string, roomId: string, isPinn
 export const updateUserProfile = async (phone: string, data: Partial<User>) => {
   const cleanPhone = (phone || '').replace(/[^0-9]/g, '');
   
-  // 1. Update in registrations (nickname, photoURL, role - but NOT isInstructor/staffRole as they are global user roles)
-  const q = query(
-    collection(db, REG_COLLECTION), 
-    where('phone', '==', cleanPhone),
-    orderBy('date', 'desc'),
-    limit(10)
-  );
-  const snap = await withTimeout(getDocs(q));
-  const regData: any = { ...data };
-  delete regData.isInstructor; // Don't propagate isInstructor to registrations as it doesn't exist there
-  delete regData.staffRole;    // Don't propagate staffRole to registrations as it doesn't exist there
-
-  const regPromises = snap.docs.map(docSnap => 
-    updateDoc(doc(db, REG_COLLECTION, docSnap.id), regData)
-  );
-  
-  // 2. Update in users (use setDoc with merge to handle cases where user doc doesn't exist)
+  // 1. MUST update 'users' collection first (Source of truth)
   const userRef = doc(db, USERS_COLLECTION, cleanPhone);
-  const userPromise = setDoc(userRef, { ...data, lastVisit: serverTimestamp() }, { merge: true });
+  await setDoc(userRef, { ...data, lastVisit: serverTimestamp() }, { merge: true });
+
+  // 2. Update in registrations (Nickname, photoURL changes - gracefully handle failures)
+  try {
+    const regData: any = { ...data };
+    delete regData.isInstructor;
+    delete regData.staffRole;
+    delete regData.lastVisit;
+
+    if (Object.keys(regData).length > 0) {
+      const q = query(
+        collection(db, REG_COLLECTION), 
+        where('phone', '==', cleanPhone),
+        orderBy('date', 'desc'),
+        limit(15)
+      );
+      const snap = await withTimeout(getDocs(q), 5000);
+      
+      const regPromises = snap.docs.map(docSnap => 
+        updateDoc(doc(db, REG_COLLECTION, docSnap.id), regData).catch(err => {
+          console.warn(`Failed to update registration ${docSnap.id}:`, err);
+          return null;
+        })
+      );
+      await Promise.all(regPromises);
+    }
+  } catch (err) {
+    console.error("Non-critical registration update failed:", err);
+  }
   
-  return await Promise.all([...regPromises, userPromise]);
+  return { success: true };
 };
 
 

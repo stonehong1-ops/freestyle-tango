@@ -307,8 +307,6 @@ export default function ChatList({ userPhone, isAdmin, onSelectRoom, selectedRoo
                     <span className={styles.searchNickname}>{user.nickname}</span>
                     {hasRole(user, 'instructor') && (
                       <span style={{ 
-                        padding: '1px 6px', borderRadius: '4px', fontSize: '0.6rem', 
-                        background: '#e0f2f1', color: '#00796b', fontWeight: 800,
                         border: '1px solid #b2dfdb'
                       }}>INSTRUCTOR</span>
                     )}
@@ -321,9 +319,21 @@ export default function ChatList({ userPhone, isAdmin, onSelectRoom, selectedRoo
                     )}
                   </div>
                   <div className={styles.searchMeta}>
-                    <span className={styles.searchRole}>
-                      {user.role === 'leader' ? '리더' : (user.role === 'follower' ? '팔로어' : user.role || '회원')}
-                    </span>
+                    <div className={styles.searchUserLabels}>
+                      {hasRole(user, 'instructor') ? (
+                        <span className="px-1.5 py-0.5 bg-orange-100 text-orange-700 text-[10px] font-bold rounded ring-1 ring-inset ring-orange-200">
+                          INSTRUCTOR
+                        </span>
+                      ) : hasRole(user, 'staff') ? (
+                        <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded ring-1 ring-inset ring-blue-200">
+                          STAFF
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-medium text-gray-400">
+                          {user.role === 'leader' ? 'LEADER' : (user.role === 'follower' ? 'FOLLOWER' : '')}
+                        </span>
+                      )}
+                    </div>
                     <span className={styles.maskedPhone}>{maskPhoneNumber(user.phone)}</span>
                   </div>
                 </div>

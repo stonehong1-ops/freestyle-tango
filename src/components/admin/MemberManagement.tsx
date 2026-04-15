@@ -359,15 +359,21 @@ export default function MemberManagement({ registrations, onClose }: Props) {
                           </div>
                         </div>
                       </div>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px' }}>
+                      <div className="flex gap-1 mt-1">
                         {hasRole(user, 'admin') && (
-                          <span style={{ padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem', background: '#fee500', color: '#191f28', fontWeight: 800 }}>ADMIN</span>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-700 ring-1 ring-inset ring-purple-200">
+                            ADMIN
+                          </span>
                         )}
                         {hasRole(user, 'staff') && (
-                          <span style={{ padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem', background: '#3182f6', color: 'white', fontWeight: 800 }}>STAFF</span>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 ring-1 ring-inset ring-blue-200">
+                            STAFF
+                          </span>
                         )}
                         {hasRole(user, 'instructor') && (
-                          <span style={{ padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem', background: '#00c73c', color: 'white', fontWeight: 800 }}>INSTRUCTOR</span>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-100 text-orange-700 ring-1 ring-inset ring-orange-200">
+                            INSTRUCTOR
+                          </span>
                         )}
                       </div>
                     </div>
@@ -404,18 +410,25 @@ export default function MemberManagement({ registrations, onClose }: Props) {
                         value={Array.isArray(user.staffRole) ? user.staffRole[0] : (user.staffRole?.includes(',') ? user.staffRole.split(',')[0].trim() : (user.staffRole || 'none'))}
                         onChange={async (e) => {
                           const newRole = e.target.value as any;
+                          const loadingAlert = alert("변경 중..."); // Simple visual indicator
                           try {
                             const { updateUserProfile } = await import('@/lib/db');
-                            await updateUserProfile(user.phone, { 
+                            const result = await updateUserProfile(user.phone, { 
                               staffRole: newRole,
                               isInstructor: newRole === 'instructor' || newRole === 'admin'
                             });
-                            setUsers(prev => prev.map(u => 
-                              u.phone === user.phone ? { ...u, staffRole: newRole, isInstructor: newRole === 'instructor' || newRole === 'admin' } : u
-                            ));
+                            
+                            if (result.success) {
+                              setUsers(prev => prev.map(u => 
+                                u.phone === user.phone ? { ...u, staffRole: newRole, isInstructor: newRole === 'instructor' || newRole === 'admin' } : u
+                              ));
+                              alert(`역할이 성공적으로 변경되었습니다: ${newRole.toUpperCase()}`);
+                            } else {
+                              throw new Error("Update failed at database level");
+                            }
                           } catch (error) {
-                            console.error("Update Role Error:", error);
-                            alert("역할 변경 중 오류가 발생했습니다.");
+                            console.error("Critical Update Role Error:", error);
+                            alert("역할 변경 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
                           }
                         }}
                         style={{ 

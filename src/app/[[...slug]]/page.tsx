@@ -96,7 +96,7 @@ export default function Home({
     setAppliedClassIds
   } = projectData;
 
-  const userPhone = currentUser?.phone?.replace(/[^0-9]/g, '') || '';
+  const userPhone = currentUser?.phone ? (typeof currentUser.phone === 'string' ? currentUser.phone.replace(/[^0-9]/g, '') : '') : '';
   const userRegistrations = registrations.filter(r => r.phone === userPhone);
 
   // UI States
@@ -218,6 +218,8 @@ const [showLucyEditor, setShowLucyEditor] = useState(false);
 
   useEffect(() => {
     const user = SafeStorage.getJson<any>('ft_user');
+    // Build ID: 20260414_0248
+    const formattedPhone = currentUser?.phone?.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3') || '';
     const cleanPhone = user ? user.phone?.replace(/[^0-9]/g, '') : null;
 
     const unsubscribe = cleanPhone ? subscribeRooms(cleanPhone, isAdminLogged, user?.settings?.pinnedRooms || [], (rooms) => {

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { auth } from '@/lib/firebase';
 import { TangoClass, Registration, getUserByPhone, updateUserSettings, remapStorageUrl } from '@/lib/db';
 import AdminChecklist from '../admin/AdminChecklist';
 import MemberManagement from '../admin/MemberManagement';
@@ -215,11 +216,14 @@ export default function UserMyPage({
 
   const monthName = selectedMonth ? selectedMonth.split('-')[1] : '04';
 
-  const handleLogout = () => {
-    if (window.confirm(language === 'ko' ? '로그아웃 하시겠습니까?' : 'Are you sure you want to logout?')) {
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
       localStorage.removeItem('ft_user');
       setIdentity(null);
       onHome();
+    } catch (error) {
+      console.error('Logout error:', error);
     }
   };
 
@@ -645,7 +649,7 @@ export default function UserMyPage({
                     <h2 className={styles.userNickname}>{identity.nickname}</h2>
                     <div style={{ display: 'flex', gap: '4px' }}>
                       <div className={styles.userRoleBadge}>
-                        {identity.role === 'leader' ? (language === 'ko' ? '리더' : 'Leader') : (language === 'ko' ? '팔로어' : 'Follower')}
+                        {identity.role === 'leader' ? 'LEADER' : 'FOLLOWER'}
                       </div>
                       {identity.isInstructor && (
                         <div className={styles.instructorBadge} style={{ background: '#0070f3', color: 'white', fontSize: '10px', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>
